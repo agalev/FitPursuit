@@ -4,35 +4,12 @@ from datetime import datetime
 
 with app.app_context():
     print('Deleting all tables...')
-    users = User.query.all()
-    for user in users:
-        db.session.delete(user)
-    db.session.commit()
-
-    teams = Team.query.all()
-    for team in teams:
-        db.session.delete(team)
-    db.session.commit()
-
-    activities = Activity.query.all()
-    for activity in activities:
-        db.session.delete(activity)
-    db.session.commit()
-
-    messages = Message.query.all()
-    for message in messages:
-        db.session.delete(message)
-    db.session.commit()
-
-    competitions = Competition.query.all()
-    for competition in competitions:
-        db.session.delete(competition)
-    db.session.commit()
-
-    competition_handlers = CompetitionHandler.query.all()
-    for competition_handler in competition_handlers:
-        db.session.delete(competition_handler)
-    db.session.commit()
+    User.query.delete()
+    Team.query.delete()
+    Activity.query.delete()
+    Message.query.delete()
+    Competition.query.delete()
+    CompetitionHandler.query.delete()
 
     # Create users
     print('Creating users...')
@@ -177,6 +154,7 @@ with app.app_context():
     message1 = Message(
         sender_id=1,
         receiver_id=2,
+        invitation=True,
         content='Hello, world!'
     )
     message2 = Message(

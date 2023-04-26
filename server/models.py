@@ -8,10 +8,10 @@ from config import bcrypt, db
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
-    serialize_rules = ('-password_hash', '-messages', '-activities', '-competitions')
+    serialize_rules = ('-_password_hash',)
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
     image = db.Column(db.String)
     first_name = db.Column(db.String, nullable=False)
@@ -27,11 +27,12 @@ class User(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    # rooms = db.relationship('RoomUser', backref='user', cascade='all, delete, delete-orphan')
-    activities = db.relationship('Activity', backref='user', cascade='all, delete, delete-orphan')
-    sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', cascade='all, delete, delete-orphan', overlaps='received_messages')
-    received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', cascade='all, delete, delete-orphan', overlaps='sent_messages')
-    competitions = db.relationship('Competition', backref='user', cascade='all, delete, delete-orphan')
+    # activities = db.relationship('Activity', backref='user', cascade='all, delete, delete-orphan')
+    # sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', cascade='all, delete, delete-orphan', overlaps='received_messages')
+    # received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', cascade='all, delete, delete-orphan', overlaps='sent_messages')
+    # sent_messages = db.relationship('Message', backref='sender', foreign_keys='Message.sender_id', cascade='all, delete, delete-orphan')
+    # received_messages = db.relationship('Message', backref='receiver', foreign_keys='Message.receiver_id', cascade='all, delete, delete-orphan')
+    # competitions = db.relationship('Competition', backref='user', cascade='all, delete, delete-orphan')
 
     @hybrid_property
     def password_hash(self):
@@ -55,15 +56,17 @@ class User(db.Model, SerializerMixin):
         return bcrypt.check_password_hash(
             self._password_hash, password.encode('utf-8'))
     
-    # @validates('email')
-    # def validate_email(self, key, email):
-    #     existing_user = User.query.filter(User.email == email).first()
-    #     if existing_user and existing_user.id != self.id:
-    #         raise ValueError('Email address already registered')
-    #     return email
+    @validates('email')
+    def validate_email(self, key, email):
+        existing_user = User.query.filter(User.email == email).first()
+        if existing_user and existing_user.id != self.id:
+            raise ValueError('Email address already registered')
+        return email
     
 class Activity(db.Model, SerializerMixin):
     __tablename__ = 'activities'
+
+    serialize_rules = ('-user',)
 
     id = db.Column(db.Integer, primary_key=True)
     strava_id = db.Column(db.Integer)
@@ -88,13 +91,18 @@ class Activity(db.Model, SerializerMixin):
     pr_count = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
+    user = db.relationship('User', backref='activities')
+
 class Team(db.Model, SerializerMixin):
     __tablename__ = 'teams'
 
+    serialize_rules = ('-leader',)
+
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
+    name = db.Column(db.String, nullable=False, unique=True)
+    image = db.Column(db.String)
     leader_id = db.Column(db.Integer, db.ForeignKey('users.id'))
-    members = db.Column(db.Integer, default=0)
+    members = db.Column(db.Integer, default=1)
     score = db.Column(db.Integer, default=0)
     wins = db.Column(db.Integer, default=0)
     type = db.Column(db.String)
@@ -107,7 +115,6 @@ class Team(db.Model, SerializerMixin):
 
     leader = db.relationship('User', backref='team', foreign_keys=[leader_id])
     messages = db.relationship('Message', backref='team', cascade='all, delete, delete-orphan')
-    # competitions = db.relationship('Competition', backref='team', cascade='all, delete, delete-orphan')
 
     @validates('topic')
     def validate_topic(self, key, topic):
@@ -117,6 +124,8 @@ class Team(db.Model, SerializerMixin):
     
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
+
+    serialize_rules = ('-team.messages', '-sender.sent_messages', '-receiver.received_messages')
 
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -128,11 +137,8 @@ class Message(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    sender = db.relationship('User', foreign_keys=[sender_id], back_populates='sent_messages')
-    receiver = db.relationship('User', foreign_keys=[receiver_id], back_populates='received_messages')
-
-
-
+    # send_by = db.relationship('User', foreign_keys=[sender_id], back_populates='sent_messages')
+    # received_by = db.relationship('User', foreign_keys=[receiver_id], back_populates='received_messages')
 
 class Competition(db.Model, SerializerMixin):
     __tablename__ = 'competitions'
