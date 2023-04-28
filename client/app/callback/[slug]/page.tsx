@@ -1,17 +1,12 @@
 'use client'
 import { useEffect } from 'react'
-import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 export default function Callback() {
+	const router = useRouter()
 	const query = useSearchParams()
 	const auth_code_regex = /(?<=code=).*.?(?=&scope)/
 	const auth_code = query.toString().match(auth_code_regex)
-	// const scope_regex = /(?<=scope=).*/
-	// const scope = query.toString().match(scope_regex)
-	let auth_tokens = {}
-	let activities = []
-	let page = 1
 
 	useEffect(() => {
 		fetch(
@@ -21,43 +16,22 @@ export default function Callback() {
 			}
 		)
 			.then((res) => res.json())
-			// .then((data) => console.log(data))
-			.then(
-				(data) =>
-					(auth_tokens = {
-						access_token: data.access_token,
-						refresh_token: data.refresh_token
-					})
-			)
-	}, [])
-
-	const getActivities = () => {
-		fetch(
-			`https://www.strava.com/api/v3/athlete/activities?per_page=200&page=${page}`,
-			{
-				method: 'GET',
-				headers: {
-					Authorization: `Bearer ${auth_tokens.access_token}`
-				}
-			}
-		)
-			.then((res) => res.json())
 			.then((data) => {
-				data.forEach((activity) => {
-					activities.push(activity)
-				})
-				if (data.length === 200) {
-					page++
-					getActivities()
+				try {
+					console.log(data)
+					fetch('/api/strava_auth', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(data)
+					})
+				} catch (err) {
+					console.log(err)
 				}
 			})
-			.finally(() => console.log(activities))
-	}
-
-	return (
-		<main>
-			<h1>FitPursuit</h1>
-			<button onClick={getActivities}>Get Activities</button>
-		</main>
-	)
+			.finally(() => {
+				router.push('/')
+			})
+	}, [])
 }

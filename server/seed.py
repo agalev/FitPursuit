@@ -15,7 +15,6 @@ with app.app_context():
     print('Creating users...')
     user1 = User(
         email='test@test.com',
-        _password_hash='Password1',
         # image='https://i.imgur.com/2FZL0fg.png',
         first_name='John',
         last_name='Doe',
@@ -28,6 +27,7 @@ with app.app_context():
         weight=180,
         # team_id=1
     )
+    user1.password_hash = 'Password1'
     user2 = User(
         email='test2@test.com',
         _password_hash='Password1',
@@ -43,6 +43,8 @@ with app.app_context():
         weight=120,
         # team_id=1
     )
+    user2.password_hash = 'Password1'
+
     user3 = User(
         email='test3@test.com',
         _password_hash='Password1',
@@ -58,6 +60,8 @@ with app.app_context():
         weight=180,
         # team_id=1
     )
+    user3.password_hash = 'Password1'
+
 
     # Create teams
     print('Creating teams...')
@@ -81,6 +85,7 @@ with app.app_context():
     print('Creating activities...')
     activity1 = Activity(
         strava_id=1,
+        name='Activity 1',
         type='running',
         distance=1000,
         moving_time=1000,
@@ -91,8 +96,6 @@ with app.app_context():
         achievement_count=1,
         kudos_count=1,
         comment_count=1,
-        start_latlng='37.7749,-122.4194',
-        end_latlng='37.7749,-122.4194',
         average_speed=1.23,
         max_speed=1.34,
         average_heartrate=1.45,
@@ -104,6 +107,7 @@ with app.app_context():
     )
     activity2 = Activity(
         strava_id=2,
+        name='Activity 2',
         type='bicycling',
         distance=1000,
         moving_time=1000,
@@ -114,8 +118,6 @@ with app.app_context():
         achievement_count=1,
         kudos_count=1,
         comment_count=1,
-        start_latlng='37.7749,-122.4194',
-        end_latlng='37.7749,-122.4194',
         average_speed=1.23,
         max_speed=1.34,
         average_heartrate=1.45,
@@ -127,6 +129,7 @@ with app.app_context():
     )
     activity3 = Activity(
         strava_id=1,
+        name='Activity 3',
         type='rollerblading',
         distance=1000,
         moving_time=1000,
@@ -137,8 +140,6 @@ with app.app_context():
         achievement_count=1,
         kudos_count=1,
         comment_count=1,
-        start_latlng='37.7749,-122.4194',
-        end_latlng='37.7749,-122.4194',
         average_speed=1.23,
         max_speed=1.34,
         average_heartrate=1.45,

@@ -8,8 +8,8 @@ from config import bcrypt, db
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
-    serialize_rules = ('-_password_hash',)
-
+    serialize_rules = ('-_password_hash','-activities','-strava_access_token','-strava_refresh_token','-strava_token_expiry', '-created_at', '-updated_at')
+    
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
@@ -23,6 +23,9 @@ class User(db.Model, SerializerMixin):
     sex = db.Column(db.String)
     height = db.Column(db.Integer)
     weight = db.Column(db.Integer)
+    strava_access_token = db.Column(db.String)
+    strava_refresh_token = db.Column(db.String)
+    strava_token_expiry = db.Column(db.DateTime)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
@@ -51,7 +54,7 @@ class User(db.Model, SerializerMixin):
         password_hash = bcrypt.generate_password_hash(
             password.encode('utf-8'))
         self._password_hash = password_hash.decode('utf-8')
-
+        
     def authenticate(self, password):
         return bcrypt.check_password_hash(
             self._password_hash, password.encode('utf-8'))
@@ -70,6 +73,7 @@ class Activity(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     strava_id = db.Column(db.Integer)
+    name = db.Column(db.String)
     type = db.Column(db.String)
     distance = db.Column(db.Integer)
     moving_time = db.Column(db.Integer)
@@ -80,8 +84,6 @@ class Activity(db.Model, SerializerMixin):
     achievement_count = db.Column(db.Integer)
     kudos_count = db.Column(db.Integer)
     comment_count = db.Column(db.Integer)
-    start_latlng = db.Column(db.String)
-    end_latlng = db.Column(db.String)
     average_speed = db.Column(db.Float)
     max_speed = db.Column(db.Float)
     average_heartrate = db.Column(db.Float)

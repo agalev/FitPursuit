@@ -1,13 +1,15 @@
 from flask import session, request
 from flask_restful import Resource
+from datetime import datetime
+import httpx
 
 from config import app, api, db
 from models import User, Activity, Team, Message, Competition, CompetitionHandler
 
-@app.before_request
-def firewall():
-    if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup']:
-        return {'error': 'Not logged in'}, 401
+# @app.before_request
+# def firewall():
+#     if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup']:
+#         return {'error': 'Not logged in'}, 401
 
 class Auth(Resource):
     def get(self):
@@ -133,10 +135,59 @@ class MessagesController(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
-class GetActivities(Resource):
+class ActivitiesController(Resource):
     def get(self):
         return [activity.to_dict() for activity in Activity.query.all()], 200
+    def post(self):
+        # try:
+            user = User.query.filter(User.id == 3).first()
+            if user.strava_token_expiry < datetime.now():
+                return {'error': 'Strava token expired'}, 400
+            page_count = 1
+            res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
+                            headers = {'Authorization': f'Bearer {user.strava_access_token}'},
+                            params={'per_page': 200, 'page': page_count})
+            if res.status_code != 200:
+                return {'error': 'Unable to retrieve activities'}, 400
+            activities = res.json()
+            while len(activities) == 200:
+                page_count += 1
+                res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
+                                headers = {'Authorization': f'Bearer {user.strava_access_token}'},
+                                params={'per_page': 200, 'page': page_count})
+                if res.status_code != 200:
+                    return {'error': 'Unable to retrieve activities'}, 400
+                activities += res.json()
+            return activities, 200
 
+            # return activities[81], 200
+            for activity in activities:
+                if Activity.query.filter(Activity.strava_id == activity['id']).first():
+                    continue
+                new_activity = Activity(strava_id = activity['id'],
+                                        name = activity['name'],
+                                        type = activity['type'],
+                                        distance = activity['distance'],
+                                        moving_time = activity['moving_time'],
+                                        elapsed_time = activity['elapsed_time'],
+                                        total_elevation_gain = activity['total_elevation_gain'],
+                                        start_date_local = datetime.strptime(activity['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'),
+                                        timezone = activity['timezone'],
+                                        achievement_count = activity['achievement_count'],
+                                        kudos_count = activity['kudos_count'],
+                                        comment_count = activity['comment_count'],
+                                        average_speed = activity['average_speed'],
+                                        max_speed = activity['max_speed'],
+                                        average_heartrate = activity['average_heartrate'] if 'average_heartrate' in activity else None,
+                                        max_heartrate = activity['max_heartrate'] if 'max_heartrate' in activity else None,
+                                        elev_high = activity['elev_high'],
+                                        elev_low = activity['elev_low'],
+                                        pr_count = activity['pr_count'],
+                                        user_id = 3)
+                db.session.add(new_activity)
+                db.session.commit()
+                                        
+                # print(activity)
 class TeamsController(Resource):
     def get(self):
         return [team.to_dict() for team in Team.query.all()], 200
@@ -216,12 +267,21 @@ class TeamLeaderController(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
         
-## Will continue backend later
-
 class GetCompetitions(Resource):
     def get(self):
         return [competition.to_dict() for competition in Competition.query.all()], 200
-        
+    
+## Will continue backend later
+
+class StravaAuth(Resource):
+    def post(self):
+        req = request.get_json()
+        user = User.query.filter(User.id == 3).first()
+        user.strava_access_token = req['access_token']
+        user.strava_refresh_token = req['refresh_token']
+        user.strava_token_expiry = datetime.fromtimestamp(int(req['expires_at']))
+        db.session.commit()
+            
 api.add_resource(Auth, '/api/auth', endpoint='/api/auth')
 api.add_resource(Signup, '/api/signup', endpoint='/api/signup')
 api.add_resource(Login, '/api/login', endpoint='/api/login')
@@ -229,9 +289,10 @@ api.add_resource(Logout, '/api/logout', endpoint='/api/logout')
 api.add_resource(GetUsers, '/api/users', endpoint='/api/users')
 api.add_resource(UserController, '/api/users/<int:id>', endpoint='/api/users/<int:id>')
 api.add_resource(MessagesController, '/api/messages', endpoint='/api/messages')
-api.add_resource(GetActivities, '/api/activities', endpoint='/api/activities')
+api.add_resource(ActivitiesController, '/api/activities', endpoint='/api/activities')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
 api.add_resource(GetCompetitions, '/api/competitions', endpoint='/api/competitions')
+api.add_resource(StravaAuth, '/api/strava_auth', endpoint='/api/strava_auth')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

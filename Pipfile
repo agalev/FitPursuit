@@ -12,6 +12,7 @@ flask-restful = "*"
 flask-bcrypt = "*"
 flask-cors = "*"
 python-dotenv = "*"
+httpx = "*"
 
 [dev-packages]
 

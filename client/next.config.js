@@ -6,8 +6,8 @@ const nextConfig = {
 	async rewrites() {
 		return [
 			{
-				source: '/:path*',
-				destination: 'http://127.0.0.1:5555/:path*' // Proxy to Backend
+				source: '/api/:path*',
+				destination: 'http://127.0.0.1:5555/api/:path*' // Proxy to Backend
 			}
 		]
 	}
