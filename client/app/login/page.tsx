@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { Input, Ripple, initTE } from 'tw-elements'
 
-export default function Signup() {
+export default function Login() {
 	const [formData, setFormData] = useState({
 		email: '',
 		password: ''
@@ -23,20 +23,26 @@ export default function Signup() {
 		})
 			.then((res) => res.json())
 			.then((data) => console.log(data))
+			.then(() => {
+				fetch('/api/auth')
+					.then((res) => res.json())
+					.then((data) => console.log(data))
+			})
 	}
 
 	return (
 		<>
 			<video
 				className='absolute object-cover w-full h-full'
-				src='https://tecdn.b-cdn.net/img/video/Lines.mp4'
+				// src='https://tecdn.b-cdn.net/img/video/Lines.mp4'
+				src='/bg_video.mp4'
 				muted
 				autoPlay
 				loop
 			/>
 			<div className='absolute inset-x-[15%] bottom-5 text-center text-white md:block'>
 				<div className='g-6 flex h-full flex-wrap items-center justify-center text-neutral-800 dark:text-neutral-200'>
-					<div className='rounded-lg bg-white shadow-lg dark:bg-neutral-800 dark:bg-opacity-75 px-5'>
+					<div className='rounded-lg bg-white shadow-lg dark:bg-neutral-800 dark:bg-opacity-70 px-5'>
 						<div className='text-center'>
 							<img
 								className='mx-auto w-48'
@@ -93,7 +99,7 @@ export default function Signup() {
 									data-te-ripple-color='light'
 									style={{
 										backgroundImage:
-											'linear-gradient(to right, #6a8eae, #7cb518, #94ecbe)'
+											'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
 									}}
 									onClick={handleLogin}
 								>
@@ -111,7 +117,7 @@ export default function Signup() {
 									data-te-ripple-color='light'
 									style={{
 										backgroundImage:
-											'linear-gradient(to right, #6a8eae, #7cb518, #94ecbe)'
+										'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
 									}}
 								>
 									Register

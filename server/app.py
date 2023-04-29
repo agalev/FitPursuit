@@ -6,14 +6,14 @@ import httpx
 from config import app, api, db
 from models import User, Activity, Team, Message, Competition, CompetitionHandler
 
-# @app.before_request
-# def firewall():
-#     if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup']:
-#         return {'error': 'Not logged in'}, 401
+@app.before_request
+def firewall():
+    if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup']:
+        return {'error': 'Not logged in'}, 401
 
 class Auth(Resource):
     def get(self):
-        return User.query.filter(User.id == session['user_id']).first().to_dict(), 200
+        return session
 
 class Signup(Resource):
     def post(self):
@@ -139,53 +139,49 @@ class ActivitiesController(Resource):
     def get(self):
         return [activity.to_dict() for activity in Activity.query.all()], 200
     def post(self):
-        # try:
-            user = User.query.filter(User.id == 3).first()
-            if user.strava_token_expiry < datetime.now():
-                return {'error': 'Strava token expired'}, 400
-            page_count = 1
+        user = User.query.filter(User.id == 3).first()
+        if user.strava_token_expiry < datetime.now():
+            return {'error': 'Strava token expired'}, 400
+        page_count = 1
+        res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
+                        headers = {'Authorization': f'Bearer {user.strava_access_token}'},
+                        params={'per_page': 200, 'page': page_count})
+        if res.status_code != 200:
+            return {'error': 'Unable to retrieve activities'}, 400
+        activities = res.json()
+        while len(activities) == 200:
+            page_count += 1
             res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
                             headers = {'Authorization': f'Bearer {user.strava_access_token}'},
                             params={'per_page': 200, 'page': page_count})
             if res.status_code != 200:
                 return {'error': 'Unable to retrieve activities'}, 400
-            activities = res.json()
-            while len(activities) == 200:
-                page_count += 1
-                res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
-                                headers = {'Authorization': f'Bearer {user.strava_access_token}'},
-                                params={'per_page': 200, 'page': page_count})
-                if res.status_code != 200:
-                    return {'error': 'Unable to retrieve activities'}, 400
-                activities += res.json()
-            return activities, 200
-
-            # return activities[81], 200
-            for activity in activities:
-                if Activity.query.filter(Activity.strava_id == activity['id']).first():
-                    continue
-                new_activity = Activity(strava_id = activity['id'],
-                                        name = activity['name'],
-                                        type = activity['type'],
-                                        distance = activity['distance'],
-                                        moving_time = activity['moving_time'],
-                                        elapsed_time = activity['elapsed_time'],
-                                        total_elevation_gain = activity['total_elevation_gain'],
-                                        start_date_local = datetime.strptime(activity['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'),
-                                        timezone = activity['timezone'],
-                                        achievement_count = activity['achievement_count'],
-                                        kudos_count = activity['kudos_count'],
-                                        comment_count = activity['comment_count'],
-                                        average_speed = activity['average_speed'],
-                                        max_speed = activity['max_speed'],
-                                        average_heartrate = activity['average_heartrate'] if 'average_heartrate' in activity else None,
-                                        max_heartrate = activity['max_heartrate'] if 'max_heartrate' in activity else None,
-                                        elev_high = activity['elev_high'],
-                                        elev_low = activity['elev_low'],
-                                        pr_count = activity['pr_count'],
-                                        user_id = 3)
-                db.session.add(new_activity)
-                db.session.commit()
+            activities += res.json()
+        for activity in activities:
+            if Activity.query.filter(Activity.strava_id == activity['id']).first():
+                continue
+            new_activity = Activity(strava_id = activity['id'],
+                                    name = activity['name'],
+                                    type = activity['type'],
+                                    distance = activity['distance'],
+                                    moving_time = activity['moving_time'],
+                                    elapsed_time = activity['elapsed_time'],
+                                    total_elevation_gain = activity['total_elevation_gain'],
+                                    start_date_local = datetime.strptime(activity['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'),
+                                    timezone = activity['timezone'],
+                                    achievement_count = activity['achievement_count'],
+                                    kudos_count = activity['kudos_count'],
+                                    comment_count = activity['comment_count'],
+                                    average_speed = activity['average_speed'],
+                                    max_speed = activity['max_speed'],
+                                    average_heartrate = activity['average_heartrate'] if 'average_heartrate' in activity else None,
+                                    max_heartrate = activity['max_heartrate'] if 'max_heartrate' in activity else None,
+                                    elev_high = activity['elev_high'],
+                                    elev_low = activity['elev_low'],
+                                    pr_count = activity['pr_count'],
+                                    user_id = 3)
+            db.session.add(new_activity)
+            db.session.commit()
                                         
                 # print(activity)
 class TeamsController(Resource):

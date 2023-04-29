@@ -18,7 +18,6 @@ export default function Callback() {
 			.then((res) => res.json())
 			.then((data) => {
 				try {
-					console.log(data)
 					fetch('/api/strava_auth', {
 						method: 'POST',
 						headers: {
