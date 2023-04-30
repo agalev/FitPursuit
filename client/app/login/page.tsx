@@ -42,7 +42,7 @@ export default function Login() {
 			/>
 			<div className='absolute inset-x-[15%] bottom-5 text-center text-white md:block'>
 				<div className='g-6 flex h-full flex-wrap items-center justify-center text-neutral-800 dark:text-neutral-200'>
-					<div className='rounded-lg bg-white shadow-lg dark:bg-neutral-800 dark:bg-opacity-70 px-5'>
+					<div className='rounded-lg bg-white shadow-lg dark:bg-neutral-800 bg-opacity-70 dark:bg-opacity-70 px-5'>
 						<div className='text-center'>
 							<img
 								className='mx-auto w-48'
