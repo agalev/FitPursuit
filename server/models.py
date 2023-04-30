@@ -30,6 +30,7 @@ class User(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
+    # team = db.relationship('Team', back_populates='users', cascade='all, delete, delete-orphan')
     # activities = db.relationship('Activity', backref='user', cascade='all, delete, delete-orphan')
     # sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', cascade='all, delete, delete-orphan', overlaps='received_messages')
     # received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', cascade='all, delete, delete-orphan', overlaps='sent_messages')
@@ -115,8 +116,9 @@ class Team(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    leader = db.relationship('User', backref='team', foreign_keys=[leader_id])
-    messages = db.relationship('Message', backref='team', cascade='all, delete, delete-orphan')
+    # users = db.relationship('User', backref='team', cascade='all, delete, delete-orphan')
+    # leader = db.relationship('User', backref='team', foreign_keys=[leader_id])
+    # messages = db.relationship('Message', backref='team', cascade='all, delete, delete-orphan')
 
     @validates('topic')
     def validate_topic(self, key, topic):
