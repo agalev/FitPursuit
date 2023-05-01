@@ -8,35 +8,49 @@ from config import bcrypt, db
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
-    serialize_rules = ('-_password_hash','-activities','-strava_access_token','-strava_refresh_token','-strava_token_expiry', '-created_at', '-updated_at')
+    serialize_rules = ('-_password_hash',
+                       '-strava_access_token',
+                       '-strava_refresh_token',
+                       '-strava_token_expiry',
+                       '-created_at',
+                       '-updated_at',
+                       '-activities',
+                       '-team.users',
+                       '-team.leader',
+                       '-team.messages',
+                       '-team.competitions',
+                       '-team.created_at',
+                       '-team.updated_at',
+                       '-competitions.organizer',
+                       '-competitions.teams',
+                       '-competitions.users'
+                       )
     
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String, nullable=False, unique=True)
+    email = db.Column(db.String(80), nullable=False, unique=True)
     _password_hash = db.Column(db.String, nullable=False)
-    image = db.Column(db.String)
-    first_name = db.Column(db.String, nullable=False)
-    last_name = db.Column(db.String, nullable=False)
-    bio = db.Column(db.String)
-    city = db.Column(db.String)
-    state = db.Column(db.String)
-    country = db.Column(db.String)
-    sex = db.Column(db.String)
+    image = db.Column(db.String(200))
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    bio = db.Column(db.String(200))
+    city = db.Column(db.String(80))
+    state = db.Column(db.String(80))
+    country = db.Column(db.String(80))
+    sex = db.Column(db.String(1))
     height = db.Column(db.Integer)
     weight = db.Column(db.Integer)
+    wins = db.Column(db.Integer, default=0)
+    team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
+    last_online = db.Column(db.DateTime)
     strava_access_token = db.Column(db.String)
     strava_refresh_token = db.Column(db.String)
     strava_token_expiry = db.Column(db.DateTime)
-    team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
-    # team = db.relationship('Team', back_populates='users', cascade='all, delete, delete-orphan')
-    # activities = db.relationship('Activity', backref='user', cascade='all, delete, delete-orphan')
-    # sent_messages = db.relationship('Message', foreign_keys='Message.sender_id', cascade='all, delete, delete-orphan', overlaps='received_messages')
-    # received_messages = db.relationship('Message', foreign_keys='Message.receiver_id', cascade='all, delete, delete-orphan', overlaps='sent_messages')
-    # sent_messages = db.relationship('Message', backref='sender', foreign_keys='Message.sender_id', cascade='all, delete, delete-orphan')
-    # received_messages = db.relationship('Message', backref='receiver', foreign_keys='Message.receiver_id', cascade='all, delete, delete-orphan')
-    # competitions = db.relationship('Competition', backref='user', cascade='all, delete, delete-orphan')
+    activities = db.relationship('Activity', back_populates='user', cascade='all, delete-orphan')
+    team = db.relationship('Team', back_populates='users', foreign_keys=[team_id], uselist=False)
+    competitions = db.relationship('Competition', back_populates='users', secondary='competition_handlers')
 
     @hybrid_property
     def password_hash(self):
@@ -75,7 +89,7 @@ class Activity(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     strava_id = db.Column(db.Integer)
     name = db.Column(db.String)
-    type = db.Column(db.String)
+    activity_type = db.Column(db.String)
     distance = db.Column(db.Integer)
     moving_time = db.Column(db.Integer)
     elapsed_time = db.Column(db.Integer)
@@ -94,21 +108,31 @@ class Activity(db.Model, SerializerMixin):
     pr_count = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    user = db.relationship('User', backref='activities')
+    user = db.relationship('User', back_populates='activities')
 
 class Team(db.Model, SerializerMixin):
     __tablename__ = 'teams'
 
-    serialize_rules = ('-leader',)
+    serialize_rules = ('-created_at',
+                       '-updated_at',
+                       '-users.team',
+                       '-users.competitions',
+                       '-messages.team',
+                       '-leader.team',
+                       '-leader.competitions',
+                       '-competitions.organizer',
+                       '-competitions.users',
+                       '-competitions.teams',
+                       )
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False, unique=True)
-    image = db.Column(db.String)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    image = db.Column(db.String(200))
     leader_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    activity_type = db.Column(db.String(20))
     members = db.Column(db.Integer, default=1)
     score = db.Column(db.Integer, default=0)
     wins = db.Column(db.Integer, default=0)
-    type = db.Column(db.String)
     total_distance = db.Column(db.Integer, default=0)
     total_moving_time = db.Column(db.Integer, default=0)
     average_speed = db.Column(db.Integer, default=0)
@@ -116,41 +140,63 @@ class Team(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    # users = db.relationship('User', backref='team', cascade='all, delete, delete-orphan')
-    # leader = db.relationship('User', backref='team', foreign_keys=[leader_id])
-    # messages = db.relationship('Message', backref='team', cascade='all, delete, delete-orphan')
+    leader = db.relationship('User', foreign_keys=[leader_id], uselist=False)
+    users = db.relationship('User', back_populates='team', foreign_keys='User.team_id', cascade='all, delete-orphan')
+    messages = db.relationship('Message', back_populates='team', cascade='all, delete-orphan')
+    competitions = db.relationship('Competition', back_populates='teams', secondary='competition_handlers')
 
-    @validates('topic')
-    def validate_topic(self, key, topic):
-        if len(topic) < 3 or len(topic) > 20:
-            raise ValueError('Topic must be between 3 and 20 characters long.')
-        return topic
+
+    @validates('members')
+    def validate_members(self, key, members):
+        if members > 5:
+            raise ValueError('Teams may not have more than 5 members.')
+        return members
     
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
 
-    serialize_rules = ('-team.messages', '-sender.sent_messages', '-receiver.received_messages')
+    serialize_rules = ('-team.messages',
+                       '-team.leader',
+                       '-team.users',
+                       '-team.competitions',
+                       '-sender.team',
+                       '-sender.competitions',
+                       '-receiver.team',
+                       '-receiver.competitions'
+                       )
 
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     receiver_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
-    content = db.Column(db.String, nullable=False)
+    content = db.Column(db.String(2000), nullable=False)
     read = db.Column(db.Boolean, default=False)
     invitation = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
     updated_at = db.Column(db.DateTime, onupdate=db.func.now())
 
-    # send_by = db.relationship('User', foreign_keys=[sender_id], back_populates='sent_messages')
-    # received_by = db.relationship('User', foreign_keys=[receiver_id], back_populates='received_messages')
+    sender = db.relationship('User', foreign_keys=[sender_id])
+    receiver = db.relationship('User', foreign_keys=[receiver_id])
+    team = db.relationship('Team', back_populates='messages')
 
 class Competition(db.Model, SerializerMixin):
     __tablename__ = 'competitions'
+
+    serialize_rules = ('-organizer.team',
+                       '-organizer.competitions',
+                       '-teams.leader',
+                       '-teams.competitions',
+                       '-teams.messages',
+                       '-teams.users',
+                       '-users.competitions',
+                       '-users.team',
+                       )
 
     id = db.Column(db.Integer, primary_key=True)
     organizer_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     title = db.Column(db.String, nullable=False)
     description = db.Column(db.String, nullable=False)
+    type = db.Column(db.String, nullable=False)
     activity_type = db.Column(db.String, nullable=False)
     distance = db.Column(db.Integer, nullable=False)
     average_speed = db.Column(db.Float, nullable=False)
@@ -159,8 +205,24 @@ class Competition(db.Model, SerializerMixin):
     end_date = db.Column(db.DateTime, nullable=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
+    organizer = db.relationship('User', foreign_keys=[organizer_id])
+    users = db.relationship('User', back_populates='competitions', secondary='competition_handlers')
+    teams = db.relationship('Team', back_populates='competitions', secondary='competition_handlers')
+
 class CompetitionHandler(db.Model, SerializerMixin):
     __tablename__ = 'competition_handlers'
+
+    serialize_rules = ('-user.team',
+                       '-user.competitions',
+                       '-competition.organizer',
+                       '-competition.users',
+                       '-competition.teams',
+                       '-team.users',
+                       '-team.leader',
+                       '-team.messages',
+                       '-team.competitions'
+                       )
+
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -168,7 +230,8 @@ class CompetitionHandler(db.Model, SerializerMixin):
     competition_id = db.Column(db.Integer, db.ForeignKey('competitions.id'))
     score = db.Column(db.Integer, default=0)
     placement = db.Column(db.Integer, default=0)
+    created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-    # user = db.relationship('User', backref='competition_handler', foreign_keys=[user_id])
-    # team = db.relationship('Team', backref='competition_handler', foreign_keys=[team_id])
-    # competition = db.relationship('Competition', backref='competition_handler', foreign_keys=[competition_id])
+    user = db.relationship('User', foreign_keys=[user_id])
+    team = db.relationship('Team', foreign_keys=[team_id])
+    competition = db.relationship('Competition', foreign_keys=[competition_id])

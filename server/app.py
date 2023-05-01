@@ -6,10 +6,10 @@ import httpx
 from config import app, api, db
 from models import User, Activity, Team, Message, Competition, CompetitionHandler
 
-@app.before_request
-def firewall():
-    if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup']:
-        return {'error': 'Not logged in'}, 401
+# @app.before_request
+# def firewall():
+#     if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup']:
+#         return {'error': 'Not logged in'}, 401
 
 class Auth(Resource):
     def get(self):
@@ -94,8 +94,8 @@ class UserController(Resource):
 class MessagesController(Resource):
     def get(self):
         try:
-            query = Message.query.filter(Message.sender_id == session['user_id']).all()
-            query += Message.query.filter(Message.receiver_id == session['user_id']).all()
+            query = Message.query.filter(Message.sender_id == 1).all()
+            query += Message.query.filter(Message.receiver_id == 1).all()
             return [message.to_dict() for message in query], 200
         except Exception as e:
             return {'error': str(e)}, 400
@@ -162,7 +162,7 @@ class ActivitiesController(Resource):
                 continue
             new_activity = Activity(strava_id = activity['id'],
                                     name = activity['name'],
-                                    type = activity['type'],
+                                    activity_type = activity['type'],
                                     distance = activity['distance'],
                                     moving_time = activity['moving_time'],
                                     elapsed_time = activity['elapsed_time'],
@@ -195,7 +195,7 @@ class TeamsController(Resource):
             user = User.query.filter(User.id == session['user_id']).first()
             team = Team(name = req['name'],
                         leader_id = session['user_id'],
-                        type = req['type'],
+                        activity_type = req['activity_type'],
                         image = req['image'] if 'image' in req else None)
             db.session.add(team)
             db.session.commit()
@@ -212,8 +212,8 @@ class TeamsController(Resource):
                 return {'error': 'Unauthorized'}, 401
             if 'name' in req:
                 team.name = req['name']
-            if 'type' in req:
-                team.type = req['type']
+            if 'activity_type' in req:
+                team.activity_type = req['activity_type']
             if 'image' in req:
                 team.image = req['image']
             db.session.commit()
@@ -267,6 +267,10 @@ class GetCompetitions(Resource):
     def get(self):
         return [competition.to_dict() for competition in Competition.query.all()], 200
     
+class CompetitionController(Resource):
+    def get(self):
+        return [competition_handler.to_dict() for competition_handler in CompetitionHandler.query.all()], 200
+    
 ## Will continue backend later
 
 class StravaAuth(Resource):
@@ -288,6 +292,7 @@ api.add_resource(MessagesController, '/api/messages', endpoint='/api/messages')
 api.add_resource(ActivitiesController, '/api/activities', endpoint='/api/activities')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
 api.add_resource(GetCompetitions, '/api/competitions', endpoint='/api/competitions')
+api.add_resource(CompetitionController, '/api/competition_handler', endpoint='/api/competition_handler')
 api.add_resource(StravaAuth, '/api/strava_auth', endpoint='/api/strava_auth')
 
 if __name__ == '__main__':
