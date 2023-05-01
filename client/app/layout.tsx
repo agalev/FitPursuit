@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata = {
 	title: 'FitPursuit',
 	description: 'Join teams and compete with others for prizes!',
-	image: '/favicon.ico',
+	// image: '/favicon.ico',
 	// url: 'https://fitpursuit.com',
 	type: 'website',
 	keywords: 'fitness, competition, community, prizes',
