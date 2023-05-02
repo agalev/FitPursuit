@@ -1,14 +1,13 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import Nav from './components/nav'
+import Footer from './components/footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
 	title: 'FitPursuit',
 	description: 'Join teams and compete with others for prizes!',
-	// image: '/favicon.ico',
-	// url: 'https://fitpursuit.com',
 	type: 'website',
 	keywords: 'fitness, competition, community, prizes',
 	siteName: 'FitPursuit',
@@ -22,9 +21,10 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang='en'>
-			<body className={inter.className}>
+			<body className={`${inter.className} bg-slate-300 dark:text-amber-500 dark:bg-slate-900 transition-colors duration-300`}>
 				<Nav />
 				{children}
+				<Footer />
 			</body>
 		</html>
 	)

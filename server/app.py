@@ -34,6 +34,7 @@ class Signup(Resource):
                     height = req['height'],
                     weight = req['weight'])
         user.password_hash = req['password']
+        user.last_online = datetime.now()
         db.session.add(user)
         db.session.commit()
         session['user_id'] = user.id
@@ -49,6 +50,8 @@ class Login(Resource):
             return {'error': 'Invalid email'}, 400
         if not user.authenticate(req['password']):
             return {'error': 'Invalid password'}, 400
+        user.last_online = datetime.now()
+        db.session.commit()
         session['user_id'] = user.id
         return user.to_dict(), 200
 
@@ -139,7 +142,7 @@ class ActivitiesController(Resource):
     def get(self):
         return [activity.to_dict() for activity in Activity.query.all()], 200
     def post(self):
-        user = User.query.filter(User.id == 3).first()
+        user = User.query.filter(User.id == session['user_id']).first()
         if user.strava_token_expiry < datetime.now():
             return {'error': 'Strava token expired'}, 400
         page_count = 1
@@ -182,8 +185,8 @@ class ActivitiesController(Resource):
                                     user_id = 3)
             db.session.add(new_activity)
             db.session.commit()
-                                        
-                # print(activity)
+        return {'message': 'Activities added'}, 200
+    
 class TeamsController(Resource):
     def get(self):
         return [team.to_dict() for team in Team.query.all()], 200
@@ -276,7 +279,7 @@ class CompetitionController(Resource):
 class StravaAuth(Resource):
     def post(self):
         req = request.get_json()
-        user = User.query.filter(User.id == 3).first()
+        user = User.query.filter(User.id == session['user_id']).first()
         user.strava_access_token = req['access_token']
         user.strava_refresh_token = req['refresh_token']
         user.strava_token_expiry = datetime.fromtimestamp(int(req['expires_at']))
