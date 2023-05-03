@@ -2,6 +2,7 @@ import './globals.css'
 import { Inter } from 'next/font/google'
 import Nav from './components/nav'
 import Footer from './components/footer'
+import Providers from './providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,16 +16,22 @@ export const metadata = {
 }
 
 export default function RootLayout({
-	children
+	children,
+	session
 }: {
 	children: React.ReactNode
+	session: any
 }) {
 	return (
 		<html lang='en'>
-			<body className={`${inter.className} bg-slate-300 dark:text-amber-500 dark:bg-slate-900 transition-colors duration-300`}>
-				<Nav />
-				{children}
-				<Footer />
+			<body
+				className={`${inter.className} bg-slate-300 dark:text-amber-500 dark:bg-slate-900 transition-colors duration-300`}
+			>
+				<Providers session={session}>
+					<Nav />
+					{children}
+					<Footer />
+				</Providers>
 			</body>
 		</html>
 	)

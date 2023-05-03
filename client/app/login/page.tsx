@@ -2,9 +2,12 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import { Input, Ripple, initTE } from 'tw-elements'
 
 export default function Login() {
+	const router = useRouter()
 	useEffect(() => {
 		initTE({ Input, Ripple })
 	}, [])
@@ -30,14 +33,13 @@ export default function Login() {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(formData)
+		}).then((res) => {
+			if (res.status === 200) {
+				router.push('/dashboard')
+			} else {
+				console.log('Login failed.')
+			}
 		})
-			.then((res) => res.json())
-			.then((data) => console.log(data))
-			.then(() => {
-				fetch('/api/auth')
-					.then((res) => res.json())
-					.then((data) => console.log(data))
-			})
 	}
 
 	return (
@@ -78,8 +80,8 @@ export default function Login() {
 							</div>
 							<div className='relative mb-4' data-te-input-wrapper-init>
 								<input
-									type='password'
 									className='peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0'
+									type='password'
 									name='password'
 									value={formData.password}
 									onChange={handleInputChange}
@@ -88,12 +90,9 @@ export default function Login() {
 									Password
 								</label>
 							</div>
-						</form>
-
-						<div className='mb-12 pb-1 pt-1 text-center'>
 							<button
-								className='mb-3 inline-block w-full rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-								type='button'
+								className='inline-block w-72 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+								type='submit'
 								data-te-ripple-init
 								data-te-ripple-color='light'
 								style={{
@@ -104,7 +103,26 @@ export default function Login() {
 							>
 								Log in
 							</button>
-						</div>
+						</form>
+						<p className='my-3'>or:</p>
+
+							<button
+								className='inline-block w-72 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+								type='button'
+								data-te-ripple-init
+								data-te-ripple-color='light'
+								style={{
+									backgroundImage:
+										'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
+								}}
+								onClick={() => {
+									signIn('strava')
+								}}
+							>
+								Log in with Strava
+							</button>
+
+						<div className='mb-12 pb-1 pt-1 text-center'></div>
 						<section className='flex items-center justify-between'>
 							<p className='mb-0 mr-2'>Don't have an account?</p>
 							<Link href='/signup'>
@@ -118,7 +136,7 @@ export default function Login() {
 											'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
 									}}
 								>
-									Register
+									Sign up
 								</button>
 							</Link>
 						</section>

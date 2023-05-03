@@ -6,14 +6,47 @@ import httpx
 from config import app, api, db
 from models import User, Activity, Team, Message, Competition, CompetitionHandler
 
-# @app.before_request
-# def firewall():
-#     if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup']:
-#         return {'error': 'Not logged in'}, 401
+@app.before_request
+def firewall():
+    if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup', '/api/auth']:
+        return {'error': 'Not logged in'}, 401
 
 class Auth(Resource):
     def get(self):
         return session
+    def post(self):
+        if 'user_id' in session:
+            return {'error': 'Already logged in'}, 401
+        req = request.get_json()
+        user = User.query.filter(User.id == req['id']).first()
+        if user:
+            session['user_id'] = req['id']
+            session['profile'] = user.to_dict()
+            return {'message': 'Logged in'}, 200
+        else:
+            user = User(id = req['id'],
+                        email = req['username'],
+                        image = req['profile'],
+                        first_name = req['firstname'],
+                        last_name = req['lastname'],
+                        bio = req['bio'],
+                        city = req['city'],
+                        state = req['state'],
+                        country = req['country'],
+                        sex = req['sex'],
+                        weight = req['weight'],
+                        strava_access_token = req['accessToken'],
+                        strava_refresh_token = req['refreshToken'],
+                        strava_token_expiry = datetime.strptime(req['expires_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
+
+                        )
+            user.password_hash = f"1Z{req['username']}" 
+            user.last_online = datetime.now()
+            db.session.add(user)
+            db.session.commit()
+            session['user_id'] = user.id
+            session['profile'] = user.to_dict()
+            return user.to_dict(), 201 
 
 class Signup(Resource):
     def post(self):
@@ -38,6 +71,7 @@ class Signup(Resource):
         db.session.add(user)
         db.session.commit()
         session['user_id'] = user.id
+        session['profile'] = user.to_dict()
         return user.to_dict(), 201
 
 class Login(Resource):
@@ -53,11 +87,13 @@ class Login(Resource):
         user.last_online = datetime.now()
         db.session.commit()
         session['user_id'] = user.id
+        session['profile'] = user.to_dict()
         return user.to_dict(), 200
 
 class Logout(Resource):
     def post(self):
         session.pop('user_id')
+        session.pop('profile')
         return {'message': 'Logged out'}, 200
 
 class GetUsers(Resource):
@@ -105,7 +141,6 @@ class MessagesController(Resource):
     def post(self):
         try:
             req = request.get_json()
-            
             message = Message(sender_id = session['user_id'],
                               receiver_id = req['receiver_id'] if 'receiver_id' in req else None,
                               team_id = req['team_id'] if 'team_id' in req else None,
@@ -140,7 +175,7 @@ class MessagesController(Resource):
 
 class ActivitiesController(Resource):
     def get(self):
-        return [activity.to_dict() for activity in Activity.query.all()], 200
+        return [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])], 200
     def post(self):
         user = User.query.filter(User.id == session['user_id']).first()
         if user.strava_token_expiry < datetime.now():
@@ -161,7 +196,7 @@ class ActivitiesController(Resource):
                 return {'error': 'Unable to retrieve activities'}, 400
             activities += res.json()
         for activity in activities:
-            if Activity.query.filter(Activity.strava_id == activity['id']).first():
+            if Activity.query.filter(Activity.strava_id == int(activity['id'])).first():
                 continue
             new_activity = Activity(strava_id = activity['id'],
                                     name = activity['name'],
@@ -182,10 +217,10 @@ class ActivitiesController(Resource):
                                     elev_high = activity['elev_high'],
                                     elev_low = activity['elev_low'],
                                     pr_count = activity['pr_count'],
-                                    user_id = 3)
+                                    user_id = session['user_id'])
             db.session.add(new_activity)
             db.session.commit()
-        return {'message': 'Activities added'}, 200
+        return {'message': 'Activities synced'}, 200
     
 class TeamsController(Resource):
     def get(self):
@@ -276,14 +311,14 @@ class CompetitionController(Resource):
     
 ## Will continue backend later
 
-class StravaAuth(Resource):
-    def post(self):
-        req = request.get_json()
-        user = User.query.filter(User.id == session['user_id']).first()
-        user.strava_access_token = req['access_token']
-        user.strava_refresh_token = req['refresh_token']
-        user.strava_token_expiry = datetime.fromtimestamp(int(req['expires_at']))
-        db.session.commit()
+# class StravaAuth(Resource):
+#     def post(self):
+#         req = request.get_json()
+#         user = User.query.filter(User.id == session['user_id']).first()
+#         user.strava_access_token = req['access_token']
+#         user.strava_refresh_token = req['refresh_token']
+#         user.strava_token_expiry = datetime.fromtimestamp(int(req['expires_at']))
+#         db.session.commit()
             
 api.add_resource(Auth, '/api/auth', endpoint='/api/auth')
 api.add_resource(Signup, '/api/signup', endpoint='/api/signup')
@@ -296,7 +331,7 @@ api.add_resource(ActivitiesController, '/api/activities', endpoint='/api/activit
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
 api.add_resource(GetCompetitions, '/api/competitions', endpoint='/api/competitions')
 api.add_resource(CompetitionController, '/api/competition_handler', endpoint='/api/competition_handler')
-api.add_resource(StravaAuth, '/api/strava_auth', endpoint='/api/strava_auth')
+# api.add_resource(StravaAuth, '/api/strava_auth', endpoint='/api/strava_auth')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

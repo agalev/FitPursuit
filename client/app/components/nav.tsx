@@ -4,6 +4,16 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Collapse, Dropdown, initTE } from 'tw-elements'
 
+const links = [
+	{ label: 'Login', href: '/login' },
+	{ label: 'Signup', href: '/signup' },
+	{ label: 'Home', href: '/' },
+	{ label: 'Dashboard', href: '/dashboard' },
+	{ label: 'Messages', href: '/messages' },
+	{ label: 'Teams', href: '/teams' },
+	{ label: 'Competitions', href: '/competitions' },
+]
+
 export default function Nav() {
 	useEffect(() => {
 		initTE({ Collapse, Dropdown })
@@ -50,20 +60,14 @@ export default function Nav() {
 					className='flex flex-wrap flex-col sm:flex-row md:flex-row lg:flex-row items-center'
 					data-te-navbar-nav-ref
 				>
+					{links.map(({ label, href }) => (
 					<Link
-						className='link-underline px-2'
-						href='/login'
+						className='link-underline mr-2 my-2'
+						href={href}
 						data-te-nav-link-ref
 					>
-						Login
-					</Link>
-					<Link
-						className='link-underline px-2'
-						href='/signup'
-						data-te-nav-link-ref
-					>
-						Signup
-					</Link>
+						{label}
+					</Link>))}
 				</section>
 			</div>
 		</nav>
