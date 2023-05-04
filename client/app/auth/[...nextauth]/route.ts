@@ -10,7 +10,6 @@ const handler = NextAuth({
 				'https://www.strava.com/oauth/authorize?approval_prompt=force&scope=activity:read_all,profile:read_all'
 		})
 	],
-
 	callbacks: {
 		async jwt({ token, account }) {
 			// Persist the OAuth access_token to the token right after signin
@@ -21,7 +20,7 @@ const handler = NextAuth({
 			}
 			return token
 		},
-		async session({ session, token }) {
+		async session({ session, token }: any) {
 			if (session?.user) {
 				session.profile = token.profile
 			}

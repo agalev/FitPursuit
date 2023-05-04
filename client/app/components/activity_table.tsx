@@ -9,14 +9,11 @@ function ActivityTable() {
 			.then((response) => response.json())
 			.then((data) => setActivities(data))
 	}, [])
-  // for(let key in activities) {
-	//   console.log(key)
-  // }
+
   console.log(JSON.parse(activities))
   for (let key in JSON.parse(activities)) {
     console.log(JSON.parse(activities)[key])
   }
-  
 
 	// Object.keys(activities.activity_type).forEach((key) => {
 	// 	rows.push(

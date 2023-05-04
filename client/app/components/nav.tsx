@@ -1,20 +1,27 @@
 'use client'
-import { useEffect } from 'react'
+import { useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { signOut } from 'next-auth/react'
 import { Collapse, Dropdown, initTE } from 'tw-elements'
-
-const links = [
-	{ label: 'Login', href: '/login' },
-	{ label: 'Signup', href: '/signup' },
-	{ label: 'Home', href: '/' },
-	{ label: 'Dashboard', href: '/dashboard' },
-	{ label: 'Messages', href: '/messages' },
-	{ label: 'Teams', href: '/teams' },
-	{ label: 'Competitions', href: '/competitions' }
-]
+import { UserContext } from '../user-provider'
 
 export default function Nav() {
+	const userData = useContext(UserContext)
+
+	const links = !userData.state.isLoggedIn
+		? [
+				{ label: 'Login', href: '/login' },
+				{ label: 'Signup', href: '/signup' }
+		  ]
+		: [
+				{ label: 'Home', href: '/' },
+				{ label: 'Dashboard', href: '/dashboard' },
+				{ label: 'Messages', href: '/messages' },
+				{ label: 'Teams', href: '/teams' },
+				{ label: 'Competitions', href: '/competitions' }
+		  ]
+
 	useEffect(() => {
 		initTE({ Collapse, Dropdown })
 	}, [])
@@ -62,7 +69,7 @@ export default function Nav() {
 				>
 					{links.map(({ label, href }) => (
 						<Link
-							className='link-underline mr-2 my-2'
+							className='link-underline mr-4 my-2'
 							key={label}
 							href={href}
 							data-te-nav-link-ref
@@ -70,6 +77,25 @@ export default function Nav() {
 							{label}
 						</Link>
 					))}
+					{userData.state.isLoggedIn && (
+						<button
+							className='link-underline mr-2 my-2'
+							data-te-nav-link-ref
+							onClick={() => {
+								signOut({ callbackUrl: '/' })
+									.then(() =>
+										fetch('/api/logout', {
+											method: 'POST'
+										})
+									)
+									.finally(() => {
+										userData.dispatch({ type: 'LOGOUT' })
+									})
+							}}
+						>
+							Logout
+						</button>
+					)}
 				</section>
 			</div>
 		</nav>

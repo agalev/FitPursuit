@@ -1,15 +1,19 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Input, Ripple, Select, initTE } from 'tw-elements'
+import checkAuth from '../hooks/check_auth'
+import { UserContext } from '../user-provider'
+import StravaButton from '../components/strava_button'
+import Toaster from '../components/toast'
 
 export default function SignUp() {
-	useEffect(() => {
-		initTE({ Input, Ripple, Select })
-	}, [])
-
+	checkAuth()
+	const userData = useContext(UserContext)
+	const router = useRouter()
+	const [error, setError] = useState('')
 	const [formData, setFormData] = useState({
 		first_name: '',
 		last_name: '',
@@ -21,9 +25,23 @@ export default function SignUp() {
 		state: '',
 		country: '',
 		sex: '',
-		height: 0,
-		weight: 0
+		height: '',
+		weight: ''
 	})
+
+	useEffect(() => {
+		initTE({ Input, Ripple, Select })
+	}, [])
+
+	useEffect(() => {
+		const disappearance = setTimeout(() => {
+			setError('')
+		}, 5000)
+		console.log(error)
+		return () => {
+			clearTimeout(disappearance)
+		}
+	}, [error])
 
 	const handleInputChange = (event) => {
 		const { name, value } = event.target
@@ -41,17 +59,36 @@ export default function SignUp() {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify(formData)
+		}).then((res) => {
+			if (res.status === 201) {
+				userData.dispatch({ type: 'LOGIN' })
+				router.push('/dashboard')
+			} else {
+				res.json().then((error) => {
+					setError(error.error)
+				})
+			}
 		})
-			.then((res) => res.json())
-			.then((data) => console.log(data))
+	}
+
+	if (userData.state.isLoggedIn) {
+		return (
+			<h1 className='flex justify-center text-3xl m-10'>Already logged in.</h1>
+		)
 	}
 
 	return (
 		<>
-			<section className='relative grid justify-center'>
+			<section className='flex justify-center'>
+			{error && <Toaster error={error} />}
 				<Image src='/500x200_motto.svg' width={500} height={200} alt='logo' />
+			</section>
+			<section className='flex justify-center my-10'>
+				<StravaButton />
+			</section>
+			<section className='relative grid justify-center'>
 				<h1 className='text-2xl my-2 flex justify-center'>
-					Fill the form to register
+					Or fill the form to register:
 				</h1>
 			</section>
 			<form className='grid grid-cols-1 sm:grid-cols-2 gap-6 px-5'>
@@ -252,7 +289,7 @@ export default function SignUp() {
 			</form>
 			<div className='my-6 pb-1 pt-1 text-center'>
 				<button
-					className='w-72 inline-block w-full rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+					className='w-72 inline-block rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
 					type='submit'
 					data-te-ripple-init
 					data-te-ripple-color='light'
@@ -263,22 +300,6 @@ export default function SignUp() {
 					onClick={handleSignup}
 				>
 					Sign up
-				</button>
-				<p className='my-3'>or:</p>
-				<button
-					className='w-72 inline-block w-full rounded px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-					type='button'
-					data-te-ripple-init
-					data-te-ripple-color='light'
-					style={{
-						backgroundImage:
-							'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
-					}}
-					onClick={() => {
-						signIn('strava')
-					}}
-				>
-					Sign up with your Strava
 				</button>
 			</div>
 			<section className='flex items-center justify-around'>

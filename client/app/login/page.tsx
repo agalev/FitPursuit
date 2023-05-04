@@ -1,21 +1,37 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { signIn } from 'next-auth/react'
 import { Input, Ripple, initTE } from 'tw-elements'
+import checkAuth from '../hooks/check_auth'
+import { UserContext } from '../user-provider'
+import StravaButton from '../components/strava_button'
+import Toaster from '../components/toast'
 
 export default function Login() {
+	checkAuth()
+	const userData = useContext(UserContext)
 	const router = useRouter()
-	useEffect(() => {
-		initTE({ Input, Ripple })
-	}, [])
-
 	const [formData, setFormData] = useState({
 		email: '',
 		password: ''
 	})
+	const [error, setError] = useState('')
+
+	useEffect(() => {
+		initTE({ Input, Ripple })
+	}, [])
+
+	useEffect(() => {
+		const disappearance = setTimeout(() => {
+			setError('')
+		}, 5000)
+		console.log(error)
+		return () => {
+			clearTimeout(disappearance)
+		}
+	}, [error])
 
 	const handleInputChange = (event) => {
 		const { name, value } = event.target
@@ -35,13 +51,21 @@ export default function Login() {
 			body: JSON.stringify(formData)
 		}).then((res) => {
 			if (res.status === 200) {
+				userData.dispatch({ type: 'LOGIN' })
 				router.push('/dashboard')
 			} else {
-				console.log('Login failed.')
+				res.json().then((error) => {
+					setError(error.error)
+				})
 			}
 		})
 	}
 
+	if (userData.state.isLoggedIn) {
+		return (
+			<h1 className='flex justify-center text-3xl m-10'>Already logged in.</h1>
+		)
+	}
 	return (
 		<>
 			<video
@@ -53,6 +77,7 @@ export default function Login() {
 			/>
 			<div className='absolute inset-x-[15%] bottom-5 text-center text-white md:block'>
 				<div className='g-6 flex h-full flex-wrap items-center justify-center'>
+					{error && <Toaster error={error} />}
 					<div className='rounded-lg bg-neutral-400 shadow-lg dark:bg-neutral-800 bg-opacity-70 dark:bg-opacity-70 px-5'>
 						<div className='text-center'>
 							<h1 className='text-3xl my-2'>FitPursuit</h1>
@@ -64,8 +89,9 @@ export default function Login() {
 								alt='logo'
 							/>
 						</div>
+						<StravaButton />
+						<p className='my-3'>or login manually:</p>
 						<form>
-							<p className='my-2'>Please login to your account</p>
 							<div className='relative mb-4' data-te-input-wrapper-init>
 								<input
 									className='peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0'
@@ -104,24 +130,6 @@ export default function Login() {
 								Log in
 							</button>
 						</form>
-						<p className='my-3'>or:</p>
-
-							<button
-								className='inline-block w-72 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-								type='button'
-								data-te-ripple-init
-								data-te-ripple-color='light'
-								style={{
-									backgroundImage:
-										'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
-								}}
-								onClick={() => {
-									signIn('strava')
-								}}
-							>
-								Log in with Strava
-							</button>
-
 						<div className='mb-12 pb-1 pt-1 text-center'></div>
 						<section className='flex items-center justify-between'>
 							<p className='mb-0 mr-2'>Don't have an account?</p>

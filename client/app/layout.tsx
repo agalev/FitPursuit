@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import Nav from './components/nav'
 import Footer from './components/footer'
 import Providers from './providers'
+import { UserProvider } from './user-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -28,9 +29,11 @@ export default function RootLayout({
 				className={`${inter.className} bg-slate-300 dark:text-amber-500 dark:bg-slate-900 transition-colors duration-300`}
 			>
 				<Providers session={session}>
-					<Nav />
-					{children}
-					<Footer />
+					<UserProvider>
+						<Nav />
+						{children}
+						<Footer />
+					</UserProvider>
 				</Providers>
 			</body>
 		</html>
