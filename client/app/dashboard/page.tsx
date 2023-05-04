@@ -2,21 +2,32 @@
 import { useEffect } from 'react'
 import { useSession, signIn } from 'next-auth/react'
 import { Ripple, Input, initTE } from 'tw-elements'
+// import ActivityTable from '../components/activity_table'
 
 export default function Dashboard() {
+
 	useEffect(() => {
 		initTE({ Ripple, Input })
 	}, [])
 
-	useEffect(() => {
-		fetch('/api/activities')
-			.then((res) => res.json())
-			.then((data) => console.log(data))
-	})
-
 	const session = useSession()
-	console.log(session)
 
+	if(session.data) {
+		console.log(session)
+		fetch('/api/auth', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				...session.data.profile,
+				accessToken: session.data.accessToken,
+				refreshToken: session.data.refreshToken,
+				expires_at: session.data.expires
+			})
+		})
+
+	}
 	const getAuth = () => {
 		fetch('/api/auth')
 			.then((res) => res.json())
@@ -35,26 +46,26 @@ export default function Dashboard() {
 			.then((data) => console.log(data))
 	}
 
-	const authWithDB = () => {
-		if (session.data !== null) {
-			fetch('/api/auth', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					...session.data.profile,
-					accessToken: session.data.accessToken,
-					refreshToken: session.data.refreshToken,
-					expires_at: session.data.expires
-				})
-			})
-				.then((res) => res.json())
-				.then((data) => console.log(data))
-		} else {
-			console.log('no profile')
-		}
-	}
+	// const authWithDB = () => {
+	// 	if (session.data !== null) {
+	// 		fetch('/api/auth', {
+	// 			method: 'POST',
+	// 			headers: {
+	// 				'Content-Type': 'application/json'
+	// 			},
+	// 			body: JSON.stringify({
+	// 				...session.data.profile,
+	// 				accessToken: session.data.accessToken,
+	// 				refreshToken: session.data.refreshToken,
+	// 				expires_at: session.data.expires
+	// 			})
+	// 		})
+	// 			.then((res) => res.json())
+	// 			.then((data) => console.log(data))
+	// 	} else {
+	// 		console.log('no profile')
+	// 	}
+	// }
 
 	const SyncActivities = () => {
 		fetch('/api/activities', {
@@ -67,6 +78,7 @@ export default function Dashboard() {
 	return (
 		<>
 			<h1>Dashboard</h1>
+			{/* <ActivityTable /> */}
 			{/* <Link
 				href={`https://www.strava.com/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID}&response_type=code&redirect_uri=http://localhost:3000/callback/exchange_token&approval_prompt=force&scope=read_all,activity:read_all`}
 			>
@@ -90,7 +102,7 @@ export default function Dashboard() {
 			>
 				Next-Auth with Strava
 			</button>
-			<button
+			{/* <button
 				type='button'
 				data-te-ripple-init
 				data-te-ripple-color='light'
@@ -98,7 +110,7 @@ export default function Dashboard() {
 				onClick={authWithDB}
 			>
 				Auth with db
-			</button>
+			</button> */}
 			<button
 				type='button'
 				data-te-ripple-init

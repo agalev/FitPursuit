@@ -11,7 +11,7 @@ const links = [
 	{ label: 'Dashboard', href: '/dashboard' },
 	{ label: 'Messages', href: '/messages' },
 	{ label: 'Teams', href: '/teams' },
-	{ label: 'Competitions', href: '/competitions' },
+	{ label: 'Competitions', href: '/competitions' }
 ]
 
 export default function Nav() {
@@ -61,13 +61,15 @@ export default function Nav() {
 					data-te-navbar-nav-ref
 				>
 					{links.map(({ label, href }) => (
-					<Link
-						className='link-underline mr-2 my-2'
-						href={href}
-						data-te-nav-link-ref
-					>
-						{label}
-					</Link>))}
+						<Link
+							className='link-underline mr-2 my-2'
+							key={label}
+							href={href}
+							data-te-nav-link-ref
+						>
+							{label}
+						</Link>
+					))}
 				</section>
 			</div>
 		</nav>

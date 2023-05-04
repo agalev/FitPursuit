@@ -6,7 +6,8 @@ const handler = NextAuth({
 		StravaProvider({
 			clientId: process.env.STRAVA_CLIENT_ID,
 			clientSecret: process.env.STRAVA_CLIENT_SECRET,
-      authorization: 'https://www.strava.com/oauth/authorize?approval_prompt=force&scope=activity:read_all,profile:read_all',
+			authorization:
+				'https://www.strava.com/oauth/authorize?approval_prompt=force&scope=activity:read_all,profile:read_all'
 		})
 	],
 
@@ -27,25 +28,6 @@ const handler = NextAuth({
 			session.accessToken = token.accessToken
 			session.refreshToken = token.refreshToken
 			return session
-		},
-		async signIn(user, account, profile) {
-      // console.log(user.account.expires_at)
-			// fetch('http://localhost:3000/api/auth', {
-			// 	method: 'POST',
-			// 	headers: {
-			// 		'Content-Type': 'application/json'
-			// 	},
-			// 	body: JSON.stringify({
-			// 		...user.profile,
-			// 		accessToken: user.account.access_token,
-			// 		refreshToken: user.account.refresh_token,
-      //     expires_at: user.account.expires_at
-			// 	})
-			// })
-      // .then(res => res.json())
-      // .then(data => console.log(data))
-
-			return true
 		}
 	}
 })
