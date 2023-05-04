@@ -2,6 +2,7 @@ from flask import session, request
 from flask_restful import Resource
 from datetime import datetime
 import httpx
+import pandas
 
 from config import app, api, db
 from models import User, Activity, Team, Message, Competition, CompetitionHandler
@@ -175,7 +176,22 @@ class MessagesController(Resource):
 
 class ActivitiesController(Resource):
     def get(self):
-        return [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])], 200
+        df = pandas.DataFrame([activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])])
+
+        # Group by activity type and calculate the mean and sum of distance, moving time, and elevation gain
+        grouped = df.groupby('activity_type').agg({
+                                            'distance': 'sum',
+                                            'moving_time': 'sum',
+                                            'total_elevation_gain': 'sum',
+                                            'average_speed': 'mean',
+                                            'max_speed': 'max',
+                                            'average_heartrate': 'mean',
+                                            'max_heartrate': 'max'
+                                            }).reset_index()
+        # Print the result
+        return grouped.to_json()
+    # def get(self):
+    #     return [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])], 200
     def post(self):
         user = User.query.filter(User.id == session['user_id']).first()
         if user.strava_token_expiry < datetime.now():
