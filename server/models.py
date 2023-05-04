@@ -79,7 +79,24 @@ class User(db.Model, SerializerMixin):
         existing_user = User.query.filter(User.email == email).first()
         if existing_user and existing_user.id != self.id:
             raise ValueError('Email address already registered')
+        if not email:
+            raise ValueError("User must have a email")
+        if '@' not in email:
+            raise ValueError("User failed simple email validation")
         return email
+    
+    @validates('first_name')
+    def validate_first_name(self, key, first_name):
+        if not first_name:
+            raise ValueError("User must have a first name")
+        return first_name
+    
+    @validates('last_name')
+    def validate_last_name(self, key, last_name):
+        if not last_name:
+            raise ValueError("User must have a last name")
+        return last_name
+
     
 class Activity(db.Model, SerializerMixin):
     __tablename__ = 'activities'

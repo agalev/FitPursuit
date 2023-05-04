@@ -14,10 +14,12 @@ def firewall():
 
 class Auth(Resource):
     def get(self):
-        return session
+        if 'user_id' not in session:
+            return {'error': 'Not logged in'}, 204
+        return session, 200
     def post(self):
         if 'user_id' in session:
-            return {'error': 'Already logged in'}, 401
+            return {'message': 'Already logged in'}, 200
         req = request.get_json()
         user = User.query.filter(User.id == req['id']).first()
         if user:
@@ -26,7 +28,7 @@ class Auth(Resource):
             return {'message': 'Logged in'}, 200
         else:
             user = User(id = req['id'],
-                        email = req['username'],
+                        email = f"strava@{req['username']}",
                         image = req['profile'],
                         first_name = req['firstname'],
                         last_name = req['lastname'],
@@ -39,7 +41,6 @@ class Auth(Resource):
                         strava_access_token = req['accessToken'],
                         strava_refresh_token = req['refreshToken'],
                         strava_token_expiry = datetime.strptime(req['expires_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
-
                         )
             user.password_hash = f"1Z{req['username']}" 
             user.last_online = datetime.now()
@@ -47,7 +48,7 @@ class Auth(Resource):
             db.session.commit()
             session['user_id'] = user.id
             session['profile'] = user.to_dict()
-            return user.to_dict(), 201 
+            return {'message': 'Signed up'}, 201
 
 class Signup(Resource):
     def post(self):
@@ -56,24 +57,27 @@ class Signup(Resource):
         req = request.get_json()
         if User.query.filter(User.email == req['email']).first():
             return {'error': 'Email already exists'}, 400
-        user = User(email = req['email'],
-                    image = req['image'] if 'image' in req else None,
-                    first_name = req['first_name'],
-                    last_name = req['last_name'],
-                    bio = req['bio'],
-                    city = req['city'],
-                    state = req['state'],
-                    country = req['country'],
-                    sex = req['sex'],
-                    height = req['height'],
-                    weight = req['weight'])
-        user.password_hash = req['password']
-        user.last_online = datetime.now()
-        db.session.add(user)
-        db.session.commit()
-        session['user_id'] = user.id
-        session['profile'] = user.to_dict()
-        return user.to_dict(), 201
+        try:
+            user = User(email = req['email'],
+                        image = req['image'] if 'image' in req else None,
+                        first_name = req['first_name'],
+                        last_name = req['last_name'],
+                        bio = req['bio'],
+                        city = req['city'],
+                        state = req['state'],
+                        country = req['country'],
+                        sex = req['sex'],
+                        height = req['height'],
+                        weight = req['weight'])
+            user.password_hash = req['password']
+            user.last_online = datetime.now()
+            db.session.add(user)
+            db.session.commit()
+            session['user_id'] = user.id
+            session['profile'] = user.to_dict()
+            return {'message': 'Signed up'}, 201
+        except Exception as e:
+            return {'error': str(e)}, 401
 
 class Login(Resource):
     def post(self):
@@ -89,12 +93,11 @@ class Login(Resource):
         db.session.commit()
         session['user_id'] = user.id
         session['profile'] = user.to_dict()
-        return user.to_dict(), 200
+        return {'message': 'Logged in'}, 200
 
 class Logout(Resource):
     def post(self):
-        session.pop('user_id')
-        session.pop('profile')
+        session.clear()
         return {'message': 'Logged out'}, 200
 
 class GetUsers(Resource):
