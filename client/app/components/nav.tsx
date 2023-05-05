@@ -31,13 +31,19 @@ export default function Nav() {
 			className='flex flex-wrap sticky top-0 z-50 w-full items-center justify-between backdrop-blur-sm py-1'
 			data-te-navbar-ref
 		>
-			<Link className='mx-2' href='/'>
+			<Link href='/'>
 				<picture>
 					<source
 						srcSet='/svg/nav_logo_orange.svg'
 						media='(prefers-color-scheme: dark)'
 					/>
-					<Image src='/svg/nav_logo_color.svg' width={200} height={40} alt='' />
+					<Image
+						src='/svg/nav_logo_color.svg'
+						width={200}
+						height={40}
+						alt=''
+						priority
+					/>
 				</picture>
 			</Link>
 			<button
@@ -69,7 +75,7 @@ export default function Nav() {
 				>
 					{links.map(({ label, href }) => (
 						<Link
-							className='link-underline mr-4 my-2'
+							className='link-underline sm:text-sm md:text-base lg:text-lg mr-3 my-2'
 							key={label}
 							href={href}
 							data-te-nav-link-ref
@@ -79,7 +85,7 @@ export default function Nav() {
 					))}
 					{userData.state.isLoggedIn && (
 						<button
-							className='link-underline mr-2 my-2'
+							className='link-underline sm:text-sm md:text-base lg:text-lg mr-2'
 							data-te-nav-link-ref
 							onClick={() => {
 								signOut({ callbackUrl: '/' })

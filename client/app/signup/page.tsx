@@ -7,13 +7,11 @@ import { Input, Ripple, Select, initTE } from 'tw-elements'
 import checkAuth from '../hooks/check_auth'
 import { UserContext } from '../user-provider'
 import StravaButton from '../components/strava_button'
-import Toaster from '../components/toast'
 
 export default function SignUp() {
 	checkAuth()
 	const userData = useContext(UserContext)
 	const router = useRouter()
-	const [error, setError] = useState('')
 	const [formData, setFormData] = useState({
 		first_name: '',
 		last_name: '',
@@ -32,16 +30,6 @@ export default function SignUp() {
 	useEffect(() => {
 		initTE({ Input, Ripple, Select })
 	}, [])
-
-	useEffect(() => {
-		const disappearance = setTimeout(() => {
-			setError('')
-		}, 5000)
-		console.log(error)
-		return () => {
-			clearTimeout(disappearance)
-		}
-	}, [error])
 
 	const handleInputChange = (event) => {
 		const { name, value } = event.target
@@ -65,7 +53,10 @@ export default function SignUp() {
 				router.push('/dashboard')
 			} else {
 				res.json().then((error) => {
-					setError(error.error)
+					userData.dispatch({
+						type: 'TOAST',
+						payload: { message: error.error, type: 'error' }
+					})
 				})
 			}
 		})
@@ -80,13 +71,18 @@ export default function SignUp() {
 	return (
 		<main>
 			<section className='flex justify-center'>
-				{error && <Toaster error={error} />}
 				<picture>
 					<source
 						srcSet='/svg/circle_logo_orange.svg'
 						media='(prefers-color-scheme: dark)'
 					/>
-					<Image src='/svg/circle_logo_color.svg' width={250} height={100} alt='' />
+					<Image
+						src='/svg/circle_logo_color.svg'
+						width={250}
+						height={100}
+						alt=''
+						priority
+					/>
 				</picture>
 			</section>
 			<section className='flex justify-center my-10'>

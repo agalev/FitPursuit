@@ -7,7 +7,6 @@ import { Input, Ripple, initTE } from 'tw-elements'
 import checkAuth from '../hooks/check_auth'
 import { UserContext } from '../user-provider'
 import StravaButton from '../components/strava_button'
-import Toaster from '../components/toast'
 
 export default function Login() {
 	checkAuth()
@@ -17,21 +16,10 @@ export default function Login() {
 		email: '',
 		password: ''
 	})
-	const [error, setError] = useState('')
 
 	useEffect(() => {
 		initTE({ Input, Ripple })
 	}, [])
-
-	useEffect(() => {
-		const disappearance = setTimeout(() => {
-			setError('')
-		}, 5000)
-		console.log(error)
-		return () => {
-			clearTimeout(disappearance)
-		}
-	}, [error])
 
 	const handleInputChange = (event) => {
 		const { name, value } = event.target
@@ -55,7 +43,10 @@ export default function Login() {
 				router.push('/dashboard')
 			} else {
 				res.json().then((error) => {
-					setError(error.error)
+					userData.dispatch({
+						type: 'TOAST',
+						payload: { message: error.error, type: 'error' }
+					})
 				})
 			}
 		})
@@ -77,7 +68,6 @@ export default function Login() {
 			/>
 			<div className='absolute inset-x-[15%] bottom-5 text-center text-white md:block'>
 				<div className='g-6 flex h-full flex-wrap items-center justify-center'>
-					{error && <Toaster error={error} />}
 					<div className='rounded-lg bg-neutral-400 shadow-lg dark:bg-neutral-800 bg-opacity-70 dark:bg-opacity-70 px-5'>
 						<picture>
 							<source
@@ -90,6 +80,7 @@ export default function Login() {
 								width={250}
 								height={100}
 								alt=''
+								priority
 							/>
 						</picture>
 						<StravaButton />
