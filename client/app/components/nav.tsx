@@ -34,10 +34,10 @@ export default function Nav() {
 			<Link className='mx-2' href='/'>
 				<picture>
 					<source
-						srcSet='/500x200_amber.svg'
+						srcSet='/svg/nav_logo_orange.svg'
 						media='(prefers-color-scheme: dark)'
 					/>
-					<Image src='/500x200_black.svg' width={100} height={40} alt='' />
+					<Image src='/svg/nav_logo_color.svg' width={200} height={40} alt='' />
 				</picture>
 			</Link>
 			<button

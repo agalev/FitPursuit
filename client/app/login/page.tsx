@@ -67,7 +67,7 @@ export default function Login() {
 		)
 	}
 	return (
-		<>
+		<main>
 			<video
 				className='absolute object-cover w-full h-full -mt-12'
 				src='/bg_video.mp4'
@@ -79,18 +79,21 @@ export default function Login() {
 				<div className='g-6 flex h-full flex-wrap items-center justify-center'>
 					{error && <Toaster error={error} />}
 					<div className='rounded-lg bg-neutral-400 shadow-lg dark:bg-neutral-800 bg-opacity-70 dark:bg-opacity-70 px-5'>
-						<div className='text-center'>
-							<h1 className='text-3xl my-2'>FitPursuit</h1>
-							<Image
-								className='my-2'
-								src='/500x200_motto.svg'
-								width={500}
-								height={200}
-								alt='logo'
+						<picture>
+							<source
+								srcSet='/svg/circle_logo_orange.svg'
+								media='(prefers-color-scheme: dark)'
 							/>
-						</div>
+							<Image
+								className='my-2 mx-auto'
+								src='/svg/circle_logo_color.svg'
+								width={250}
+								height={100}
+								alt=''
+							/>
+						</picture>
 						<StravaButton />
-						<p className='my-3'>or login manually:</p>
+						<p className='my-3'>or login:</p>
 						<form>
 							<div className='relative mb-4' data-te-input-wrapper-init>
 								<input
@@ -123,7 +126,7 @@ export default function Login() {
 								data-te-ripple-color='light'
 								style={{
 									backgroundImage:
-										'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
+										'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)'
 								}}
 								onClick={handleLogin}
 							>
@@ -141,7 +144,7 @@ export default function Login() {
 									data-te-ripple-color='light'
 									style={{
 										backgroundImage:
-											'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
+											'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)'
 									}}
 								>
 									Sign up
@@ -151,6 +154,6 @@ export default function Login() {
 					</div>
 				</div>
 			</div>
-		</>
+		</main>
 	)
 }

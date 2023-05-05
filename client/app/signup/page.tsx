@@ -78,10 +78,16 @@ export default function SignUp() {
 	}
 
 	return (
-		<>
+		<main>
 			<section className='flex justify-center'>
-			{error && <Toaster error={error} />}
-				<Image src='/500x200_motto.svg' width={500} height={200} alt='logo' />
+				{error && <Toaster error={error} />}
+				<picture>
+					<source
+						srcSet='/svg/circle_logo_orange.svg'
+						media='(prefers-color-scheme: dark)'
+					/>
+					<Image src='/svg/circle_logo_color.svg' width={250} height={100} alt='' />
+				</picture>
 			</section>
 			<section className='flex justify-center my-10'>
 				<StravaButton />
@@ -295,7 +301,7 @@ export default function SignUp() {
 					data-te-ripple-color='light'
 					style={{
 						backgroundImage:
-							'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
+							'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)'
 					}}
 					onClick={handleSignup}
 				>
@@ -312,13 +318,13 @@ export default function SignUp() {
 						data-te-ripple-color='light'
 						style={{
 							backgroundImage:
-								'linear-gradient(to right, #0f4c81, #1d5088, #2b548f, #395896, #475c9d, #5560a4, #6667ab, #745f9d, #82578f, #904f81, #9e4773, #ac3f65, #be3455)'
+								'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)'
 						}}
 					>
 						Login
 					</button>
 				</Link>
 			</section>
-		</>
+		</main>
 	)
 }
