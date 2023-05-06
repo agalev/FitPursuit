@@ -1,8 +1,8 @@
-"""added type to competition
+"""create tables
 
-Revision ID: 357228e2626d
+Revision ID: 01e4e285a256
 Revises: 
-Create Date: 2023-05-01 14:07:34.761914
+Create Date: 2023-05-05 13:20:16.293728
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '357228e2626d'
+revision = '01e4e285a256'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -52,6 +52,7 @@ def upgrade():
     sa.Column('height', sa.Integer(), nullable=True),
     sa.Column('weight', sa.Integer(), nullable=True),
     sa.Column('wins', sa.Integer(), nullable=True),
+    sa.Column('FPcoins', sa.Integer(), nullable=True),
     sa.Column('team_id', sa.Integer(), nullable=True),
     sa.Column('last_online', sa.DateTime(), nullable=True),
     sa.Column('strava_access_token', sa.String(), nullable=True),
@@ -95,6 +96,7 @@ def upgrade():
     sa.Column('description', sa.String(), nullable=False),
     sa.Column('type', sa.String(), nullable=False),
     sa.Column('activity_type', sa.String(), nullable=False),
+    sa.Column('prize_pool', sa.Integer(), nullable=False),
     sa.Column('distance', sa.Integer(), nullable=False),
     sa.Column('average_speed', sa.Float(), nullable=False),
     sa.Column('max_speed', sa.Float(), nullable=False),

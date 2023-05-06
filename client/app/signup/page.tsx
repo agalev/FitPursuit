@@ -5,12 +5,12 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Input, Ripple, Select, initTE } from 'tw-elements'
 import checkAuth from '../hooks/check_auth'
-import { UserContext } from '../user-provider'
+import { GlobalState } from '../global-provider'
 import StravaButton from '../components/strava_button'
 
 export default function SignUp() {
 	checkAuth()
-	const userData = useContext(UserContext)
+	const global = useContext(GlobalState)
 	const router = useRouter()
 	const [formData, setFormData] = useState({
 		first_name: '',
@@ -49,11 +49,13 @@ export default function SignUp() {
 			body: JSON.stringify(formData)
 		}).then((res) => {
 			if (res.status === 201) {
-				userData.dispatch({ type: 'LOGIN' })
+				res.json().then((data) => {
+					global.dispatch({ type: 'LOGIN', payload: data.profile })
+				})
 				router.push('/dashboard')
 			} else {
 				res.json().then((error) => {
-					userData.dispatch({
+					global.dispatch({
 						type: 'TOAST',
 						payload: { message: error.error, type: 'error' }
 					})
@@ -62,7 +64,7 @@ export default function SignUp() {
 		})
 	}
 
-	if (userData.state.isLoggedIn) {
+	if (global.state.isLoggedIn) {
 		return (
 			<h1 className='flex justify-center text-3xl m-10'>Already logged in.</h1>
 		)
@@ -122,13 +124,9 @@ export default function SignUp() {
 					<input
 						className='peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0'
 						type='email'
+						name='email'
 						value={formData.email}
-						onChange={(e) =>
-							setFormData({
-								...formData,
-								email: e.target.value
-							})
-						}
+						onChange={handleInputChange}
 					/>
 					<label className='pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary-600 peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary'>
 						Email address

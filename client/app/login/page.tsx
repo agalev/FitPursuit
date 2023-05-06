@@ -5,12 +5,12 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Input, Ripple, initTE } from 'tw-elements'
 import checkAuth from '../hooks/check_auth'
-import { UserContext } from '../user-provider'
+import { GlobalState } from '../global-provider'
 import StravaButton from '../components/strava_button'
 
 export default function Login() {
 	checkAuth()
-	const userData = useContext(UserContext)
+	const global = useContext(GlobalState)
 	const router = useRouter()
 	const [formData, setFormData] = useState({
 		email: '',
@@ -39,11 +39,13 @@ export default function Login() {
 			body: JSON.stringify(formData)
 		}).then((res) => {
 			if (res.status === 200) {
-				userData.dispatch({ type: 'LOGIN' })
+				res.json().then((data) => {
+					global.dispatch({ type: 'LOGIN', payload: data.profile })
+				})
 				router.push('/dashboard')
 			} else {
 				res.json().then((error) => {
-					userData.dispatch({
+					global.dispatch({
 						type: 'TOAST',
 						payload: { message: error.error, type: 'error' }
 					})
@@ -52,7 +54,7 @@ export default function Login() {
 		})
 	}
 
-	if (userData.state.isLoggedIn) {
+	if (global.state.isLoggedIn) {
 		return (
 			<h1 className='flex justify-center text-3xl m-10'>Already logged in.</h1>
 		)

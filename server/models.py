@@ -40,6 +40,7 @@ class User(db.Model, SerializerMixin):
     height = db.Column(db.Integer)
     weight = db.Column(db.Integer)
     wins = db.Column(db.Integer, default=0)
+    FPcoins = db.Column(db.Integer, default=0)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
     last_online = db.Column(db.DateTime)
     strava_access_token = db.Column(db.String)
@@ -80,21 +81,21 @@ class User(db.Model, SerializerMixin):
         if existing_user and existing_user.id != self.id:
             raise ValueError('Email address already registered')
         if not email:
-            raise ValueError("User must have a email")
+            raise ValueError("Please provide an email address")
         if '@' not in email:
-            raise ValueError("User failed simple email validation")
+            raise ValueError("Please provide an email address")
         return email
     
     @validates('first_name')
     def validate_first_name(self, key, first_name):
         if not first_name:
-            raise ValueError("User must have a first name")
+            raise ValueError("Please provide a first name")
         return first_name
     
     @validates('last_name')
     def validate_last_name(self, key, last_name):
         if not last_name:
-            raise ValueError("User must have a last name")
+            raise ValueError("Please provide a last name")
         return last_name
 
     
@@ -215,6 +216,7 @@ class Competition(db.Model, SerializerMixin):
     description = db.Column(db.String, nullable=False)
     type = db.Column(db.String, nullable=False)
     activity_type = db.Column(db.String, nullable=False)
+    prize_pool = db.Column(db.Integer, nullable=False, default=0)
     distance = db.Column(db.Integer, nullable=False)
     average_speed = db.Column(db.Float, nullable=False)
     max_speed = db.Column(db.Float, nullable=False)
@@ -239,7 +241,6 @@ class CompetitionHandler(db.Model, SerializerMixin):
                        '-team.messages',
                        '-team.competitions'
                        )
-
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))

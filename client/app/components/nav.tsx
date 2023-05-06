@@ -4,23 +4,36 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { signOut } from 'next-auth/react'
 import { Collapse, Dropdown, initTE } from 'tw-elements'
-import { UserContext } from '../user-provider'
+import { GlobalState } from '../global-provider'
 
 export default function Nav() {
-	const userData = useContext(UserContext)
+	const global = useContext(GlobalState)
 
-	const links = !userData.state.isLoggedIn
+	const links = !global.state.isLoggedIn
 		? [
+				{ label: 'Home', href: '/' },
+				{ label: 'Teams', href: '/teams' },
+				{ label: 'Competitions', href: '/competitions' },
 				{ label: 'Login', href: '/login' },
 				{ label: 'Signup', href: '/signup' }
 		  ]
 		: [
 				{ label: 'Home', href: '/' },
-				{ label: 'Dashboard', href: '/dashboard' },
-				{ label: 'Messages', href: '/messages' },
 				{ label: 'Teams', href: '/teams' },
-				{ label: 'Competitions', href: '/competitions' }
+				{ label: 'Competitions', href: '/competitions' },
+				{ label: 'Dashboard', href: '/dashboard' },
+				{ label: 'Messages', href: '/messages' }
 		  ]
+
+	const handleLogout = () => {
+		fetch('/api/logout', {
+			method: 'POST'
+		})
+			.then(() => global.dispatch({ type: 'LOGOUT' }))
+			.finally(() => {
+				signOut({ callbackUrl: '/' })
+			})
+	}
 
 	useEffect(() => {
 		initTE({ Collapse, Dropdown })
@@ -83,21 +96,11 @@ export default function Nav() {
 							{label}
 						</Link>
 					))}
-					{userData.state.isLoggedIn && (
+					{global.state.isLoggedIn && (
 						<button
 							className='link-underline sm:text-sm md:text-base lg:text-lg mr-2'
 							data-te-nav-link-ref
-							onClick={() => {
-								signOut({ callbackUrl: '/' })
-									.then(() =>
-										fetch('/api/logout', {
-											method: 'POST'
-										})
-									)
-									.finally(() => {
-										userData.dispatch({ type: 'LOGOUT' })
-									})
-							}}
+							onClick={handleLogout}
 						>
 							Logout
 						</button>

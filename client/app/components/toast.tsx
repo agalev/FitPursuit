@@ -42,7 +42,7 @@ export default function Toaster({
 			data-te-toast-show
 		>
 			<div
-				className={`flex items-center justify-between rounded-t-lg bg-${toast_types[type]}-100 bg-clip-padding px-4 pb-2 pt-2.5 !text-${toast_types[type]}-700`}
+				className={`flex items-center justify-between rounded-t-lg !bg-${toast_types[type]}-100 bg-clip-padding px-4 pb-2 pt-2.5 !text-${toast_types[type]}-700`}
 			>
 				<p
 					className={`flex items-center font-bold !text-${toast_types[type]}-700`}
@@ -88,7 +88,7 @@ export default function Toaster({
 				</div>
 			</div>
 			<div
-				className={`break-words rounded-b-lg bg-${toast_types[type]}-100 px-4 py-4 !text-${toast_types[type]}-700`}
+				className={`break-words rounded-b-lg !bg-${toast_types[type]}-100 px-4 py-4 !text-${toast_types[type]}-700`}
 			>
 				{message}
 			</div>

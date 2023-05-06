@@ -25,7 +25,7 @@ class Auth(Resource):
         if user:
             session['user_id'] = req['id']
             session['profile'] = user.to_dict()
-            return {'message': 'Logged in'}, 200
+            return session, 200
         else:
             user = User(id = req['id'],
                         email = f"strava@{req['username']}",
@@ -48,7 +48,7 @@ class Auth(Resource):
             db.session.commit()
             session['user_id'] = user.id
             session['profile'] = user.to_dict()
-            return {'message': 'Signed up'}, 201
+            return session, 201
 
 class Signup(Resource):
     def post(self):
@@ -75,7 +75,7 @@ class Signup(Resource):
             db.session.commit()
             session['user_id'] = user.id
             session['profile'] = user.to_dict()
-            return {'message': 'Signed up'}, 201
+            return session, 201
         except Exception as e:
             return {'error': str(e)}, 401
 
@@ -93,7 +93,7 @@ class Login(Resource):
         db.session.commit()
         session['user_id'] = user.id
         session['profile'] = user.to_dict()
-        return {'message': 'Logged in'}, 200
+        return session, 200
 
 class Logout(Resource):
     def post(self):

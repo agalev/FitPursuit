@@ -2,15 +2,16 @@
 import { useEffect, createContext, useReducer } from 'react'
 import Toaster from './components/toast'
 
-const UserContext = createContext(null)
+const GlobalState = createContext(null)
 
-const UserProvider = ({ children }) => {
+const DispatchProvider = ({ children }) => {
 	const reducer = (state, action) => {
 		switch (action.type) {
 			case 'LOGIN':
 				return {
 					...state,
 					isLoggedIn: true,
+					profile: action.payload,
 					toast: {
 						message: 'Logged in.',
 						type: 'success'
@@ -20,6 +21,7 @@ const UserProvider = ({ children }) => {
 				return {
 					...state,
 					isLoggedIn: false,
+					profile: {},
 					toast: {
 						message: 'Logged out.',
 						type: 'success'
@@ -40,6 +42,7 @@ const UserProvider = ({ children }) => {
 
 	const [state, dispatch] = useReducer(reducer, {
 		isLoggedIn: false,
+		profile: {},
 		toast: {
 			message: '',
 			type: ''
@@ -50,19 +53,20 @@ const UserProvider = ({ children }) => {
 		const disappearance = setTimeout(() => {
 			dispatch({ type: 'TOAST', payload: { message: '', type: '' } })
 		}, 5000)
+		console.log(state)
 		return () => {
 			clearTimeout(disappearance)
 		}
 	}, [state.toast.message])
 
 	return (
-		<UserContext.Provider value={{ state, dispatch }}>
+		<GlobalState.Provider value={{ state, dispatch }}>
 			{state.toast.message && (
 				<Toaster message={state.toast.message} type={state.toast.type} />
 			)}
 			{children}
-		</UserContext.Provider>
+		</GlobalState.Provider>
 	)
 }
 
-export { UserContext, UserProvider }
+export { GlobalState, DispatchProvider }

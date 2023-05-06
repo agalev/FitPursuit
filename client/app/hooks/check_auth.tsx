@@ -1,14 +1,14 @@
 'use client'
 import { useContext, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { UserContext } from '../user-provider'
+import { GlobalState } from '../global-provider'
 
 export default function checkAuth() {
-	const userData = useContext(UserContext)
+	const global = useContext(GlobalState)
 	const session: any = useSession()
 
 	useEffect(() => {
-		if (session.data && !userData.state.isLoggedIn) {
+		if (session.data && !global.state.isLoggedIn) {
 			fetch('/api/auth', {
 				method: 'POST',
 				headers: {
@@ -20,13 +20,19 @@ export default function checkAuth() {
 					refreshToken: session.data.refreshToken,
 					expires_at: session.data.expires
 				})
-			}).finally(() => {
-				userData.dispatch({ type: 'LOGIN' })
+			}).then((res) => {
+				if (res.status === 200) {
+					res.json().then((data) => {
+						global.dispatch({ type: 'LOGIN', payload: data.profile })
+					})
+				}
 			})
-		} else if (!userData.state.isLoggedIn) {
+		} else if (!global.state.isLoggedIn) {
 			fetch('/api/auth').then((res) => {
 				if (res.status === 200) {
-					userData.dispatch({ type: 'LOGIN' })
+					res.json().then((data) => {
+						global.dispatch({ type: 'LOGIN', payload: data.profile })
+					})
 				}
 			})
 		}
