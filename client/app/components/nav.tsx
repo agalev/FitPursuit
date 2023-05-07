@@ -5,8 +5,11 @@ import Image from 'next/image'
 import { signOut } from 'next-auth/react'
 import { Collapse, Dropdown, initTE } from 'tw-elements'
 import { GlobalState } from '../global-provider'
+import checkAuth from '../hooks/check_auth'
 
 export default function Nav() {
+	checkAuth()
+
 	const global = useContext(GlobalState)
 
 	const links = !global.state.isLoggedIn

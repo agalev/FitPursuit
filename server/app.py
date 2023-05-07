@@ -23,6 +23,11 @@ class Auth(Resource):
         req = request.get_json()
         user = User.query.filter(User.id == req['id']).first()
         if user:
+            user.strava_access_token = req['accessToken']
+            user.strava_refresh_token = req['refreshToken']
+            user.strava_token_expiry = datetime.strptime(req['expires_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
+            user.last_online = datetime.now()
+            db.session.commit()
             session['user_id'] = req['id']
             session['profile'] = user.to_dict()
             return session, 200
@@ -179,27 +184,13 @@ class MessagesController(Resource):
 
 class ActivitiesController(Resource):
     def get(self):
-        df = pandas.DataFrame([activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])])
-
-        # Group by activity type and calculate the mean and sum of distance, moving time, and elevation gain
-        grouped = df.groupby('activity_type').agg({
-                                            'distance': 'sum',
-                                            'moving_time': 'sum',
-                                            'total_elevation_gain': 'sum',
-                                            'average_speed': 'mean',
-                                            'max_speed': 'max',
-                                            'average_heartrate': 'mean',
-                                            'max_heartrate': 'max'
-                                            }).reset_index()
-        # Print the result
-        return grouped.to_json()
-    # def get(self):
-    #     return [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])], 200
+        return [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])], 200
     def post(self):
         user = User.query.filter(User.id == session['user_id']).first()
         if user.strava_token_expiry < datetime.now():
             return {'error': 'Strava token expired'}, 400
         page_count = 1
+        new_activity_count = 0
         res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
                         headers = {'Authorization': f'Bearer {user.strava_access_token}'},
                         params={'per_page': 200, 'page': page_count})
@@ -237,10 +228,26 @@ class ActivitiesController(Resource):
                                     elev_low = activity['elev_low'],
                                     pr_count = activity['pr_count'],
                                     user_id = session['user_id'])
+            new_activity_count += 1
             db.session.add(new_activity)
             db.session.commit()
-        return {'message': 'Activities synced'}, 200
-    
+        return {'message': f"{new_activity_count} new {'activity' if new_activity_count == 1 else 'activities'} added."}, 200
+
+class AggActivities(Resource):
+    def get(self):
+        df = pandas.DataFrame([activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])])
+        # Group by activity type and calculate the mean and sum of distance, moving time, and elevation gain
+        grouped = df.groupby('activity_type').agg({
+                                            'distance': 'sum',
+                                            'moving_time': 'sum',
+                                            'total_elevation_gain': 'sum',
+                                            'average_speed': 'mean',
+                                            'max_speed': 'max',
+                                            'average_heartrate': 'mean',
+                                            'max_heartrate': 'max'
+                                            }).reset_index()
+        return grouped.to_json()
+
 class TeamsController(Resource):
     def get(self):
         return [team.to_dict() for team in Team.query.all()], 200
@@ -347,6 +354,7 @@ api.add_resource(GetUsers, '/api/users', endpoint='/api/users')
 api.add_resource(UserController, '/api/users/<int:id>', endpoint='/api/users/<int:id>')
 api.add_resource(MessagesController, '/api/messages', endpoint='/api/messages')
 api.add_resource(ActivitiesController, '/api/activities', endpoint='/api/activities')
+api.add_resource(AggActivities, '/api/agg_activities', endpoint='/api/agg_activities')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
 api.add_resource(GetCompetitions, '/api/competitions', endpoint='/api/competitions')
 api.add_resource(CompetitionController, '/api/competition_handler', endpoint='/api/competition_handler')

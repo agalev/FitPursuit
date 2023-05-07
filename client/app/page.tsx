@@ -1,11 +1,9 @@
 'use client'
 import { useEffect, useContext } from 'react'
 import { Ripple, Input, initTE } from 'tw-elements'
-import checkAuth from './hooks/check_auth'
 import { GlobalState } from './global-provider'
 
 export default function Home() {
-	checkAuth()
 	const global = useContext(GlobalState)
 
 	useEffect(() => {
@@ -42,7 +40,12 @@ export default function Home() {
 			method: 'POST'
 		})
 			.then((res) => res.json())
-			.then((data) => console.log(data))
+			.then((data) =>
+				global.dispatch({
+					type: 'TOAST',
+					payload: { message: data.message, type: 'info' }
+				})
+			)
 	}
 
 	return (

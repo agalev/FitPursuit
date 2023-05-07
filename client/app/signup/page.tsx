@@ -4,12 +4,10 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Input, Ripple, Select, initTE } from 'tw-elements'
-import checkAuth from '../hooks/check_auth'
 import { GlobalState } from '../global-provider'
 import StravaButton from '../components/strava_button'
 
 export default function SignUp() {
-	checkAuth()
 	const global = useContext(GlobalState)
 	const router = useRouter()
 	const [formData, setFormData] = useState({
