@@ -35,6 +35,11 @@ const DispatchProvider = ({ children }) => {
 						type: action.payload.type
 					}
 				}
+			case 'REFRESH':
+				return {
+					...state,
+					profile: action.payload
+				}
 			default:
 				return state
 		}

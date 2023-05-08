@@ -3,13 +3,23 @@ import { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Input, Ripple, Select, initTE } from 'tw-elements'
+import { Ripple, Input, Select, initTE } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import StravaButton from '../components/strava_button'
+import states_countries from '../misc/states_countries.json'
 
 export default function SignUp() {
 	const global = useContext(GlobalState)
+
+	useEffect(() => {
+		initTE({ Ripple, Input, Select })
+	}, [])
+
+	const states = states_countries.states
+	const countries = states_countries.countries
+
 	const router = useRouter()
+
 	const [formData, setFormData] = useState({
 		first_name: '',
 		last_name: '',
@@ -21,13 +31,9 @@ export default function SignUp() {
 		state: '',
 		country: '',
 		sex: '',
-		height: '',
-		weight: ''
+		height: 0,
+		weight: 0
 	})
-
-	useEffect(() => {
-		initTE({ Input, Ripple, Select })
-	}, [])
 
 	const handleInputChange = (event) => {
 		const { name, value } = event.target
@@ -184,71 +190,24 @@ export default function SignUp() {
 					className='relative my-2'
 					data-te-select-init
 				>
-					<option value=''>Select State</option>
-					<option value='AL'>Alabama</option>
-					<option value='AK'>Alaska</option>
-					<option value='AZ'>Arizona</option>
-					<option value='AR'>Arkansas</option>
-					<option value='CA'>California</option>
-					<option value='CO'>Colorado</option>
-					<option value='CT'>Connecticut</option>
-					<option value='DE'>Delaware</option>
-					<option value='DC'>District Of Columbia</option>
-					<option value='FL'>Florida</option>
-					<option value='GA'>Georgia</option>
-					<option value='HI'>Hawaii</option>
-					<option value='ID'>Idaho</option>
-					<option value='IL'>Illinois</option>
-					<option value='IN'>Indiana</option>
-					<option value='IA'>Iowa</option>
-					<option value='KS'>Kansas</option>
-					<option value='KY'>Kentucky</option>
-					<option value='LA'>Louisiana</option>
-					<option value='ME'>Maine</option>
-					<option value='MD'>Maryland</option>
-					<option value='MA'>Massachusetts</option>
-					<option value='MI'>Michigan</option>
-					<option value='MN'>Minnesota</option>
-					<option value='MS'>Mississippi</option>
-					<option value='MO'>Missouri</option>
-					<option value='MT'>Montana</option>
-					<option value='NE'>Nebraska</option>
-					<option value='NV'>Nevada</option>
-					<option value='NH'>New Hampshire</option>
-					<option value='NJ'>New Jersey</option>
-					<option value='NM'>New Mexico</option>
-					<option value='NY'>New York</option>
-					<option value='NC'>North Carolina</option>
-					<option value='ND'>North Dakota</option>
-					<option value='OH'>Ohio</option>
-					<option value='OK'>Oklahoma</option>
-					<option value='OR'>Oregon</option>
-					<option value='PA'>Pennsylvania</option>
-					<option value='RI'>Rhode Island</option>
-					<option value='SC'>South Carolina</option>
-					<option value='SD'>South Dakota</option>
-					<option value='TN'>Tennessee</option>
-					<option value='TX'>Texas</option>
-					<option value='UT'>Utah</option>
-					<option value='VT'>Vermont</option>
-					<option value='VA'>Virginia</option>
-					<option value='WA'>Washington</option>
-					<option value='WV'>West Virginia</option>
-					<option value='WI'>Wisconsin</option>
-					<option value='WY'>Wyoming</option>
+					{states.map((state) => (
+						<option key={state.value} value={state.value}>
+							{state.label}
+						</option>
+					))}
 				</select>
-				<div className='relative my-2' data-te-input-wrapper-init>
-					<input
-						className='peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:placeholder:text-neutral-200 [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0'
-						type='text'
+					<select
 						name='country'
-						value={formData.country}
 						onChange={handleInputChange}
-					/>
-					<label className='pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary-600 peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary'>
-						Country
-					</label>
-				</div>
+						className='relative my-2'
+						data-te-select-init
+					>
+						{countries.map((country) => (
+							<option key={country} value={country}>
+								{country}
+							</option>
+						))}
+					</select>
 				<select
 					name='sex'
 					onChange={handleInputChange}

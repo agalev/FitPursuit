@@ -2,6 +2,7 @@
 import { useEffect, useContext } from 'react'
 import { Ripple, Input, initTE } from 'tw-elements'
 import { GlobalState } from '../global-provider'
+import UserProfile from '../components/user_profile'
 import ChartElement from '../components/chart'
 // import ActivityTable from '../components/activity_table'
 
@@ -23,6 +24,7 @@ export default function Dashboard() {
 	return (
 		<>
 			<h1>Dashboard</h1>
+			<UserProfile />
 			<ChartElement />
 		</>
 	)

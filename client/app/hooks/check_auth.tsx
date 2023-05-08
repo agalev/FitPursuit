@@ -21,17 +21,50 @@ export default function checkAuth() {
 					expires_at: session.data.expires
 				})
 			}).then((res) => {
-				if (res.status === 200) {
+				if (res.status === 200 || res.status === 201) {
 					res.json().then((data) => {
 						global.dispatch({ type: 'LOGIN', payload: data.profile })
+					})
+				} else {
+					res.json().then((error) => {
+						global.dispatch({
+							type: 'TOAST',
+							payload: { message: error.error, type: 'error' }
+						})
 					})
 				}
 			})
 		} else if (!global.state.isLoggedIn) {
 			fetch('/api/auth').then((res) => {
+				if (res.status === 200 || res.status === 201) {
+					res.json().then((data) => {
+						global.dispatch({ type: 'LOGIN', payload: data.profile })
+					})
+				}
+			})
+		} else if (session.data.profile.id !== global.state.profile.id) {
+			fetch('/api/auth', {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					...session.data.profile,
+					accessToken: session.data.accessToken,
+					refreshToken: session.data.refreshToken,
+					expires_at: session.data.expires
+				})
+			}).then((res) => {
 				if (res.status === 200) {
 					res.json().then((data) => {
 						global.dispatch({ type: 'LOGIN', payload: data.profile })
+					})
+				} else {
+					res.json().then((error) => {
+						global.dispatch({
+							type: 'TOAST',
+							payload: { message: error.error, type: 'error' }
+						})
 					})
 				}
 			})
