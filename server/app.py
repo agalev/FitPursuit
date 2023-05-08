@@ -23,6 +23,8 @@ class Auth(Resource):
         req = request.get_json()
         user = User.query.filter(User.id == req['id']).first()
         if user:
+            user.strava_connected = True
+            user.strava_id = req['id']
             user.strava_access_token = req['accessToken']
             user.strava_refresh_token = req['refreshToken']
             user.strava_token_expiry = datetime.strptime(req['expires_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -32,28 +34,52 @@ class Auth(Resource):
             session['profile'] = user.to_dict()
             return session, 200
         else:
-            user = User(id = req['id'],
-                        email = f"strava@{req['username']}",
-                        image = req['profile'],
-                        first_name = req['firstname'],
-                        last_name = req['lastname'],
-                        bio = req['bio'],
-                        city = req['city'],
-                        state = req['state'],
-                        country = req['country'],
-                        sex = req['sex'],
-                        weight = req['weight'],
-                        strava_access_token = req['accessToken'],
-                        strava_refresh_token = req['refreshToken'],
-                        strava_token_expiry = datetime.strptime(req['expires_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
-                        )
-            user.password_hash = f"1Z{req['username']}" 
+            try:
+                new_user = User(id = req['id'],
+                                strava_id = req['id'],
+                                email = f"strava@{req['username']}",
+                                image = req['profile'],
+                                first_name = req['firstname'],
+                                last_name = req['lastname'],
+                                bio = req['bio'],
+                                city = req['city'],
+                                state = req['state'],
+                                country = req['country'],
+                                sex = req['sex'],
+                                weight = req['weight'] * 2.20462,
+                                strava_connected = True,
+                                strava_access_token = req['accessToken'],
+                                strava_refresh_token = req['refreshToken'],
+                                strava_token_expiry = datetime.strptime(req['expires_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
+                                )
+                new_user.password_hash = f"1Z{req['username']}" 
+                new_user.last_online = datetime.now()
+                db.session.add(new_user)
+                db.session.commit()
+                session['user_id'] = new_user.id
+                session['profile'] = new_user.to_dict()
+                return session, 201
+            except Exception as e:
+                return {'error': 'This Strava account is already associated with a user'}, 401
+    def patch(self):
+        if 'user_id' not in session:
+            return {'error': 'Not logged in'}, 401
+        req = request.get_json()
+        if User.query.filter(User.strava_id == req['id']).first():
+                return {'error': 'This Strava account is already associated with a user'}, 401
+        user = User.query.filter(User.id == session['user_id']).first()
+        if user:
+            user.strava_id = req['id']
+            user.strava_connected = True
+            user.strava_access_token = req['accessToken']
+            user.strava_refresh_token = req['refreshToken']
+            user.strava_token_expiry = datetime.strptime(req['expires_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
             user.last_online = datetime.now()
-            db.session.add(user)
             db.session.commit()
-            session['user_id'] = user.id
             session['profile'] = user.to_dict()
-            return session, 201
+            return session, 200
+        else:
+            return {'error': 'User not found'}, 404
 
 class Signup(Resource):
     def post(self):
@@ -124,6 +150,7 @@ class UserController(Resource):
             for attr in req:
                 setattr(user, attr, req[attr])
             db.session.commit()
+            session['profile'] = user.to_dict()
             return user.to_dict(), 200
         except:
             return {'error': 'Unable to edit user'}, 401
@@ -229,13 +256,20 @@ class ActivitiesController(Resource):
                                     pr_count = activity['pr_count'],
                                     user_id = session['user_id'])
             new_activity_count += 1
+            user.FPcoins = new_activity_count * 10
             db.session.add(new_activity)
             db.session.commit()
-        return {'message': f"{new_activity_count} new {'activity' if new_activity_count == 1 else 'activities'} added."}, 200
+        session['profile'] = user.to_dict()
+        if new_activity_count == 0:
+            return {'message': 'Your Strava is synced'}, 200
+        return {'message': f"You just added {new_activity_count} new {'activity' if new_activity_count == 1 else 'activities'}! You earned {new_activity_count * 10} FP coins!", 'profile': user.to_dict()}, 200
 
-class AggActivities(Resource):
+class Stats(Resource):
     def get(self):
-        df = pandas.DataFrame([activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])])
+        activities = [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])]
+        if not activities:
+            return 204
+        df = pandas.DataFrame(activities)
         # Group by activity type and calculate the mean and sum of distance, moving time, and elevation gain
         grouped = df.groupby('activity_type').agg({
                                             'distance': 'sum',
@@ -245,7 +279,7 @@ class AggActivities(Resource):
                                             'max_speed': 'max',
                                             'average_heartrate': 'mean',
                                             'max_heartrate': 'max'
-                                            }).reset_index()
+                                            })
         return grouped.to_json()
 
 class TeamsController(Resource):
@@ -354,7 +388,7 @@ api.add_resource(GetUsers, '/api/users', endpoint='/api/users')
 api.add_resource(UserController, '/api/users/<int:id>', endpoint='/api/users/<int:id>')
 api.add_resource(MessagesController, '/api/messages', endpoint='/api/messages')
 api.add_resource(ActivitiesController, '/api/activities', endpoint='/api/activities')
-api.add_resource(AggActivities, '/api/agg_activities', endpoint='/api/agg_activities')
+api.add_resource(Stats, '/api/stats', endpoint='/api/stats')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
 api.add_resource(GetCompetitions, '/api/competitions', endpoint='/api/competitions')
 api.add_resource(CompetitionController, '/api/competition_handler', endpoint='/api/competition_handler')
