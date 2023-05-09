@@ -109,3 +109,27 @@
 		background-position: 100% 50%;
 	}
 }
+
+table {
+	overflow: hidden;
+}
+
+tr:hover {
+	color:white
+}
+
+td,
+th {
+	position: relative;
+}
+
+th:active:hover::after {
+	content: '';
+	position: absolute;
+	background-color: #475569;
+	left: 0;
+	top: -5000px;
+	height: 10000px;
+	width: 100%;
+	z-index: -1;
+}

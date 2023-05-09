@@ -238,25 +238,25 @@ class ActivitiesController(Resource):
             new_activity = Activity(strava_id = activity['id'],
                                     name = activity['name'],
                                     activity_type = activity['type'],
-                                    distance = activity['distance'],
+                                    distance = activity['distance'] * 0.000621371192, # convert meters to miles
                                     moving_time = activity['moving_time'],
                                     elapsed_time = activity['elapsed_time'],
-                                    total_elevation_gain = activity['total_elevation_gain'],
+                                    total_elevation_gain = activity['total_elevation_gain'] * 3.2808399, # convert meters to feet
                                     start_date_local = datetime.strptime(activity['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'),
                                     timezone = activity['timezone'],
                                     achievement_count = activity['achievement_count'],
                                     kudos_count = activity['kudos_count'],
                                     comment_count = activity['comment_count'],
-                                    average_speed = activity['average_speed'],
-                                    max_speed = activity['max_speed'],
-                                    average_heartrate = activity['average_heartrate'] if 'average_heartrate' in activity else None,
-                                    max_heartrate = activity['max_heartrate'] if 'max_heartrate' in activity else None,
-                                    elev_high = activity['elev_high'],
-                                    elev_low = activity['elev_low'],
+                                    average_speed = activity['average_speed'] * 2.23694, # convert meters per second to miles per hour
+                                    max_speed = activity['max_speed'] * 2.23694, # convert meters per second to miles per hour
+                                    average_heartrate = activity['average_heartrate'] if 'average_heartrate' in activity else 0,
+                                    max_heartrate = activity['max_heartrate'] if 'max_heartrate' in activity else 0,
+                                    elev_high = activity['elev_high'] * 3.2808399, # convert meters to feet,
+                                    elev_low = activity['elev_low'] * 3.2808399, # convert meters to feet,
                                     pr_count = activity['pr_count'],
                                     user_id = session['user_id'])
             new_activity_count += 1
-            user.FPcoins = new_activity_count * 10
+            user.FPcoins += new_activity_count * 10
             db.session.add(new_activity)
             db.session.commit()
         session['profile'] = user.to_dict()

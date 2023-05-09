@@ -58,7 +58,6 @@ const DispatchProvider = ({ children }) => {
 		const disappearance = setTimeout(() => {
 			dispatch({ type: 'TOAST', payload: { message: '', type: '' } })
 		}, 5000)
-		console.log(state)
 		return () => {
 			clearTimeout(disappearance)
 		}

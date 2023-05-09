@@ -221,36 +221,26 @@ export default function UserProfile() {
 							onChange={handleInputChange}
 							className='relative my-2'
 							data-te-select-init
+							defaultValue={global.state.profile.state}
 						>
-							{states.map((state) =>
-								state.value === global.state.profile.state ? (
-									<option key={state.value} value={state.value} selected>
-										{state.label}
-									</option>
-								) : (
-									<option key={state.value} value={state.value}>
-										{state.label}
-									</option>
-								)
-							)}
+							{states.map((state) => (
+								<option key={state.value} value={state.value}>
+									{state.label}
+								</option>
+							))}
 						</select>
 						<select
 							name='country'
 							onChange={handleInputChange}
 							className='relative my-2'
 							data-te-select-init
+							defaultValue={global.state.profile.country}
 						>
-							{countries.map((country) =>
-								country === global.state.profile.country ? (
-									<option key={country} value={country} selected>
-										{country}
-									</option>
-								) : (
-									<option key={country} value={country}>
-										{country}
-									</option>
-								)
-							)}
+							{countries.map((country) => (
+								<option key={country} value={country}>
+									{country}
+								</option>
+							))}
 						</select>
 					</section>
 				) : (
@@ -271,11 +261,12 @@ export default function UserProfile() {
 							onChange={handleInputChange}
 							className='relative my-2'
 							data-te-select-init
+							defaultValue={global.state.profile.sex}
 						>
 							<option value=''>Select Gender</option>
 							<option value='M'>Male</option>
 							<option value='F'>Female</option>
-							<option value='O'>Other</option>
+							<option value='N'>Nonbinary</option>
 						</select>
 						<div className='relative my-2' data-te-input-wrapper-init>
 							<input
@@ -325,7 +316,7 @@ export default function UserProfile() {
 			{editMode ? (
 				<>
 					<button
-						className='inline-block px-2 w-48 bg-amber-500 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+						className='inline-block px-2 w-48 bg-red-500 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
 						data-te-ripple-init
 						data-te-ripple-color='light'
 						onClick={() => handleCancel()}

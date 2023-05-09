@@ -1,72 +1,96 @@
 import { useState, useEffect } from 'react'
-import { ResponsiveContainer, BarChart, Bar } from 'recharts'
+import { initTE, Select } from 'tw-elements'
+import {
+	ResponsiveContainer,
+	BarChart,
+	Bar,
+	XAxis,
+	YAxis,
+	Tooltip,
+	Legend,
+	CartesianGrid
+} from 'recharts'
 
 export default function ChartElement() {
 	const [activities, setActivities] = useState(null)
+	const [chartData, setChartData] = useState({
+		dataset: [],
+		bar_key: ''
+	})
+
+	useEffect(() => {
+		initTE({ Select })
+	}, [])
+
 	useEffect(() => {
 		fetch('/api/stats')
 			.then((response) => response.json())
-			.then((data) => setActivities(data))
+			.then((data) => setActivities(Object.entries(JSON.parse(data))))
 	}, [])
 
-  console.log(activities)
-  
-  
-	// activities !== null && Object.keys(activities).forEach((key) => {
-	// 	agg.push({[key]: activities[key]})
-	// })
+	const tooltip_map = {
+		distance: 'Total distance(miles) travelled',
+		moving_time: 'Total time(minutes) spent exercising',
+		total_elevation_gain: 'Total elevation gain(feet)',
+		average_speed: 'Average Speed (mph)',
+		max_speed: 'Max Speed (mph)',
+		average_heartrate: 'Average Heartrate (bpm)',
+		max_heartrate: 'Max Heartrate (bpm)'
+	}
 
-	const data = [
-		{
-			name: 'Page A',
-			uv: 4000,
-			pv: 2400,
-			amt: 2400
-		},
-		{
-			name: 'Page B',
-			uv: 3000,
-			pv: 1398,
-			amt: 2210
-		},
-		{
-			name: 'Page C',
-			uv: 2000,
-			pv: 9800,
-			amt: 2290
-		},
-		{
-			name: 'Page D',
-			uv: 2780,
-			pv: 3908,
-			amt: 2000
-		},
-		{
-			name: 'Page E',
-			uv: 1890,
-			pv: 4800,
-			amt: 2181
-		},
-		{
-			name: 'Page F',
-			uv: 2390,
-			pv: 3800,
-			amt: 2500
-		},
-		{
-			name: 'Page G',
-			uv: 3490,
-			pv: 4300,
-			amt: 2100
-		}
-	]
+	const stats =
+		activities &&
+		activities.map((activity) => {
+			return {
+				category: activity[0],
+				stats: Object.entries(activity[1]).map((stat) => {
+					return {
+						discipline: [stat[0]].toString(),
+						[activity[0]]: stat[1]
+					}
+				})
+			}
+		})
+
+	const handleInputChange = (e) => {
+		const categoryIndex = stats.findIndex(
+			(category) => category['category'] === e.target.value
+		)
+		setChartData({
+			dataset: stats[categoryIndex]['stats'],
+			bar_key: e.target.value
+		})
+	}
+
 	return (
-		<>
-			<ResponsiveContainer className='mx-auto' width={'90%'} height={300}>
-				<BarChart data={data}>
-					<Bar dataKey='uv' fill='#8884d8' />
+		<section className='rounded-lg mx-2 my-4 text-center'>
+			<h2 className='text-2xl my-2 font-bold'>Dynamic Chart</h2>
+			<select
+				name='chartSelect'
+				onChange={handleInputChange}
+				data-te-select-init
+			>
+				<option>Select a category to view chart</option>
+				{stats &&
+					stats.map((stat) => (
+						<option key={stat['category']} value={stat['category']}>
+							{stat['category']}
+						</option>
+					))}
+			</select>
+			{chartData.bar_key && (
+				<p className='text-lg my-2'>{tooltip_map[chartData.bar_key]}</p>
+			)}
+			<ResponsiveContainer className='mx-auto' width={'100%'} height={400}>
+				<BarChart data={chartData.dataset}>
+					<XAxis dataKey='discipline' />
+					<YAxis />
+					<Tooltip />
+					<Legend />
+					<Bar dataKey={chartData.bar_key} fill='#8884d8' />
+					<CartesianGrid strokeDasharray='1 1' />
 				</BarChart>
 			</ResponsiveContainer>
-		</>
+		</section>
 	)
 }
