@@ -68,11 +68,10 @@ export default function SignUp() {
 		})
 	}
 
-	if (global.state.isLoggedIn) {
+	if (global.state.isLoggedIn)
 		return (
 			<h1 className='flex justify-center text-3xl m-10'>Already logged in.</h1>
 		)
-	}
 
 	return (
 		<main>
@@ -196,18 +195,18 @@ export default function SignUp() {
 						</option>
 					))}
 				</select>
-					<select
-						name='country'
-						onChange={handleInputChange}
-						className='relative my-2'
-						data-te-select-init
-					>
-						{countries.map((country) => (
-							<option key={country} value={country}>
-								{country}
-							</option>
-						))}
-					</select>
+				<select
+					name='country'
+					onChange={handleInputChange}
+					className='relative my-2'
+					data-te-select-init
+				>
+					{countries.map((country) => (
+						<option key={country} value={country}>
+							{country}
+						</option>
+					))}
+				</select>
 				<select
 					name='sex'
 					onChange={handleInputChange}

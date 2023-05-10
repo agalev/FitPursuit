@@ -115,7 +115,12 @@ table {
 }
 
 tr:hover {
-	color:white
+	color: crimson;
+}
+
+th,
+th:hover {
+	color: white;
 }
 
 td,

@@ -256,9 +256,10 @@ class ActivitiesController(Resource):
                                     pr_count = activity['pr_count'],
                                     user_id = session['user_id'])
             new_activity_count += 1
-            user.FPcoins += new_activity_count * 10
             db.session.add(new_activity)
             db.session.commit()
+        user.FPcoins += new_activity_count * 10
+        db.session.commit()
         session['profile'] = user.to_dict()
         if new_activity_count == 0:
             return {'message': 'Your Strava is synced'}, 200

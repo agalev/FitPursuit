@@ -1,29 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 
-export default function ActivityTable() {
-	const [activities, setActivities] = useState(null)
+export default function TeamsTable() {
+	const [teams, setTeams] = useState(null)
 	const [sortField, setSortField] = useState('')
 	const [sortOrder, setSortOrder] = useState('asc')
 
 	let index = 1
 
 	useEffect(() => {
-		fetch('/api/activities')
+		fetch('/api/teams')
 			.then((response) => response.json())
-			.then((data) => setActivities(data))
+			.then((data) => setTeams(data))
 	}, [])
 
-	const convertSecondsToHours = (seconds) => {
-		const hours = Math.floor(seconds / 3600)
-		const remainingMinutes = Math.floor((seconds % 3600) / 60)
-		const remainingSeconds = (seconds % 3600) % 60
-		return hours > 0
-			? `${hours}h ${remainingMinutes}m ${remainingSeconds}s`
-			: `${remainingMinutes}m ${remainingSeconds}s`
-	}
-
-	const sortActivities = (category) => {
+	const sortTable = (category) => {
 		const order = category === sortField && sortOrder === 'asc' ? 'desc' : 'asc'
 		setSortField(category)
 		setSortOrder(order)
@@ -33,20 +24,20 @@ export default function ActivityTable() {
 	const handleSorting = (sortField, sortOrder) => {
 		console.log(sortField, sortOrder)
 		if (sortField) {
-			const sorted = [...activities].sort((a, b) => {
+			const sorted = [...teams].sort((a, b) => {
 				return (
 					a[sortField].toString().localeCompare(b[sortField].toString(), 'en', {
 						numeric: true
 					}) * (sortOrder === 'asc' ? 1 : -1)
 				)
 			})
-			setActivities(sorted)
+			setTeams(sorted)
 		}
 	}
 
 	return (
 		<section className='flex flex-col overflow-x-auto'>
-			<h2 className='text-2xl my-2 font-bold text-center'>Activities Table</h2>
+			<h2 className='text-2xl my-2 font-bold text-center'>Teams Leaderboard</h2>
 			<table className='min-w-full text-center text-sm font-light'>
 				<thead className='border-b bg-amber-500 text-white font-medium dark:border-neutral-500'>
 					<tr>
@@ -56,9 +47,9 @@ export default function ActivityTable() {
 						<th
 							scope='col'
 							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('name')}
+							onClick={() => sortTable('name')}
 						>
-							Activity Name
+							Name
 							{sortField === 'name' && sortOrder === 'asc' ? (
 								<Image
 									src='/arrow-up.svg'
@@ -82,9 +73,35 @@ export default function ActivityTable() {
 						<th
 							scope='col'
 							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('activity_type')}
+							onClick={() => sortTable('wins')}
 						>
-							Activity Type
+							Wins
+							{sortField === 'wins' && sortOrder === 'asc' ? (
+								<Image
+									src='/arrow-up.svg'
+									width='0'
+									height='0'
+									sizes='100vw'
+									className='w-6 h-auto inline-block'
+									alt='arrow up'
+								/>
+							) : (
+								<Image
+									src='/arrow-down.svg'
+									width='0'
+									height='0'
+									sizes='100vw'
+									className='w-6 h-auto inline-block'
+									alt='arrow down'
+								/>
+							)}
+						</th>
+						<th
+							scope='col'
+							className='hover:bg-slate-600 cursor-pointer'
+							onClick={() => sortTable('activity_type')}
+						>
+							Activity
 							{sortField === 'activity_type' && sortOrder === 'asc' ? (
 								<Image
 									src='/arrow-up.svg'
@@ -108,10 +125,10 @@ export default function ActivityTable() {
 						<th
 							scope='col'
 							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('start_date_local')}
+							onClick={() => sortTable('members')}
 						>
-							Date & Time
-							{sortField === 'start_date_local' && sortOrder === 'asc' ? (
+							Members
+							{sortField === 'members' && sortOrder === 'asc' ? (
 								<Image
 									src='/arrow-up.svg'
 									width='0'
@@ -134,10 +151,10 @@ export default function ActivityTable() {
 						<th
 							scope='col'
 							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('timezone')}
+							onClick={() => sortTable('leader_id')}
 						>
-							Timezone & Location
-							{sortField === 'timezone' && sortOrder === 'asc' ? (
+							Leader
+							{sortField === 'leader_id' && sortOrder === 'asc' ? (
 								<Image
 									src='/arrow-up.svg'
 									width='0'
@@ -160,85 +177,7 @@ export default function ActivityTable() {
 						<th
 							scope='col'
 							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('distance')}
-						>
-							Distance
-							{sortField === 'distance' && sortOrder === 'asc' ? (
-								<Image
-									src='/arrow-up.svg'
-									width='0'
-									height='0'
-									sizes='100vw'
-									className='w-6 h-auto inline-block'
-									alt='arrow up'
-								/>
-							) : (
-								<Image
-									src='/arrow-down.svg'
-									width='0'
-									height='0'
-									sizes='100vw'
-									className='w-6 h-auto inline-block'
-									alt='arrow down'
-								/>
-							)}
-						</th>
-						<th
-							scope='col'
-							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('moving_time')}
-						>
-							Moving Time
-							{sortField === 'moving_time' && sortOrder === 'asc' ? (
-								<Image
-									src='/arrow-up.svg'
-									width='0'
-									height='0'
-									sizes='100vw'
-									className='w-6 h-auto inline-block'
-									alt='arrow up'
-								/>
-							) : (
-								<Image
-									src='/arrow-down.svg'
-									width='0'
-									height='0'
-									sizes='100vw'
-									className='w-6 h-auto inline-block'
-									alt='arrow down'
-								/>
-							)}
-						</th>
-						<th
-							scope='col'
-							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('total_elevation_gain')}
-						>
-							Elev. Gain
-							{sortField === 'total_elevation_gain' && sortOrder === 'asc' ? (
-								<Image
-									src='/arrow-up.svg'
-									width='0'
-									height='0'
-									sizes='100vw'
-									className='w-6 h-auto inline-block'
-									alt='arrow up'
-								/>
-							) : (
-								<Image
-									src='/arrow-down.svg'
-									width='0'
-									height='0'
-									sizes='100vw'
-									className='w-6 h-auto inline-block'
-									alt='arrow down'
-								/>
-							)}
-						</th>
-						<th
-							scope='col'
-							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('average_speed')}
+							onClick={() => sortTable('average_speed')}
 						>
 							Avg Speed
 							{sortField === 'average_speed' && sortOrder === 'asc' ? (
@@ -264,7 +203,7 @@ export default function ActivityTable() {
 						<th
 							scope='col'
 							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('max_speed')}
+							onClick={() => sortTable('max_speed')}
 						>
 							Max Speed
 							{sortField === 'max_speed' && sortOrder === 'asc' ? (
@@ -290,10 +229,10 @@ export default function ActivityTable() {
 						<th
 							scope='col'
 							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('average_heartrate')}
+							onClick={() => sortTable('total_moving_time')}
 						>
-							Avg Heart
-							{sortField === 'average_heartrate' && sortOrder === 'asc' ? (
+							Total Moving Time
+							{sortField === 'total_moving_time' && sortOrder === 'asc' ? (
 								<Image
 									src='/arrow-up.svg'
 									width='0'
@@ -316,10 +255,10 @@ export default function ActivityTable() {
 						<th
 							scope='col'
 							className='hover:bg-slate-600 cursor-pointer'
-							onClick={() => sortActivities('max_heartrate')}
+							onClick={() => sortTable('total_distance')}
 						>
-							Max Heart
-							{sortField === 'max_heartrate' && sortOrder === 'asc' ? (
+							Total Distance
+							{sortField === 'total_distance' && sortOrder === 'asc' ? (
 								<Image
 									src='/arrow-up.svg'
 									width='0'
@@ -342,49 +281,32 @@ export default function ActivityTable() {
 					</tr>
 				</thead>
 				<tbody>
-					{activities &&
-						activities.map((activity) => (
-							<tr
-								key={activity.strava_id}
-								className='border-b dark:border-neutral-500'
-							>
+					{teams &&
+						teams.map((team) => (
+							<tr key={team.id} className='border-b dark:border-neutral-500'>
 								<td className='whitespace-nowrap px-6 py-4 font-medium'>
 									{index++}
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>{activity.name}</td>
-								<td className='whitespace-nowrap px-6 py-4'>
-									{activity.activity_type}
+								<td className='whitespace-nowrap px-6 py-4'>{team.name}</td>
+								<td className='whitespace-nowrap px-10 py-4'>{team.wins}</td>
+								<td className='whitespace-nowrap px-10 py-4'>
+									{team.activity_type}
 								</td>
+								<td className='whitespace-nowrap px-12 py-4'>{team.members}</td>
 								<td className='whitespace-nowrap px-6 py-4'>
-									{activity.start_date_local}
+									{`${team.leader.first_name} ${team.leader.last_name}`}
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
-									{activity.timezone}
+								<td className='whitespace-nowrap px-12 py-4'>
+									{team.average_speed ? team.average_speed : '-'}
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
-									{Math.round(activity.distance * 100) / 100} miles
+								<td className='whitespace-nowrap px-12 py-4'>
+									{team.max_speed ? team.max_speed : '-'}
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
-									{convertSecondsToHours(activity.moving_time)}
+								<td className='whitespace-nowrap px-20 py-4'>
+									{team.total_moving_time ? team.total_moving_time : '-'}
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
-									{Math.round(activity.total_elevation_gain * 100) / 100} ft
-								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
-									{Math.round(activity.average_speed * 100) / 100}mph
-								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
-									{Math.round(activity.max_speed * 100) / 100}mph
-								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
-									{activity.average_heartrate
-										? `${activity.average_heartrate}bpm`
-										: '-'}
-								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
-									{activity.max_heartrate
-										? `${activity.max_heartrate}bpm`
-										: '-'}
+								<td className='whitespace-nowrap px-16 py-4'>
+									{team.total_distance ? team.total_distance : '-'}
 								</td>
 							</tr>
 						))}
