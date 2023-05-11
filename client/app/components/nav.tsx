@@ -3,7 +3,7 @@ import { useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { signOut } from 'next-auth/react'
-import { Collapse, Dropdown, initTE } from 'tw-elements'
+import { initTE, Collapse, Dropdown } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import checkAuth from '../hooks/check_auth'
 
@@ -15,7 +15,6 @@ export default function Nav() {
 	const links = !global.state.isLoggedIn
 		? [
 				{ label: 'Home', href: '/' },
-				{ label: 'Teams', href: '/teams' },
 				{ label: 'Competitions', href: '/competitions' },
 				{ label: 'Login', href: '/login' },
 				{ label: 'Signup', href: '/signup' }

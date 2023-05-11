@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { initTE, Select } from 'tw-elements'
 import {
 	ResponsiveContainer,
@@ -10,8 +10,11 @@ import {
 	Legend,
 	CartesianGrid
 } from 'recharts'
+import { GlobalState } from '../global-provider'
 
 export default function ChartElement() {
+	const global = useContext(GlobalState)
+
 	const [activities, setActivities] = useState(null)
 	const [chartData, setChartData] = useState({
 		dataset: [],
@@ -64,7 +67,7 @@ export default function ChartElement() {
 
 	return (
 		<section className='rounded-lg mx-2 my-4 text-center'>
-			<h2 className='text-2xl my-2 font-bold'>Dynamic Chart</h2>
+			<h2 className='text-2xl my-2 font-bold'>{`${global.state.profile.first_name}'s Dynamic Chart`}</h2>
 			<select
 				name='chartSelect'
 				onChange={handleInputChange}

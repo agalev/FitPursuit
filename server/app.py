@@ -169,8 +169,8 @@ class UserController(Resource):
 class MessagesController(Resource):
     def get(self):
         try:
-            query = Message.query.filter(Message.sender_id == 1).all()
-            query += Message.query.filter(Message.receiver_id == 1).all()
+            query = Message.query.filter(Message.sender_id == session['user_id']).all()
+            query += Message.query.filter(Message.receiver_id == session['user_id']).all()
             return [message.to_dict() for message in query], 200
         except Exception as e:
             return {'error': str(e)}, 400
@@ -210,8 +210,11 @@ class MessagesController(Resource):
             return {'error': str(e)}, 400
 
 class ActivitiesController(Resource):
-    def get(self):
-        return [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])], 200
+    def get(self, param):
+        if param == 'self':
+            return [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])], 200
+        elif param == 'all':
+            return [activity.to_dict() for activity in Activity.query.all()], 200
     def post(self):
         user = User.query.filter(User.id == session['user_id']).first()
         if user.strava_token_expiry < datetime.now():
@@ -388,12 +391,11 @@ api.add_resource(Logout, '/api/logout', endpoint='/api/logout')
 api.add_resource(GetUsers, '/api/users', endpoint='/api/users')
 api.add_resource(UserController, '/api/users/<int:id>', endpoint='/api/users/<int:id>')
 api.add_resource(MessagesController, '/api/messages', endpoint='/api/messages')
-api.add_resource(ActivitiesController, '/api/activities', endpoint='/api/activities')
+api.add_resource(ActivitiesController, '/api/activities/<string:param>', endpoint='/api/activities/<string:param>')
 api.add_resource(Stats, '/api/stats', endpoint='/api/stats')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
 api.add_resource(GetCompetitions, '/api/competitions', endpoint='/api/competitions')
 api.add_resource(CompetitionController, '/api/competition_handler', endpoint='/api/competition_handler')
-# api.add_resource(StravaAuth, '/api/strava_auth', endpoint='/api/strava_auth')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

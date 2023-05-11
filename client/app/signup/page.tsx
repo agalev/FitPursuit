@@ -258,7 +258,7 @@ export default function SignUp() {
 					Sign up
 				</button>
 			</div>
-			<section className='flex items-center justify-around'>
+			<section className='flex items-center justify-center'>
 				<p className='mb-0 mr-2'>Already have an account?</p>
 				<Link href='/login'>
 					<button

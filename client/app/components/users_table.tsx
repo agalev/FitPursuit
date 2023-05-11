@@ -22,7 +22,6 @@ export default function UsersTable() {
 	}
 
 	const handleSorting = (sortField, sortOrder) => {
-		console.log(sortField, sortOrder)
 		if (sortField) {
 			const sorted = [...users].sort((a, b) => {
 				return (
@@ -287,7 +286,7 @@ export default function UsersTable() {
 								<td className='whitespace-nowrap px-6 py-4 font-medium'>
 									{index++}
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
+								<td className='whitespace-nowrap px-8 py-4'>
 									{user.first_name ? user.first_name : '-'}
 								</td>
 								<td className='whitespace-nowrap px-10 py-4'>
@@ -306,7 +305,7 @@ export default function UsersTable() {
 								<td className='whitespace-nowrap px-6 py-4'>
 									{user.state ? user.state : '-'}
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
+								<td className='whitespace-nowrap px-8 py-4'>
 									{user.country ? user.country : '-'}
 								</td>
 								<td className='whitespace-nowrap px-6 py-4'>

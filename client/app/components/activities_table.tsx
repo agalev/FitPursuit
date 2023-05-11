@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Image from 'next/image'
+import { GlobalState } from '../global-provider'
 
-export default function ActivityTable() {
+export default function ActivitiesTable({ param }) {
+	const global = useContext(GlobalState)
+
 	const [activities, setActivities] = useState(null)
 	const [sortField, setSortField] = useState('')
 	const [sortOrder, setSortOrder] = useState('asc')
@@ -9,7 +12,7 @@ export default function ActivityTable() {
 	let index = 1
 
 	useEffect(() => {
-		fetch('/api/activities')
+		fetch(`/api/activities/${param}`)
 			.then((response) => response.json())
 			.then((data) => setActivities(data))
 	}, [])
@@ -46,7 +49,7 @@ export default function ActivityTable() {
 
 	return (
 		<section className='flex flex-col overflow-x-auto'>
-			<h2 className='text-2xl my-2 font-bold text-center'>Activities Table</h2>
+			<h2 className='text-2xl my-2 font-bold text-center'>{`${global.state.profile.first_name}'s Activities`}</h2>
 			<table className='min-w-full text-center text-sm font-light'>
 				<thead className='border-b bg-amber-500 text-white font-medium dark:border-neutral-500'>
 					<tr>
@@ -351,7 +354,7 @@ export default function ActivityTable() {
 								<td className='whitespace-nowrap px-6 py-4 font-medium'>
 									{index++}
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>{activity.name}</td>
+								<td className='whitespace-nowrap px-8 py-4'>{activity.name}</td>
 								<td className='whitespace-nowrap px-6 py-4'>
 									{activity.activity_type}
 								</td>
@@ -364,7 +367,7 @@ export default function ActivityTable() {
 								<td className='whitespace-nowrap px-6 py-4'>
 									{Math.round(activity.distance * 100) / 100} miles
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
+								<td className='whitespace-nowrap px-8 py-4'>
 									{convertSecondsToHours(activity.moving_time)}
 								</td>
 								<td className='whitespace-nowrap px-6 py-4'>

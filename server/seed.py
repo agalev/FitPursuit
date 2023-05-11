@@ -19,7 +19,7 @@ with app.app_context():
     print('Creating users...')
     user1 = User(
         email='test@test.com',
-        # image='https://i.imgur.com/2FZL0fg.png',
+        image='/seed_avatars/1.svg',
         first_name='John',
         last_name='Doe',
         bio='I am a test user',
@@ -27,15 +27,17 @@ with app.app_context():
         state='CA',
         country='USA',
         sex='M',
-        height=72,
-        weight=180,
+        height=82,
+        weight=220,
+        wins=3,
+        FPcoins=2000,
         team_id=1
     )
     user1.password_hash = 'Password1'
     user2 = User(
         email='test2@test.com',
         _password_hash='Password1',
-        # image='https://i.imgur.com/2FZL0fg.png',
+        image='/seed_avatars/2.svg',
         first_name='Jane',
         last_name='Doe',
         bio='I am a test user',
@@ -45,6 +47,8 @@ with app.app_context():
         sex='F',
         height=60,
         weight=120,
+        wins=2,
+        FPcoins=3000,
         team_id=1
     )
     user2.password_hash = 'Password1'
@@ -52,7 +56,7 @@ with app.app_context():
     user3 = User(
         email='test3@test.com',
         _password_hash='Password1',
-        # image='https://i.imgur.com/2FZL0fg.png',
+        image='/seed_avatars/3.svg',
         first_name='Johny',
         last_name='Doey',
         bio='I am a test user',
@@ -62,6 +66,8 @@ with app.app_context():
         sex='M',
         height=72,
         weight=180,
+        wins=2,
+        FPcoins=3000,
         team_id=1
     )
     user3.password_hash = 'Password1'
@@ -100,10 +106,10 @@ with app.app_context():
         achievement_count=1,
         kudos_count=1,
         comment_count=1,
-        average_speed=1.23,
-        max_speed=1.34,
-        average_heartrate=1.45,
-        max_heartrate=1.56,
+        average_speed=11,
+        max_speed=14,
+        average_heartrate=90,
+        max_heartrate=184,
         elev_high=2,
         elev_low=1,
         pr_count=1,
@@ -122,17 +128,17 @@ with app.app_context():
         achievement_count=1,
         kudos_count=1,
         comment_count=1,
-        average_speed=1.23,
-        max_speed=1.34,
-        average_heartrate=1.45,
-        max_heartrate=1.56,
+        average_speed=13,
+        max_speed=14,
+        average_heartrate=115,
+        max_heartrate=186,
         elev_high=2,
         elev_low=1,
         pr_count=1,
         user_id=2
     )
     activity3 = Activity(
-        strava_id=1,
+        strava_id=3,
         name='Activity 3',
         activity_type='rollerblading',
         distance=1000,
@@ -144,10 +150,10 @@ with app.app_context():
         achievement_count=1,
         kudos_count=1,
         comment_count=1,
-        average_speed=1.23,
-        max_speed=1.34,
-        average_heartrate=1.45,
-        max_heartrate=1.56,
+        average_speed=12.3,
+        max_speed=13.4,
+        average_heartrate=145,
+        max_heartrate=156,
         elev_high=2,
         elev_low=1,
         pr_count=1,
@@ -170,10 +176,16 @@ with app.app_context():
     )
     message3 = Message(
         sender_id=1,
-        # receiver_id=3,
+        receiver_id=3,
         team_id=1,
         content='Hello, world!'
     )
+    message4 = Message(
+        sender_id=3,
+        receiver_id=1,
+        content='Hello, world!'
+    )
+
 
     # Create competitions
     print('Creating competitions...')
@@ -245,6 +257,7 @@ with app.app_context():
         message1,
         message2,
         message3,
+        message4,
         competition1,
         competition2,
         competition3,

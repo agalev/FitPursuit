@@ -22,7 +22,6 @@ export default function TeamsTable() {
 	}
 
 	const handleSorting = (sortField, sortOrder) => {
-		console.log(sortField, sortOrder)
 		if (sortField) {
 			const sorted = [...teams].sort((a, b) => {
 				return (
