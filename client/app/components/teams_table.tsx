@@ -24,6 +24,7 @@ export default function TeamsTable() {
 	const handleSorting = (sortField, sortOrder) => {
 		if (sortField) {
 			const sorted = [...teams].sort((a, b) => {
+				if (a[sortField] === null || b[sortField] === null) return 0
 				return (
 					a[sortField].toString().localeCompare(b[sortField].toString(), 'en', {
 						numeric: true

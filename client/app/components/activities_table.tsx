@@ -36,6 +36,7 @@ export default function ActivitiesTable({ param }) {
 	const handleSorting = (sortField, sortOrder) => {
 		if (sortField) {
 			const sorted = [...activities].sort((a, b) => {
+				if (a[sortField] === null || b[sortField] === null) return 0
 				return (
 					a[sortField].toString().localeCompare(b[sortField].toString(), 'en', {
 						numeric: true

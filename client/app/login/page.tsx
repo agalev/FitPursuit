@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Input, Ripple, initTE } from 'tw-elements'
+import { initTE, Ripple, Input } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import StravaButton from '../components/strava_button'
 

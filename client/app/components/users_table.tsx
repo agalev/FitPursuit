@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { initTE, Ripple, Input } from 'tw-elements'
 
 export default function UsersTable() {
 	const [users, setUsers] = useState(null)
+	const [searchQuery, setSearchQuery] = useState('')
 	const [sortField, setSortField] = useState('')
 	const [sortOrder, setSortOrder] = useState('asc')
+
+	useEffect(() => {
+		initTE({ Input, Ripple })
+	}, [])
 
 	let index = 1
 
@@ -24,6 +30,7 @@ export default function UsersTable() {
 	const handleSorting = (sortField, sortOrder) => {
 		if (sortField) {
 			const sorted = [...users].sort((a, b) => {
+				if (a[sortField] === null || b[sortField] === null) return 0
 				return (
 					a[sortField].toString().localeCompare(b[sortField].toString(), 'en', {
 						numeric: true
@@ -34,9 +41,46 @@ export default function UsersTable() {
 		}
 	}
 
+	const filteredUsers =
+		users &&
+		users.filter((user) => {
+			return JSON.stringify(user)
+				.toLowerCase()
+				.includes(searchQuery.toLowerCase())
+		})
+
+	const displayUsers = searchQuery.length > 0 ? filteredUsers : users
+
 	return (
 		<section className='flex flex-col overflow-x-auto'>
 			<h2 className='text-2xl my-2 font-bold text-center'>Users Leaderboard</h2>
+			<div className='relative mb-3' data-te-input-wrapper-init>
+				<input
+					type='search'
+					className='peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0'
+					id='Search'
+					value={searchQuery}
+					onChange={(e) => setSearchQuery(e.target.value)}
+				/>
+				<label
+					htmlFor='Search'
+					className='pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary'
+				>
+					Search
+					<svg
+						xmlns='http://www.w3.org/2000/svg'
+						viewBox='0 0 22 22'
+						fill='currentColor'
+						className='h-5 w-5 ml-1 inline-block'
+					>
+						<path
+							fillRule='evenodd'
+							d='M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z'
+							clipRule='evenodd'
+						/>
+					</svg>
+				</label>
+			</div>
 			<table className='min-w-full text-center text-sm font-light'>
 				<thead className='border-b bg-amber-500 text-white font-medium dark:border-neutral-500'>
 					<tr>
@@ -280,8 +324,8 @@ export default function UsersTable() {
 					</tr>
 				</thead>
 				<tbody>
-					{users &&
-						users.map((user) => (
+					{displayUsers &&
+						displayUsers.map((user) => (
 							<tr key={user.id} className='border-b dark:border-neutral-500'>
 								<td className='whitespace-nowrap px-6 py-4 font-medium'>
 									{index++}
