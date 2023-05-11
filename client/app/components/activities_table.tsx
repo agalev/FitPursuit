@@ -34,7 +34,6 @@ export default function ActivitiesTable({ param }) {
 	}
 
 	const handleSorting = (sortField, sortOrder) => {
-		console.log(sortField, sortOrder)
 		if (sortField) {
 			const sorted = [...activities].sort((a, b) => {
 				return (

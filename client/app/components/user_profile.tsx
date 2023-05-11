@@ -83,7 +83,7 @@ export default function UserProfile() {
 	else if (global.state.profile.sex === 'F') gender = 'Female'
 
 	const SyncActivities = () => {
-		fetch('/api/activities', {
+		fetch('/api/activities/self', {
 			method: 'POST'
 		})
 			.then((res) => res.json())

@@ -43,7 +43,7 @@ class User(db.Model, SerializerMixin):
     wins = db.Column(db.Integer, default=0)
     FPcoins = db.Column(db.Integer, default=0)
     team_id = db.Column(db.Integer, db.ForeignKey('teams.id'))
-    last_online = db.Column(db.DateTime)
+    last_online = db.Column(db.DateTime, default=db.func.now())
     strava_connected = db.Column(db.Boolean, default=False)
     strava_access_token = db.Column(db.String)
     strava_refresh_token = db.Column(db.String)

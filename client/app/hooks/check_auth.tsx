@@ -42,7 +42,10 @@ export default function checkAuth() {
 					})
 				}
 			})
-		} else if (session.data.profile.id !== global.state.profile.id) {
+		} else if (
+			session.data &&
+			session.data.profile.id !== global.state.profile.id
+		) {
 			fetch('/api/auth', {
 				method: 'PATCH',
 				headers: {

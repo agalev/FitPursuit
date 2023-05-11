@@ -215,58 +215,59 @@ class ActivitiesController(Resource):
             return [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == session['user_id'])], 200
         elif param == 'all':
             return [activity.to_dict() for activity in Activity.query.all()], 200
-    def post(self):
-        user = User.query.filter(User.id == session['user_id']).first()
-        if user.strava_token_expiry < datetime.now():
-            return {'error': 'Strava token expired'}, 400
-        page_count = 1
-        new_activity_count = 0
-        res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
-                        headers = {'Authorization': f'Bearer {user.strava_access_token}'},
-                        params={'per_page': 200, 'page': page_count})
-        if res.status_code != 200:
-            return {'error': 'Unable to retrieve activities'}, 400
-        activities = res.json()
-        while len(activities) == 200:
-            page_count += 1
+    def post(self, param):
+        if param == 'self':
+            user = User.query.filter(User.id == session['user_id']).first()
+            if user.strava_token_expiry < datetime.now():
+                return {'error': 'Strava token expired'}, 400
+            page_count = 1
+            new_activity_count = 0
             res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
                             headers = {'Authorization': f'Bearer {user.strava_access_token}'},
                             params={'per_page': 200, 'page': page_count})
             if res.status_code != 200:
                 return {'error': 'Unable to retrieve activities'}, 400
-            activities += res.json()
-        for activity in activities:
-            if Activity.query.filter(Activity.strava_id == int(activity['id'])).first():
-                continue
-            new_activity = Activity(strava_id = activity['id'],
-                                    name = activity['name'],
-                                    activity_type = activity['type'],
-                                    distance = activity['distance'] * 0.000621371192, # convert meters to miles
-                                    moving_time = activity['moving_time'],
-                                    elapsed_time = activity['elapsed_time'],
-                                    total_elevation_gain = activity['total_elevation_gain'] * 3.2808399, # convert meters to feet
-                                    start_date_local = datetime.strptime(activity['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'),
-                                    timezone = activity['timezone'],
-                                    achievement_count = activity['achievement_count'],
-                                    kudos_count = activity['kudos_count'],
-                                    comment_count = activity['comment_count'],
-                                    average_speed = activity['average_speed'] * 2.23694, # convert meters per second to miles per hour
-                                    max_speed = activity['max_speed'] * 2.23694, # convert meters per second to miles per hour
-                                    average_heartrate = activity['average_heartrate'] if 'average_heartrate' in activity else 0,
-                                    max_heartrate = activity['max_heartrate'] if 'max_heartrate' in activity else 0,
-                                    elev_high = activity['elev_high'] * 3.2808399, # convert meters to feet,
-                                    elev_low = activity['elev_low'] * 3.2808399, # convert meters to feet,
-                                    pr_count = activity['pr_count'],
-                                    user_id = session['user_id'])
-            new_activity_count += 1
-            db.session.add(new_activity)
+            activities = res.json()
+            while len(activities) == 200:
+                page_count += 1
+                res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
+                                headers = {'Authorization': f'Bearer {user.strava_access_token}'},
+                                params={'per_page': 200, 'page': page_count})
+                if res.status_code != 200:
+                    return {'error': 'Unable to retrieve activities'}, 400
+                activities += res.json()
+            for activity in activities:
+                if Activity.query.filter(Activity.strava_id == int(activity['id'])).first():
+                    continue
+                new_activity = Activity(strava_id = activity['id'],
+                                        name = activity['name'],
+                                        activity_type = activity['type'],
+                                        distance = activity['distance'] * 0.000621371192, # convert meters to miles
+                                        moving_time = activity['moving_time'],
+                                        elapsed_time = activity['elapsed_time'],
+                                        total_elevation_gain = activity['total_elevation_gain'] * 3.2808399, # convert meters to feet
+                                        start_date_local = datetime.strptime(activity['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'),
+                                        timezone = activity['timezone'],
+                                        achievement_count = activity['achievement_count'],
+                                        kudos_count = activity['kudos_count'],
+                                        comment_count = activity['comment_count'],
+                                        average_speed = activity['average_speed'] * 2.23694, # convert meters per second to miles per hour
+                                        max_speed = activity['max_speed'] * 2.23694, # convert meters per second to miles per hour
+                                        average_heartrate = activity['average_heartrate'] if 'average_heartrate' in activity else 0,
+                                        max_heartrate = activity['max_heartrate'] if 'max_heartrate' in activity else 0,
+                                        elev_high = activity['elev_high'] * 3.2808399, # convert meters to feet,
+                                        elev_low = activity['elev_low'] * 3.2808399, # convert meters to feet,
+                                        pr_count = activity['pr_count'],
+                                        user_id = session['user_id'])
+                new_activity_count += 1
+                db.session.add(new_activity)
+                db.session.commit()
+            user.FPcoins += new_activity_count * 10
             db.session.commit()
-        user.FPcoins += new_activity_count * 10
-        db.session.commit()
-        session['profile'] = user.to_dict()
-        if new_activity_count == 0:
-            return {'message': 'Your Strava is synced'}, 200
-        return {'message': f"You just added {new_activity_count} new {'activity' if new_activity_count == 1 else 'activities'}! You earned {new_activity_count * 10} FP coins!", 'profile': user.to_dict()}, 200
+            session['profile'] = user.to_dict()
+            if new_activity_count == 0:
+                return {'message': 'Your Strava is synced'}, 200
+            return {'message': f"You just added {new_activity_count} new {'activity' if new_activity_count == 1 else 'activities'}! You earned {new_activity_count * 10} FP coins!", 'profile': user.to_dict()}, 200
 
 class Stats(Resource):
     def get(self):

@@ -24,8 +24,8 @@ with app.app_context():
         last_name='Doe',
         bio='I am a test user',
         city='San Francisco',
-        state='CA',
-        country='USA',
+        state='California',
+        country='United States',
         sex='M',
         height=82,
         weight=220,
@@ -34,16 +34,16 @@ with app.app_context():
         team_id=1
     )
     user1.password_hash = 'Password1'
+    
     user2 = User(
         email='test2@test.com',
-        _password_hash='Password1',
         image='/seed_avatars/2.svg',
         first_name='Jane',
         last_name='Doe',
         bio='I am a test user',
-        city='San Francisco',
-        state='CA',
-        country='USA',
+        city='Santa Barbara',
+        state='California',
+        country='United States',
         sex='F',
         height=60,
         weight=120,
@@ -55,14 +55,13 @@ with app.app_context():
 
     user3 = User(
         email='test3@test.com',
-        _password_hash='Password1',
         image='/seed_avatars/3.svg',
         first_name='Johny',
         last_name='Doey',
         bio='I am a test user',
-        city='San Francisco',
-        state='CA',
-        country='USA',
+        city='San Diego',
+        state='California',
+        country='United States',
         sex='M',
         height=72,
         weight=180,
@@ -72,23 +71,180 @@ with app.app_context():
     )
     user3.password_hash = 'Password1'
 
+    user4 = User(
+        email='test4@test.com',
+        image='/seed_avatars/4.svg',
+        first_name='Janice',
+        last_name='Danice',
+        bio='I am a test user',
+        city='Los Angeles',
+        state='California',
+        country='United States',
+        sex='F',
+        height=71,
+        weight=177,
+        wins=1,
+        FPcoins=1000,
+        team_id=3
+    )
+    user4.password_hash = 'Password1'
+
+    user5 = User(
+        email='test5@test.com',
+        image='/seed_avatars/5.svg',
+        first_name='Janet',
+        last_name='Doe',
+        bio='I am a test user',
+        city='Denver',
+        state='Colorado',
+        country='United States',
+        sex='F',
+        height=73,
+        weight=178,
+        wins=4,
+        FPcoins=1000,
+        team_id=1
+    )
+    user5.password_hash = 'Password1'
+
+    user6 = User(
+        email='test6@test.com',
+        image='/seed_avatars/6.svg',
+        first_name='Joe',
+        last_name='Dan',
+        bio='I am a test user',
+        city='Boulder',
+        state='Colorado',
+        country='United States',
+        sex='M',
+        height=83,
+        weight=180,
+        wins=5,
+        FPcoins=4000,
+        team_id=2
+    )
+    user6.password_hash = 'Password1'
+
+    user7 = User(
+        email='test7@test.com',
+        image='/seed_avatars/7.svg',
+        first_name='Jack',
+        last_name='Daniels',
+        bio='I am a test user',
+        city='Boston',
+        state='Massachusetts',
+        country='United States',
+        sex='M',
+        height=84,
+        weight=220,
+        wins=2,
+        FPcoins=2000,
+        team_id=3
+    )
+    user7.password_hash = 'Password1'
+
+    user8 = User(
+        email='test8@test.com',
+        image='/seed_avatars/8.svg',
+        first_name='Jill',
+        last_name='Daniels',
+        bio='I am a test user',
+        city='Miami',
+        state='Florida',
+        country='United States',
+        sex='F',
+        height=80,
+        weight=170,
+        wins=1,
+        FPcoins=4000,
+        team_id=2
+    )
+    user8.password_hash = 'Password1'
+
+    user9 = User(
+        email='test9@test.com',
+        image='/seed_avatars/9.svg',
+        first_name='Jackson',
+        last_name='Johnson',
+        bio='I am a test user',
+        city='Jacksonville',
+        state='Florida',
+        country='United States',
+        sex='M',
+        height=79,
+        weight=179,
+        wins=3,
+        FPcoins=3000,
+        team_id=3
+    )
+    user9.password_hash = 'Password1'
+
+    user10 = User(
+        email='test10@test.com',
+        image='/seed_avatars/10.svg',
+        first_name='Joan',
+        last_name='Johnson',
+        bio='I am a test user',
+        city='Boulder',
+        state='Colorado',
+        country='United States',
+        sex='M',
+        height=79,
+        weight=166,
+        wins=1,
+        FPcoins=1000,
+        team_id=1
+    )
+    user10.password_hash = 'Password1'
+
 
     # Create teams
     print('Creating teams...')
     team1 = Team(
-        name='Team 1',
+        name='Runner Ups',
         leader_id=1,
+        wins=13,
         activity_type='running'
     )
     team2 = Team(
-        name='Team 2',
+        name='Cyclus',
         leader_id=2,
+        wins=11,
         activity_type='bicycling'
     )
     team3 = Team(
-        name='Team 3',
+        name='Rollerbladers',
         leader_id=3,
+        wins=7,
         activity_type='rollerblading'
+    )
+
+    team4 = Team(
+        name='Ski Bums',
+        leader_id=4,
+        wins=12,
+        activity_type='skiing'
+    )
+
+    team5 = Team(
+        name='Snow Bunniez',
+        leader_id=5,
+        wins=5,
+        activity_type='snowboarding'
+    )
+
+    team6 = Team(
+        name='Mountain Goats',
+        leader_id=6,
+        wins=9,
+        activity_type='climbing'
+    )
+
+    team7 = Team(
+        name='Swimmers',
+        leader_id=7,
+        wins=8,
+        activity_type='swimming'
     )
 
     # Create activities
@@ -97,7 +253,7 @@ with app.app_context():
         strava_id=1,
         name='Activity 1',
         activity_type='running',
-        distance=1000,
+        distance=6,
         moving_time=1000,
         elapsed_time=1000,
         total_elevation_gain=1000,
@@ -119,7 +275,7 @@ with app.app_context():
         strava_id=2,
         name='Activity 2',
         activity_type='bicycling',
-        distance=1000,
+        distance=8,
         moving_time=1000,
         elapsed_time=1000,
         total_elevation_gain=1000,
@@ -141,7 +297,7 @@ with app.app_context():
         strava_id=3,
         name='Activity 3',
         activity_type='rollerblading',
-        distance=1000,
+        distance=10,
         moving_time=1000,
         elapsed_time=1000,
         total_elevation_gain=1000,
@@ -167,25 +323,94 @@ with app.app_context():
         team_id=1,
         receiver_id=2,
         invitation=True,
-        content='Hello, world!'
+        content='Hello, Jane!'
     )
     message2 = Message(
         sender_id=2,
         receiver_id=1,
-        content='Hello, world!'
+        content='Hello, John!'
     )
     message3 = Message(
         sender_id=1,
-        receiver_id=3,
+        receiver_id=2,
         team_id=1,
-        content='Hello, world!'
+        content='How do you like the team?'
     )
     message4 = Message(
+        sender_id=2,
+        receiver_id=1,
+        content='It is great!'
+    )
+    message5 = Message(
+        sender_id=1,
+        receiver_id=2,
+        content='I am glad you like it!'
+    )
+    message6 = Message(
+        sender_id=2,
+        receiver_id=1,
+        content='Me too!'
+    )
+    message7 = Message(
+        sender_id=2,
+        receiver_id=1,
+        content='FP is awesome!'
+    )
+    message8 = Message(
+        sender_id=1,
+        receiver_id=2,
+        content='I know, right?'
+    )
+    message9 = Message(
+        sender_id=2,
+        receiver_id=1,
+        content='I am so glad I joined!'
+    )
+    message10 = Message(
+        sender_id=1,
+        receiver_id=2,
+        content='Me too!'
+    )
+    message11 = Message(
         sender_id=3,
         receiver_id=1,
-        content='Hello, world!'
+        content='I am so glad I joined!'
     )
-
+    message12 = Message(
+        sender_id=4,
+        receiver_id=1,
+        content='Hello John'
+    )
+    message13 = Message(
+        sender_id=5,
+        receiver_id=1,
+        content='Hello John'
+    )
+    message14 = Message(
+        sender_id=6,
+        receiver_id=1,
+        content='Hello John'
+    )
+    message15 = Message(
+        sender_id=7,
+        receiver_id=1,
+        content='Hello John'
+    )
+    message16 = Message(
+        sender_id=8,
+        receiver_id=1,
+        content='Hello John'
+    )
+    message17 = Message(
+        sender_id=9,
+        receiver_id=1,
+        content='Hello John'
+    )
+    message18 = Message(
+        sender_id=10,
+        receiver_id=1,
+        content='Hello John'
+    )
 
     # Create competitions
     print('Creating competitions...')
@@ -248,9 +473,20 @@ with app.app_context():
         user1,
         user2,
         user3,
+        user4,
+        user5,
+        user6,
+        user7,
+        user8,
+        user9,
+        user10,
         team1,
         team2,
         team3,
+        team4,
+        team5,
+        team6,
+        team7,
         activity1,
         activity2,
         activity3,
@@ -258,6 +494,20 @@ with app.app_context():
         message2,
         message3,
         message4,
+        message5,
+        message6,
+        message7,
+        message8,
+        message9,
+        message10,
+        message11,
+        message12,
+        message13,
+        message14,
+        message15,
+        message16,
+        message17,
+        message18,
         competition1,
         competition2,
         competition3,

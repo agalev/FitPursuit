@@ -29,8 +29,6 @@ export default function Messages() {
 			})
 	}, [selectedUser])
 
-	console.log(messages)
-
 	const handleSubmit = (e) => {
 		e.preventDefault()
 		fetch('/api/messages', {
@@ -45,7 +43,6 @@ export default function Messages() {
 		})
 			.then((res) => res.json())
 			.then((data) => {
-				console.log(data)
 				setMessages([...messages, data])
 				setMessage('')
 			})
@@ -78,7 +75,7 @@ export default function Messages() {
 	}
 	return (
 		<main className='flex' style={{ height: 'calc(100vh - 4rem)' }}>
-			<div className='flex flex-col min-w-max bg-slate-200'>
+			<div className='flex flex-col min-w-max bg-slate-200 dark:bg-slate-600'>
 				<h2 className='text-sm sm:text-xl py-2 pl-1 font-bold'>Users</h2>
 				<ul className='mt-4'>
 					{conversations_list.map((user) => (
@@ -97,9 +94,9 @@ export default function Messages() {
 					))}
 				</ul>
 			</div>
-			<div className='flex flex-col flex-grow bg-slate-100'>
+			<div className='flex flex-col flex-grow bg-slate-100  dark:bg-slate-400'>
 				{/* Header */}
-				<header className='py-2 pl-1 bg-slate-200'>
+				<header className='py-2 pl-1 bg-slate-200 dark:bg-slate-600'>
 					<h1 className='text-sm sm:text-xl font-bold'>
 						{selectedUser
 							? `Conversation with ${selectedUser.first_name} ${selectedUser.last_name}`
