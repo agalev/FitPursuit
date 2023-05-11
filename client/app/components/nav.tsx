@@ -15,14 +15,15 @@ export default function Nav() {
 	const links = !global.state.isLoggedIn
 		? [
 				{ label: 'Home', href: '/' },
-				{ label: 'Competitions', href: '/competitions' },
+				// { label: 'Teams', href: '/teams' },
+				// { label: 'Competitions', href: '/competitions' },
 				{ label: 'Login', href: '/login' },
 				{ label: 'Signup', href: '/signup' }
 		  ]
 		: [
 				{ label: 'Home', href: '/' },
-				{ label: 'Teams', href: '/teams' },
-				{ label: 'Competitions', href: '/competitions' },
+				// { label: 'Teams', href: '/teams' },
+				// { label: 'Competitions', href: '/competitions' },
 				{ label: 'Dashboard', href: '/dashboard' },
 				{ label: 'Messages', href: '/messages' }
 		  ]

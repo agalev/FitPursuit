@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { initTE, Ripple, Input } from 'tw-elements'
+import { initTE, Input } from 'tw-elements'
 
 export default function UsersTable() {
 	const [users, setUsers] = useState(null)
@@ -9,7 +9,7 @@ export default function UsersTable() {
 	const [sortOrder, setSortOrder] = useState('asc')
 
 	useEffect(() => {
-		initTE({ Input, Ripple })
+		initTE({ Input })
 	}, [])
 
 	let index = 1

@@ -6,7 +6,8 @@ import ScrollContainer from '../components/scroll_container'
 
 export default function Messages() {
 	const global = useContext(GlobalState)
-
+	const [users, setUsers] = useState(null)
+	const [searchQuery, setSearchQuery] = useState('')
 	const [messages, setMessages] = useState(null)
 	const [selectedUser, setSelectedUser] = useState(null)
 	const [message, setMessage] = useState('')
@@ -16,9 +17,13 @@ export default function Messages() {
 	}, [selectedUser])
 
 	useEffect(() => {
-		fetch('/api/messages', {
-			method: 'GET'
-		})
+		fetch('/api/users')
+			.then((response) => response.json())
+			.then((data) => setUsers(data))
+	}, [])
+
+	useEffect(() => {
+		fetch('/api/messages')
 			.then((res) => res.json())
 			.then((data) => {
 				setMessages(
@@ -66,6 +71,16 @@ export default function Messages() {
 			}
 		})
 
+	const filteredUsers =
+		users &&
+		users.filter((user) => {
+			return JSON.stringify(user)
+				.toLowerCase()
+				.includes(searchQuery.toLowerCase())
+		})
+
+	const displayUsers = searchQuery.length > 0 ? filteredUsers : users
+
 	if (!global.state.isLoggedIn) {
 		return (
 			<h1 className='flex justify-center text-3xl m-10'>
@@ -74,30 +89,80 @@ export default function Messages() {
 		)
 	}
 	return (
-		<main className='flex' style={{ height: 'calc(100vh - 4rem)' }}>
-			<div className='flex flex-col min-w-max bg-slate-200 dark:bg-slate-600'>
-				<h2 className='text-sm sm:text-xl py-2 pl-1 font-bold'>Users</h2>
-				<ul className='mt-4'>
-					{conversations_list.map((user) => (
-						<li
-							key={user.id}
-							className='flex items-center py-1 rounded hover:bg-slate-300 cursor-pointer'
-							onClick={() => setSelectedUser(user)}
+		<main className='flex' style={{ height: 'calc(100vh - 4.5rem)' }}>
+			<div className='flex flex-col w-48 bg-slate-200 dark:bg-slate-800'>
+				<h2 className='text-sm sm:text-xl py-2 pl-1 font-bold text-center'>
+					Users
+				</h2>
+				<div className='relative mb-3' data-te-input-wrapper-init>
+					<input
+						type='search'
+						className='peer block min-h-[auto] w-full rounded border-0 bg-transparent px-3 py-[0.32rem] leading-[1.6] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 peer-focus:text-primary data-[te-input-state-active]:placeholder:opacity-100 motion-reduce:transition-none dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:peer-focus:text-primary [&:not([data-te-input-placeholder-active])]:placeholder:opacity-0'
+						id='Search'
+						value={searchQuery}
+						onChange={(e) => setSearchQuery(e.target.value)}
+					/>
+					<label
+						htmlFor='Search'
+						className='pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary'
+					>
+						Search
+						<svg
+							xmlns='http://www.w3.org/2000/svg'
+							viewBox='0 0 22 22'
+							fill='currentColor'
+							className='h-5 w-5 ml-1 inline-block'
 						>
-							<img
-								className='w-8 h-8 rounded-full mr-2 border-2 border-amber-500 shadow-2xl'
-								src={user.image || '/avatar.jpg'}
-								alt='avatar'
+							<path
+								fillRule='evenodd'
+								d='M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z'
+								clipRule='evenodd'
 							/>
-							<span>{`${user.first_name} ${user.last_name}`}</span>
-						</li>
-					))}
+						</svg>
+					</label>
+				</div>
+				<ul className='mt-4 ml-1 overflow-auto'>
+					{displayUsers &&
+						displayUsers.map((user) => (
+							<li
+								key={user.id}
+								className='flex items-center py-1 rounded hover:bg-slate-300 text-sm cursor-pointer'
+								onClick={() => setSelectedUser(user)}
+								data-te-dropdown-item-ref
+							>
+								<img
+									className='w-8 h-8 rounded-full mr-2 border-2 border-amber-500 shadow-2xl inline-block'
+									src={user.image || '/avatar.jpg'}
+									alt='avatar'
+								/>
+								<span className='align-middle'>{`${user.first_name} ${user.last_name}`}</span>
+							</li>
+						))}
+					<hr className='py-0.5 my-2 border-0 bg-amber-500' />
+					{conversations_list.length > 0 ? (
+						conversations_list.map((user) => (
+							<li
+								key={user.id}
+								className='flex items-center py-1 rounded hover:bg-slate-300 text-sm cursor-pointer'
+								onClick={() => setSelectedUser(user)}
+							>
+								<img
+									className='w-8 h-8 rounded-full mr-2 border-2 border-amber-500 shadow-2xl'
+									src={user.image || '/avatar.jpg'}
+									alt='avatar'
+								/>
+								<span>{`${user.first_name} ${user.last_name}`}</span>
+							</li>
+						))
+					) : (
+						<span>No conversations</span>
+					)}
 				</ul>
 			</div>
-			<div className='flex flex-col flex-grow bg-slate-100  dark:bg-slate-400'>
+			<div className='flex flex-col flex-grow bg-slate-100 dark:bg-slate-400'>
 				{/* Header */}
-				<header className='py-2 pl-1 bg-slate-200 dark:bg-slate-600'>
-					<h1 className='text-sm sm:text-xl font-bold'>
+				<header className='py-2 pl-1 bg-slate-200 dark:bg-slate-800'>
+					<h1 className='text-sm sm:text-xl font-bold text-center'>
 						{selectedUser
 							? `Conversation with ${selectedUser.first_name} ${selectedUser.last_name}`
 							: `Conversations`}
