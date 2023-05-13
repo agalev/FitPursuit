@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useContext, use } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { initTE, Ripple, Input } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import ScrollContainer from '../components/scroll_container'
@@ -19,8 +19,16 @@ export default function Messages() {
 	useEffect(() => {
 		fetch('/api/users')
 			.then((response) => response.json())
-			.then((data) => setUsers(data))
+			.then((data) => {
+				data.forEach((user) => {
+					if (user.id === global.state.profile.id) {
+						data.splice(data.indexOf(user), 1)
+					}
+				})
+				setUsers(data)
+			})
 	}, [])
+	console.log(users)
 
 	useEffect(() => {
 		fetch('/api/messages')
@@ -36,6 +44,16 @@ export default function Messages() {
 
 	const handleSubmit = (e) => {
 		e.preventDefault()
+		if (message.length === 0) {
+			global.dispatch({
+				type: 'TOAST',
+				payload: {
+					type: 'error',
+					message: 'Message cannot be empty'
+				}
+			})
+			return
+		}
 		fetch('/api/messages', {
 			method: 'POST',
 			headers: {
@@ -121,7 +139,8 @@ export default function Messages() {
 						</svg>
 					</label>
 				</div>
-				<ul className='mt-4 ml-1 overflow-auto'>
+				<span>Browse all users</span>
+				<ul className='ml-1 overflow-auto'>
 					{displayUsers &&
 						displayUsers.map((user) => (
 							<li
@@ -139,6 +158,7 @@ export default function Messages() {
 							</li>
 						))}
 					<hr className='py-0.5 my-2 border-0 bg-amber-500' />
+					<span>Conversations</span>
 					{conversations_list.length > 0 ? (
 						conversations_list.map((user) => (
 							<li
@@ -175,8 +195,10 @@ export default function Messages() {
 						{selectedUser &&
 							messages.map((message) => {
 								if (
-									message.sender_id === selectedUser.id ||
-									message.receiver_id === selectedUser.id
+									(message.sender_id === selectedUser.id &&
+										message.receiver_id === global.state.profile.id) ||
+									(message.receiver_id === selectedUser.id &&
+										message.sender_id === global.state.profile.id)
 								) {
 									return (
 										<div
