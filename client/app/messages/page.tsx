@@ -157,9 +157,13 @@ export default function Messages() {
 								<span className='align-middle'>{`${user.first_name} ${user.last_name}`}</span>
 							</li>
 						))}
-					<hr className='py-0.5 my-2 border-0 bg-amber-500' />
-					<span>Conversations</span>
-					{conversations_list.length > 0 ? (
+				</ul>
+				<hr className='py-0.5 my-2 border-0 bg-amber-500' />
+				<span>
+					{conversations_list.length > 0 ? `Conversations` : `No conversations`}
+				</span>
+				<ul className='ml-1 overflow-auto'>
+					{conversations_list.length > 0 &&
 						conversations_list.map((user) => (
 							<li
 								key={user.id}
@@ -173,14 +177,10 @@ export default function Messages() {
 								/>
 								<span>{`${user.first_name} ${user.last_name}`}</span>
 							</li>
-						))
-					) : (
-						<span>No conversations</span>
-					)}
+						))}
 				</ul>
 			</div>
 			<div className='flex flex-col flex-grow bg-slate-100 dark:bg-slate-400'>
-				{/* Header */}
 				<header className='py-2 pl-1 bg-slate-200 dark:bg-slate-800'>
 					<h1 className='text-sm sm:text-xl font-bold text-center'>
 						{selectedUser
@@ -188,10 +188,8 @@ export default function Messages() {
 							: `Conversations`}
 					</h1>
 				</header>
-				{/* Messages */}
 				<div className='flex-grow overflow-y-auto'>
 					<ScrollContainer>
-						{/* Message bubbles go here */}
 						{selectedUser &&
 							messages.map((message) => {
 								if (
@@ -209,7 +207,7 @@ export default function Messages() {
 													: 'bg-gray-200'
 											}`}
 										>
-											<div className='flex items-center p-1'>
+											<div key={message.id} className='flex items-center p-1'>
 												<img
 													className='w-8 h-8 rounded-full mr-2 mb-1 border-2 border-amber-500 shadow-2xl'
 													src={
@@ -244,7 +242,7 @@ export default function Messages() {
 								value={message}
 								onChange={(e) => setMessage(e.target.value)}
 							/>
-							<label className='pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-neutral-500 transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary-600 peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:text-neutral-200 dark:peer-focus:text-primary'>
+							<label className='pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-black transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-primary-600 peer-data-[te-input-state-active]:-translate-y-[0.9rem] peer-data-[te-input-state-active]:scale-[0.8] motion-reduce:transition-none dark:peer-focus:text-primary'>
 								Type your message
 							</label>
 						</div>
