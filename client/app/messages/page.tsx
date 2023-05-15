@@ -17,15 +17,16 @@ export default function Messages() {
 	}, [selectedUser])
 
 	useEffect(() => {
-		fetch('/api/users')
+		fetch('/api/messages/unread')
 			.then((response) => response.json())
 			.then((data) => {
-				data.forEach((user) => {
+				data.users.forEach((user) => {
+					console.log(user.id, global.state.profile.id)
 					if (user.id === global.state.profile.id) {
-						data.splice(data.indexOf(user), 1)
+						data.users.splice(data.users.indexOf(user), 1)
 					}
 				})
-				setUsers(data)
+				setUsers(data.users)
 			})
 	}, [])
 	console.log(users)
@@ -90,12 +91,12 @@ export default function Messages() {
 		})
 
 	const filteredUsers =
-		users &&
-		users.filter((user) => {
-			return JSON.stringify(user)
-				.toLowerCase()
-				.includes(searchQuery.toLowerCase())
-		})
+	users &&
+	users.filter((user) => {
+		return JSON.stringify(user)
+			.toLowerCase()
+			.includes(searchQuery.toLowerCase())
+	})
 
 	const displayUsers = searchQuery.length > 0 ? filteredUsers : users
 
@@ -154,7 +155,7 @@ export default function Messages() {
 									src={user.image || '/avatar.jpg'}
 									alt='avatar'
 								/>
-								<span className='align-middle'>{`${user.first_name} ${user.last_name}`}</span>
+								<span className='align-middle'>{user.name}</span>
 							</li>
 						))}
 				</ul>

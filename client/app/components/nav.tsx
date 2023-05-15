@@ -6,6 +6,7 @@ import { signOut } from 'next-auth/react'
 import { initTE, Collapse, Dropdown } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import checkAuth from '../hooks/check_auth'
+import MessagesLink from './messages_link'
 
 export default function Nav() {
 	checkAuth()
@@ -101,7 +102,7 @@ export default function Nav() {
 					))}
 					{global.state.isLoggedIn && (
 						<>
-							<div className='relative inline-flex w-fit'>
+							{/* <div className='relative inline-flex w-fit'>
 								<Link
 									className='link-underline sm:text-sm md:text-base lg:text-lg mr-3 my-2'
 									href={'/messages'}
@@ -112,7 +113,8 @@ export default function Nav() {
 									</div>
 									Messages
 								</Link>
-							</div>
+							</div> */}
+							<MessagesLink />
 							<button
 								className='link-underline sm:text-sm md:text-base lg:text-lg mr-2'
 								data-te-nav-link-ref

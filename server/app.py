@@ -208,6 +208,26 @@ class MessagesController(Resource):
             return {'message': 'Message deleted'}, 200
         except Exception as e:
             return {'error': str(e)}, 400
+        
+class UnreadMessages(Resource):
+    def get(self):
+        try:
+            user_names = []
+            for user in User.query.all():
+                user_names.append({"id":user.id, "name": f"{user.first_name} {user.last_name}", "image": user.image})
+            return {'users': user_names, 'unread_count': len(Message.query.filter(Message.receiver_id == session['user_id']).filter(Message.read == False).all())}, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
+    def patch(self):
+        try:
+            req = request.get_json()
+            for message in req['read_messages']:
+                mark_message = Message.query.filter(Message.id == message).first()
+                mark_message.read = True
+            db.session.commit()
+            return {'message': 'Messages marked as read'}, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
 
 class ActivitiesController(Resource):
     def get(self, param):
@@ -392,6 +412,7 @@ api.add_resource(Logout, '/api/logout', endpoint='/api/logout')
 api.add_resource(GetUsers, '/api/users', endpoint='/api/users')
 api.add_resource(UserController, '/api/users/<int:id>', endpoint='/api/users/<int:id>')
 api.add_resource(MessagesController, '/api/messages', endpoint='/api/messages')
+api.add_resource(UnreadMessages, '/api/messages/unread', endpoint='/api/messages/unread')
 api.add_resource(ActivitiesController, '/api/activities/<string:param>', endpoint='/api/activities/<string:param>')
 api.add_resource(Stats, '/api/stats', endpoint='/api/stats')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
