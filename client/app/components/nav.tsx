@@ -102,18 +102,6 @@ export default function Nav() {
 					))}
 					{global.state.isLoggedIn && (
 						<>
-							{/* <div className='relative inline-flex w-fit'>
-								<Link
-									className='link-underline sm:text-sm md:text-base lg:text-lg mr-3 my-2'
-									href={'/messages'}
-									data-te-nav-link-ref
-								>
-									<div className='absolute bottom-auto left-auto right-0 top-1 z-10 inline-block whitespace-nowrap rounded-full bg-red-700 px-1 py-0.5 text-center align-baseline text-xs font-bold leading-none text-white'>
-										3
-									</div>
-									Messages
-								</Link>
-							</div> */}
 							<MessagesLink />
 							<button
 								className='link-underline sm:text-sm md:text-base lg:text-lg mr-2'

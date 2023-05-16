@@ -13,25 +13,6 @@ export default function Messages() {
 	const [message, setMessage] = useState('')
 
 	useEffect(() => {
-		initTE({ Ripple, Input })
-	}, [selectedUser])
-
-	useEffect(() => {
-		fetch('/api/messages/unread')
-			.then((response) => response.json())
-			.then((data) => {
-				data.users.forEach((user) => {
-					console.log(user.id, global.state.profile.id)
-					if (user.id === global.state.profile.id) {
-						data.users.splice(data.users.indexOf(user), 1)
-					}
-				})
-				setUsers(data.users)
-			})
-	}, [])
-	console.log(users)
-
-	useEffect(() => {
 		fetch('/api/messages')
 			.then((res) => res.json())
 			.then((data) => {
@@ -41,7 +22,16 @@ export default function Messages() {
 					})
 				)
 			})
+		initTE({ Ripple, Input })
 	}, [selectedUser])
+
+	useEffect(() => {
+		fetch('/api/messages/unread')
+			.then((response) => response.json())
+			.then((data) => {
+				setUsers(data.users)
+			})
+	}, [])
 
 	const handleSubmit = (e) => {
 		e.preventDefault()
@@ -77,26 +67,71 @@ export default function Messages() {
 
 	messages &&
 		[...messages].forEach((message) => {
-			if (message.sender_id === global.state.profile.id) {
-				if (!uniqueIDs.includes(message.receiver_id)) {
-					uniqueIDs.push(message.receiver.id)
-					conversations_list.push(message.receiver)
-				}
-			} else if (message.receiver_id === global.state.profile.id) {
-				if (!uniqueIDs.includes(message.sender_id)) {
-					uniqueIDs.push(message.sender.id)
-					conversations_list.push(message.sender)
-				}
+			if (message.receiver_id === null) {
+				return
+			} else if (
+				message.sender_id === global.state.profile.id &&
+				!uniqueIDs.includes(message.receiver_id)
+			) {
+				uniqueIDs.push(message.receiver.id)
+				conversations_list.push({
+					with: message.receiver,
+					unread: null
+				})
+			} else if (
+				message.receiver_id === global.state.profile.id &&
+				!uniqueIDs.includes(message.sender_id) &&
+				message.read === false
+			) {
+				uniqueIDs.push(message.sender.id)
+				conversations_list.push({
+					with: message.sender,
+					unread: 1
+				})
+			} else if (
+				message.receiver_id === global.state.profile.id &&
+				!uniqueIDs.includes(message.sender_id) &&
+				message.read === true
+			) {
+				uniqueIDs.push(message.sender.id)
+				conversations_list.push({
+					with: message.sender,
+					unread: null
+				})
+			} else if (message.read === false) {
+				conversations_list.forEach((conversation) => {
+					if (conversation.with.id === message.sender_id) {
+						conversation.unread += 1
+					}
+				})
 			}
 		})
 
+	console.log('conv list', conversations_list, 'selected user', selectedUser)
+
+	const handleUserSelect = (user) => {
+		setSelectedUser(user)
+		conversations_list.forEach((conversation) => {
+			if (conversation.unread > 0 && conversation.with.id === user.id) {
+				conversation.unread = null
+				fetch('/api/messages/unread', {
+					method: 'PATCH',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(user.id)
+				})
+			}
+		})
+	}
+
 	const filteredUsers =
-	users &&
-	users.filter((user) => {
-		return JSON.stringify(user)
-			.toLowerCase()
-			.includes(searchQuery.toLowerCase())
-	})
+		users &&
+		users.filter((user) => {
+			return JSON.stringify(user)
+				.toLowerCase()
+				.includes(searchQuery.toLowerCase())
+		})
 
 	const displayUsers = searchQuery.length > 0 ? filteredUsers : users
 
@@ -143,21 +178,26 @@ export default function Messages() {
 				<span>Browse all users</span>
 				<ul className='ml-1 overflow-auto'>
 					{displayUsers &&
-						displayUsers.map((user) => (
-							<li
-								key={user.id}
-								className='flex items-center py-1 rounded hover:bg-slate-300 text-sm cursor-pointer'
-								onClick={() => setSelectedUser(user)}
-								data-te-dropdown-item-ref
-							>
-								<img
-									className='w-8 h-8 rounded-full mr-2 border-2 border-amber-500 shadow-2xl inline-block'
-									src={user.image || '/avatar.jpg'}
-									alt='avatar'
-								/>
-								<span className='align-middle'>{user.name}</span>
-							</li>
-						))}
+						displayUsers.map(
+							(user) =>
+								user.id !== global.state.profile.id && (
+									<li
+										key={user.id}
+										className='flex items-center py-1 rounded hover:bg-slate-300 text-sm cursor-pointer'
+										onClick={() => handleUserSelect(user)}
+										data-te-dropdown-item-ref
+									>
+										<img
+											className='w-8 h-8 rounded-full mr-2 border-2 border-amber-500 shadow-2xl inline-block'
+											src={user.image || '/avatar.jpg'}
+											alt='avatar'
+										/>
+										<span>
+											{user.first_name} {user.last_name}
+										</span>
+									</li>
+								)
+						)}
 				</ul>
 				<hr className='py-0.5 my-2 border-0 bg-amber-500' />
 				<span>
@@ -165,18 +205,23 @@ export default function Messages() {
 				</span>
 				<ul className='ml-1 overflow-auto'>
 					{conversations_list.length > 0 &&
-						conversations_list.map((user) => (
+						conversations_list.map((conversation) => (
 							<li
-								key={user.id}
+								key={conversation.with.id}
 								className='flex items-center py-1 rounded hover:bg-slate-300 text-sm cursor-pointer'
-								onClick={() => setSelectedUser(user)}
+								onClick={() => handleUserSelect(conversation.with)}
 							>
 								<img
 									className='w-8 h-8 rounded-full mr-2 border-2 border-amber-500 shadow-2xl'
-									src={user.image || '/avatar.jpg'}
+									src={conversation.with.image || '/avatar.jpg'}
 									alt='avatar'
 								/>
-								<span>{`${user.first_name} ${user.last_name}`}</span>
+								<span className=''>{`${conversation.with.first_name} ${conversation.with.last_name}`}</span>
+								{conversation.unread > 0 && (
+									<span className='ml-1 bg-red-600 rounded-full py-0.5 px-1.5 text-xs font-bold'>
+										{conversation.unread}
+									</span>
+								)}
 							</li>
 						))}
 				</ul>
@@ -192,6 +237,7 @@ export default function Messages() {
 				<div className='flex-grow overflow-y-auto'>
 					<ScrollContainer>
 						{selectedUser &&
+							messages &&
 							messages.map((message) => {
 								if (
 									(message.sender_id === selectedUser.id &&

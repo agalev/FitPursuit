@@ -214,16 +214,17 @@ class UnreadMessages(Resource):
         try:
             user_names = []
             for user in User.query.all():
-                user_names.append({"id":user.id, "name": f"{user.first_name} {user.last_name}", "image": user.image})
+                user_names.append({"id": user.id, "first_name": user.first_name, "last_name": user.last_name, "image": user.image})
             return {'users': user_names, 'unread_count': len(Message.query.filter(Message.receiver_id == session['user_id']).filter(Message.read == False).all())}, 200
         except Exception as e:
             return {'error': str(e)}, 400
     def patch(self):
         try:
             req = request.get_json()
-            for message in req['read_messages']:
-                mark_message = Message.query.filter(Message.id == message).first()
-                mark_message.read = True
+            print(req)
+            messages = Message.query.filter(Message.sender_id == req).filter(Message.read == False).all()
+            for message in messages:
+                message.read = True
             db.session.commit()
             return {'message': 'Messages marked as read'}, 200
         except Exception as e:
