@@ -1,7 +1,7 @@
 'use client'
 import { useContext } from 'react'
 import { GlobalState } from '../global-provider'
-import TeamsTable from '../components/teams_table'
+import CreateTeam from '../components/create_team'
 
 export default function Teams() {
 	const global = useContext(GlobalState)
@@ -16,7 +16,7 @@ export default function Teams() {
 
 	return (
 		<>
-			<TeamsTable />
+		<CreateTeam />
 		</>
 	)
 }

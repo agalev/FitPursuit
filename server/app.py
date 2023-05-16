@@ -221,7 +221,6 @@ class UnreadMessages(Resource):
     def patch(self):
         try:
             req = request.get_json()
-            print(req)
             messages = Message.query.filter(Message.sender_id == req).filter(Message.read == False).all()
             for message in messages:
                 message.read = True
@@ -313,10 +312,10 @@ class TeamsController(Resource):
         return [team.to_dict() for team in Team.query.all()], 200
     def post(self):
         try:
-            if Team.query.filter(Team.leader_id == session['user_id']).first():
-                return {'error': 'User already has a team'}, 400
             req = request.get_json()
             user = User.query.filter(User.id == session['user_id']).first()
+            if user.team_id:
+                return {'error': 'You already belong to a team'}, 400
             team = Team(name = req['name'],
                         leader_id = session['user_id'],
                         activity_type = req['activity_type'],
@@ -325,7 +324,7 @@ class TeamsController(Resource):
             db.session.commit()
             user.team_id = team.id
             db.session.commit()
-            return team.to_dict(), 201
+            return user.to_dict(), 201
         except Exception as e:
             return {'error': str(e)}, 400
     def patch(self):

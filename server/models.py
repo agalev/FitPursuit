@@ -172,6 +172,21 @@ class Team(db.Model, SerializerMixin):
             raise ValueError('Teams may not have more than 5 members.')
         return members
     
+    @validates('name')
+    def validate_name(self, key, name):
+        existing_team = Team.query.filter(Team.name == name).first()
+        if existing_team and existing_team.id != self.id:
+            raise ValueError('Team name already taken')
+        if not name:
+            raise ValueError("Please provide a team name")
+        return name
+    
+    @validates('activity_type')
+    def validate_activity_type(self, key, activity_type):
+        if not activity_type:
+            raise ValueError("Please provide an activity type")
+        return activity_type
+    
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
 

@@ -107,8 +107,6 @@ export default function Messages() {
 			}
 		})
 
-	console.log('conv list', conversations_list, 'selected user', selectedUser)
-
 	const handleUserSelect = (user) => {
 		setSelectedUser(user)
 		conversations_list.forEach((conversation) => {
