@@ -14,9 +14,5 @@ export default function Teams() {
 		)
 	}
 
-	return (
-		<>
-		<CreateTeam />
-		</>
-	)
+	return <main>{!global.state.profile.team && <CreateTeam />}</main>
 }

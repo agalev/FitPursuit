@@ -17,7 +17,9 @@ export default function MessagesLink() {
 	return (
 		<div className='relative inline-flex w-fit'>
 			<Link
-				className='link-underline sm:text-sm md:text-base lg:text-lg mr-3 my-2'
+				className={`${
+					pathname === '/messages' ? 'link-underline-active' : 'link-underline'}
+				 sm:text-sm md:text-base lg:text-lg mr-3 my-2`}
 				href={'/messages'}
 				data-te-nav-link-ref
 				onClick={() => setUnread(0)}

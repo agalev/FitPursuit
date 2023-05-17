@@ -20,7 +20,7 @@ export default function Dashboard() {
 
 	return (
 		<>
-			<h1>Dashboard</h1>
+			<h1 className='flex justify-center text-3xl'>Profile</h1>
 			<UserProfile />
 			<div className='flex justify-center'>
 				<button
@@ -45,7 +45,7 @@ export default function Dashboard() {
 				</button>
 			</div>
 			{showChart && <ChartElement />}
-			{showTable && <ActivitiesTable param={'self'} />}
+			{showTable && <ActivitiesTable param='self' />}
 		</>
 	)
 }

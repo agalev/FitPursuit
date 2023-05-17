@@ -2,6 +2,7 @@
 import { useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { initTE, Collapse, Dropdown } from 'tw-elements'
 import { GlobalState } from '../global-provider'
@@ -10,6 +11,7 @@ import MessagesLink from './messages_link'
 
 export default function Nav() {
 	checkAuth()
+	const pathname = usePathname()
 
 	const global = useContext(GlobalState)
 
@@ -89,7 +91,9 @@ export default function Nav() {
 				>
 					{links.map(({ label, href }) => (
 						<Link
-							className='link-underline sm:text-sm md:text-base lg:text-lg mr-3 my-2'
+							className={`${
+								pathname === href ? 'link-underline-active' : 'link-underline'
+							} sm:text-sm md:text-base lg:text-lg mr-3 my-2`}
 							key={label}
 							href={href}
 							data-te-nav-link-ref
