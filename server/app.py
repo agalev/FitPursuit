@@ -180,6 +180,7 @@ class MessagesController(Resource):
             message = Message(sender_id = session['user_id'],
                               receiver_id = req['receiver_id'] if 'receiver_id' in req else None,
                               team_id = req['team_id'] if 'team_id' in req else None,
+                              invitation = req['invitation'] if 'invitation' in req else False,
                               content = req['content'])
             db.session.add(message)
             db.session.commit()
