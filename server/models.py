@@ -107,6 +107,7 @@ class Activity(db.Model, SerializerMixin):
     serialize_rules = ('-user',)
 
     id = db.Column(db.Integer, primary_key=True)
+    qualified = db.Column(db.Boolean, default=True)
     strava_id = db.Column(db.Integer)
     name = db.Column(db.String)
     activity_type = db.Column(db.String)
