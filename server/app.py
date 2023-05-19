@@ -52,7 +52,7 @@ class Auth(Resource):
                                 strava_refresh_token = req['refreshToken'],
                                 strava_token_expiry = datetime.strptime(req['expires_at'], '%Y-%m-%dT%H:%M:%S.%fZ')
                                 )
-                new_user.password_hash = f"1Z{req['username']}" 
+                new_user.password_hash = f"1Z{req['profile']}" 
                 new_user.last_online = datetime.now()
                 db.session.add(new_user)
                 db.session.commit()
@@ -60,7 +60,7 @@ class Auth(Resource):
                 session['profile'] = new_user.to_dict()
                 return session, 201
             except Exception as e:
-                return {'error': 'This Strava account is already associated with a user'}, 401
+                return {'error': str(e)}, 401
     def patch(self):
         if 'user_id' not in session:
             return {'error': 'Not logged in'}, 401
@@ -180,7 +180,7 @@ class MessagesController(Resource):
             message = Message(sender_id = session['user_id'],
                               receiver_id = req['receiver_id'] if 'receiver_id' in req else None,
                               team_id = req['team_id'] if 'team_id' in req else None,
-                              invitation = req['invitation'] if 'invitation' in req else False,
+                            #   invitation = req['invitation'] if 'invitation' in req else False,
                               content = req['content'])
             db.session.add(message)
             db.session.commit()
@@ -370,7 +370,7 @@ class TeamLeaderController(Resource):
         try:
             req = request.get_json()
             team = Team.query.filter(Team.leader_id == session['user_id']).first()
-            user = User.query.filter(User.email == req['email']).first()
+            user = User.query.filter(User.id == req['receiver_id']).first()
             if user.team_id:
                 return {'error': 'User already has a team'}, 400
             if team.members > 5:
@@ -379,11 +379,28 @@ class TeamLeaderController(Resource):
                 sender_id = session['user_id'],
                 receiver_id = user.id,
                 team_id = team.id,
-                content = f'You have been invited to join {team.name}!',
+                content = f'{user.first_name} {user.last_name} has been invited to join {team.name}.',
                 invitation = True)
             db.session.add(invitation)
             db.session.commit()
-            return {'message': 'User invited to team'}, 200
+            return invitation.to_dict(), 201
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+class JoinTeam(Resource):
+    def post(self):
+        try:
+            req = request.get_json()
+            user = User.query.filter(User.id == session['user_id']).first()
+            team = Team.query.filter(Team.id == req['team_id']).first()
+            if user.team_id == None:
+                return {'error': 'User already has a team'}, 400
+            if team.members > 5:
+                return {'error': 'Team is full'}, 400
+            user.team_id = team.id
+            team.members += 1
+            db.session.commit()
+            return user.to_dict(), 201
         except Exception as e:
             return {'error': str(e)}, 400
         
@@ -417,6 +434,8 @@ api.add_resource(UnreadMessages, '/api/messages/unread', endpoint='/api/messages
 api.add_resource(ActivitiesController, '/api/activities/<string:param>', endpoint='/api/activities/<string:param>')
 api.add_resource(Stats, '/api/stats', endpoint='/api/stats')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
+api.add_resource(TeamLeaderController, '/api/teams/leader', endpoint='/api/teams/leader')
+api.add_resource(JoinTeam, '/api/teams/join', endpoint='/api/teams/join')
 api.add_resource(GetCompetitions, '/api/competitions', endpoint='/api/competitions')
 api.add_resource(CompetitionController, '/api/competition_handler', endpoint='/api/competition_handler')
 

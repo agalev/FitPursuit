@@ -11,6 +11,8 @@ export default function Messages() {
 	const [messages, setMessages] = useState(null)
 	const [selectedUser, setSelectedUser] = useState(null)
 	const [message, setMessage] = useState('')
+	const [invited, setInvited] = useState(false)
+	const [accepted, setAccepted] = useState(false)
 
 	useEffect(() => {
 		fetch('/api/messages')
@@ -60,6 +62,86 @@ export default function Messages() {
 				setMessages([...messages, data])
 				setMessage('')
 			})
+	}
+
+	const handleInvite = () => {
+		fetch('/api/teams/leader', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				content: `${global.state.profile.first_name} ${global.state.profile.last_name} has invited ${selectedUser.first_name} ${selectedUser.last_name} to join ${global.state.profile.team.name}.`,
+				receiver_id: selectedUser.id,
+				invitation: true
+			})
+		}).then((res) => {
+			if (res.ok) {
+				res.json().then((data) => {
+					setMessages([...messages, data])
+					global.dispatch({
+						type: 'TOAST',
+						payload: {
+							type: 'success',
+							message: 'Invitation sent.'
+						}
+					})
+					setInvited(true)
+				})
+			} else {
+				res.json().then((data) => {
+					global.dispatch({
+						type: 'TOAST',
+						payload: {
+							type: 'error',
+							message: data.message
+						}
+					})
+				})
+			}
+		})
+	}
+
+	const handleAccept = () => {
+		fetch('/api/teams/join', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				user_id: global.state.profile.id,
+				team_id: selectedUser.team_id
+			})
+		}).then((res) => {
+			if (res.ok) {
+				res.json().then((data) => {
+					global.dispatch({
+						type: 'REFRESH',
+						payload: {
+							profile: data
+						}
+					})
+					global.dispatch({
+						type: 'TOAST',
+						payload: {
+							type: 'success',
+							message: `You have joined the team.`
+						}
+					})
+					setAccepted(true)
+				})
+			} else {
+				res.json().then((data) => {
+					global.dispatch({
+						type: 'TOAST',
+						payload: {
+							type: 'error',
+							message: data.error
+						}
+					})
+				})
+			}
+		})
 	}
 
 	const conversations_list = []
@@ -132,6 +214,8 @@ export default function Messages() {
 		})
 
 	const displayUsers = searchQuery.length > 0 ? filteredUsers : users
+
+	selectedUser && console.log(global.state.profile)
 
 	if (!global.state.isLoggedIn) {
 		return (
@@ -270,6 +354,28 @@ export default function Messages() {
 											</div>
 											<p className='text-black rounded-lg my-1 ml-1'>
 												{message.content}
+												{!invited &&
+													global.state.profile.team &&
+													global.state.profile.team.leader_id ===
+														global.state.profile.id &&
+													message.content.includes(
+														`${selectedUser.first_name} ${selectedUser.last_name} has requested to join ${global.state.profile.team.name}.`
+													) && (
+														<button
+															className='bg-sky-700 px-2 py-2 rounded-lg text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+															onClick={handleInvite}
+														>
+															invite
+														</button>
+													)}
+												{!global.state.profile.team && message.invitation && (
+													<button
+														className='bg-sky-700 px-2 py-2 rounded-lg text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+														onClick={handleAccept}
+													>
+														accept
+													</button>
+												)}
 											</p>
 										</div>
 									)

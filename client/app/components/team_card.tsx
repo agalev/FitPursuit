@@ -19,7 +19,7 @@ export default function TeamCard(team) {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				content: `${global.state.profile.first_name} ${global.state.profile.last_name} has requested to join your team.`,
+				content: `${global.state.profile.first_name} ${global.state.profile.last_name} has requested to join ${team.name}.`,
 				receiver_id: team.leader_id
 			})
 		}).then((res) => {
