@@ -63,7 +63,7 @@ class Auth(Resource):
                 return {'error': str(e)}, 401
     def patch(self):
         if 'user_id' not in session:
-            return {'error': 'Not logged in'}, 401
+            return {'error': 'Not logged in.'}, 401
         req = request.get_json()
         if User.query.filter(User.strava_id == req['id']).first():
                 return {'error': 'This Strava account is already associated with a user.'}, 401
@@ -79,7 +79,7 @@ class Auth(Resource):
             session['profile'] = user.to_dict()
             return session, 200
         else:
-            return {'error': 'User not found'}, 404
+            return {'error': 'User not found.'}, 404
 
 class Signup(Resource):
     def post(self):
