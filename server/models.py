@@ -164,7 +164,7 @@ class Team(db.Model, SerializerMixin):
     leader = db.relationship('User', foreign_keys=[leader_id], uselist=False)
     users = db.relationship('User', back_populates='team', foreign_keys='User.team_id', cascade='all, delete-orphan')
     messages = db.relationship('Message', back_populates='team', cascade='all, delete-orphan')
-    competitions = db.relationship('Competition', back_populates='teams', secondary='competition_handlers')
+    competitions = db.relationship('Competition', back_populates='teams', secondary='competition_handlers', overlaps="competitions")
 
 
     @validates('members')
@@ -243,8 +243,8 @@ class Competition(db.Model, SerializerMixin):
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     organizer = db.relationship('User', foreign_keys=[organizer_id])
-    users = db.relationship('User', back_populates='competitions', secondary='competition_handlers')
-    teams = db.relationship('Team', back_populates='competitions', secondary='competition_handlers')
+    users = db.relationship('User', back_populates='competitions', secondary='competition_handlers', overlaps="competitions")
+    teams = db.relationship('Team', back_populates='competitions', secondary='competition_handlers', overlaps="competitions,users")
 
 class CompetitionHandler(db.Model, SerializerMixin):
     __tablename__ = 'competition_handlers'
@@ -268,6 +268,6 @@ class CompetitionHandler(db.Model, SerializerMixin):
     placement = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
-    user = db.relationship('User', foreign_keys=[user_id])
-    team = db.relationship('Team', foreign_keys=[team_id])
-    competition = db.relationship('Competition', foreign_keys=[competition_id])
+    user = db.relationship('User', foreign_keys=[user_id], overlaps="competitions,users")
+    team = db.relationship('Team', foreign_keys=[team_id], overlaps="competitions,teams")
+    competition = db.relationship('Competition', foreign_keys=[competition_id], overlaps="competitions,competitions,teams,users")

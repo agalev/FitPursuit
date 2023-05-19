@@ -10,16 +10,16 @@ from models import User, Activity, Team, Message, Competition, CompetitionHandle
 @app.before_request
 def firewall():
     if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup', '/api/auth']:
-        return {'error': 'Not logged in'}, 401
+        return {'error': 'Not logged in.'}, 401
 
 class Auth(Resource):
     def get(self):
         if 'user_id' not in session:
-            return {'error': 'Not logged in'}, 204
+            return {'error': 'Not logged in.'}, 204
         return session, 200
     def post(self):
         if 'user_id' in session:
-            return {'message': 'Already logged in'}, 200
+            return {'message': 'Already logged in.'}, 200
         req = request.get_json()
         user = User.query.filter(User.id == req['id']).first()
         if user:
@@ -66,7 +66,7 @@ class Auth(Resource):
             return {'error': 'Not logged in'}, 401
         req = request.get_json()
         if User.query.filter(User.strava_id == req['id']).first():
-                return {'error': 'This Strava account is already associated with a user'}, 401
+                return {'error': 'This Strava account is already associated with a user.'}, 401
         user = User.query.filter(User.id == session['user_id']).first()
         if user:
             user.strava_id = req['id']
@@ -87,7 +87,7 @@ class Signup(Resource):
             return {'error': 'Already logged in'}, 401
         req = request.get_json()
         if User.query.filter(User.email == req['email']).first():
-            return {'error': 'Email already exists'}, 400
+            return {'error': 'Email already exists.'}, 400
         try:
             user = User(email = req['email'],
                         image = req['image'] if 'image' in req else None,
@@ -113,13 +113,13 @@ class Signup(Resource):
 class Login(Resource):
     def post(self):
         if 'user_id' in session:
-            return {'error': 'Already logged in'}, 401
+            return {'error': 'Already logged in.'}, 401
         req = request.get_json()
         user = User.query.filter(User.email == req['email']).first()
         if not user:
-            return {'error': 'Invalid email'}, 400
+            return {'error': 'Invalid email.'}, 400
         if not user.authenticate(req['password']):
-            return {'error': 'Invalid password'}, 400
+            return {'error': 'Invalid password.'}, 400
         user.last_online = datetime.now()
         db.session.commit()
         session['user_id'] = user.id
@@ -129,7 +129,7 @@ class Login(Resource):
 class Logout(Resource):
     def post(self):
         session.clear()
-        return {'message': 'Logged out'}, 200
+        return {'message': 'Logged out.'}, 200
 
 class GetUsers(Resource):
     def get(self):
@@ -140,10 +140,10 @@ class UserController(Resource):
         try:
             return User.query.filter(User.id == id).first().to_dict(), 200
         except:
-            return {'error': 'User not found'}, 404
+            return {'error': 'User not found.'}, 404
     def patch(self, id):
         if session['user_id'] != id:
-            return {'error': 'Unauthorized'}, 401
+            return {'error': 'Unauthorized.'}, 401
         try:
             req = request.get_json()
             user = User.query.filter(User.id == id).first()
@@ -153,7 +153,7 @@ class UserController(Resource):
             session['profile'] = user.to_dict()
             return user.to_dict(), 200
         except:
-            return {'error': 'Unable to edit user'}, 401
+            return {'error': 'Unable to edit user.'}, 401
     def delete(self, id):
         if session['user_id'] != id:
             return {'error': 'Unauthorized'}, 401
@@ -162,9 +162,9 @@ class UserController(Resource):
             db.session.delete(user)
             db.session.commit()
             session.pop('user_id')
-            return {'message': 'User deleted'}, 200
+            return {'message': 'User deleted.'}, 200
         except:
-            return {'error': 'Unable to delete user'}, 401
+            return {'error': 'Unable to delete user.'}, 401
 
 class MessagesController(Resource):
     def get(self):
@@ -180,7 +180,6 @@ class MessagesController(Resource):
             message = Message(sender_id = session['user_id'],
                               receiver_id = req['receiver_id'] if 'receiver_id' in req else None,
                               team_id = req['team_id'] if 'team_id' in req else None,
-                            #   invitation = req['invitation'] if 'invitation' in req else False,
                               content = req['content'])
             db.session.add(message)
             db.session.commit()
@@ -192,7 +191,7 @@ class MessagesController(Resource):
             req = request.get_json()
             message = Message.query.filter(Message.id == req['id']).first()
             if message.sender_id != session['user_id']:
-                return {'error': 'Unauthorized'}, 401
+                return {'error': 'Unauthorized.'}, 401
             message.content = req['content']
             db.session.commit()
             return message.to_dict(), 200
@@ -203,10 +202,31 @@ class MessagesController(Resource):
             req = request.get_json()
             message = Message.query.filter(Message.id == req['id']).first()
             if message.sender_id != session['user_id']:
-                return {'error': 'Unauthorized'}, 401
+                return {'error': 'Unauthorized.'}, 401
             db.session.delete(message)
             db.session.commit()
-            return {'message': 'Message deleted'}, 200
+            return {'message': 'Message deleted.'}, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
+
+class TeamMessagesController(Resource):
+    def get(self):
+        try:
+            user = User.query.filter(User.id == session['user_id']).first()
+            query = Message.query.filter(Message.team_id == user.team_id).all()
+            return [message.to_dict() for message in query], 200
+        except Exception as e:
+            return {'error': str(e)}, 400
+    def post(self):
+        try:
+            req = request.get_json()
+            user = User.query.filter(User.id == session['user_id']).first()
+            message = Message(sender_id = session['user_id'],
+                              team_id = user.team_id,
+                              content = req['content'])
+            db.session.add(message)
+            db.session.commit()
+            return message.to_dict(), 201
         except Exception as e:
             return {'error': str(e)}, 400
         
@@ -226,7 +246,7 @@ class UnreadMessages(Resource):
             for message in messages:
                 message.read = True
             db.session.commit()
-            return {'message': 'Messages marked as read'}, 200
+            return {'message': 'Messages marked as read.'}, 200
         except Exception as e:
             return {'error': str(e)}, 400
 
@@ -247,7 +267,7 @@ class ActivitiesController(Resource):
                             headers = {'Authorization': f'Bearer {user.strava_access_token}'},
                             params={'per_page': 200, 'page': page_count})
             if res.status_code != 200:
-                return {'error': 'Unable to retrieve activities'}, 400
+                return {'error': 'Unable to retrieve activities.'}, 400
             activities = res.json()
             while len(activities) == 200:
                 page_count += 1
@@ -255,7 +275,7 @@ class ActivitiesController(Resource):
                                 headers = {'Authorization': f'Bearer {user.strava_access_token}'},
                                 params={'per_page': 200, 'page': page_count})
                 if res.status_code != 200:
-                    return {'error': 'Unable to retrieve activities'}, 400
+                    return {'error': 'Unable to retrieve activities.'}, 400
                 activities += res.json()
             for activity in activities:
                 if Activity.query.filter(Activity.strava_id == int(activity['id'])).first():
@@ -316,7 +336,7 @@ class TeamsController(Resource):
             req = request.get_json()
             user = User.query.filter(User.id == session['user_id']).first()
             if user.team_id:
-                return {'error': 'You already belong to a team'}, 400
+                return {'error': 'You already belong to a team.'}, 400
             team = Team(name = req['name'],
                         leader_id = session['user_id'],
                         activity_type = req['activity_type'],
@@ -350,11 +370,11 @@ class TeamsController(Resource):
             user = User.query.filter(User.id == session['user_id']).first()
             team = Team.query.filter(Team.id == req['id']).first()
             if team.leader_id != session['user_id']:
-                return {'error': 'Unauthorized'}, 401
+                return {'error': 'Unauthorized.'}, 401
             user.team_id = None
             db.session.delete(team)
             db.session.commit()
-            return {'message': 'Team deleted'}, 200
+            return {'message': 'Team deleted.'}, 200
         except Exception as e:
             return {'error': str(e)}, 400
 
@@ -372,9 +392,9 @@ class TeamLeaderController(Resource):
             team = Team.query.filter(Team.leader_id == session['user_id']).first()
             user = User.query.filter(User.id == req['receiver_id']).first()
             if user.team_id:
-                return {'error': 'User already has a team'}, 400
+                return {'error': 'User already belongs to a team.'}, 400
             if team.members > 5:
-                return {'error': 'Team is full'}, 400
+                return {'error': 'Team is full.'}, 400
             invitation = Message(
                 sender_id = session['user_id'],
                 receiver_id = user.id,
@@ -393,10 +413,16 @@ class JoinTeam(Resource):
             req = request.get_json()
             user = User.query.filter(User.id == session['user_id']).first()
             team = Team.query.filter(Team.id == req['team_id']).first()
-            if user.team_id == None:
-                return {'error': 'User already has a team'}, 400
+            if user.team_id is not None:
+                return {'error': 'User already belongs to a team.'}, 400
             if team.members > 5:
-                return {'error': 'Team is full'}, 400
+                return {'error': 'Team is full.'}, 400
+            message = Message(
+                sender_id = session['user_id'],
+                team_id = team.id,
+                content = f'{user.first_name} {user.last_name} has joined {team.name}.'
+            )
+            db.session.add(message)
             user.team_id = team.id
             team.members += 1
             db.session.commit()
@@ -430,6 +456,7 @@ api.add_resource(Logout, '/api/logout', endpoint='/api/logout')
 api.add_resource(GetUsers, '/api/users', endpoint='/api/users')
 api.add_resource(UserController, '/api/users/<int:id>', endpoint='/api/users/<int:id>')
 api.add_resource(MessagesController, '/api/messages', endpoint='/api/messages')
+api.add_resource(TeamMessagesController, '/api/messages/team', endpoint='/api/messages/team')
 api.add_resource(UnreadMessages, '/api/messages/unread', endpoint='/api/messages/unread')
 api.add_resource(ActivitiesController, '/api/activities/<string:param>', endpoint='/api/activities/<string:param>')
 api.add_resource(Stats, '/api/stats', endpoint='/api/stats')

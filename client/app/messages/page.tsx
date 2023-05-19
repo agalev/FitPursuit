@@ -9,21 +9,38 @@ export default function Messages() {
 	const [users, setUsers] = useState(null)
 	const [searchQuery, setSearchQuery] = useState('')
 	const [messages, setMessages] = useState(null)
+	const [teamMessages, setTeamMessages] = useState(null)
 	const [selectedUser, setSelectedUser] = useState(null)
 	const [message, setMessage] = useState('')
 	const [invited, setInvited] = useState(false)
-	const [accepted, setAccepted] = useState(false)
 
 	useEffect(() => {
-		fetch('/api/messages')
-			.then((res) => res.json())
-			.then((data) => {
-				setMessages(
-					data.sort((a, b) => {
-						return a.created_at.localeCompare(b.created_at)
-					})
-				)
-			})
+		if (
+			global.state.profile.team &&
+			selectedUser &&
+			selectedUser.name === global.state.profile.team.name
+		) {
+			fetch('/api/messages/team')
+				.then((res) => res.json())
+				.then((data) => {
+					console.log(data)
+					setTeamMessages(
+						data.sort((a, b) => {
+							return a.created_at.localeCompare(b.created_at)
+						})
+					)
+				})
+		} else {
+			fetch('/api/messages')
+				.then((res) => res.json())
+				.then((data) => {
+					setMessages(
+						data.sort((a, b) => {
+							return a.created_at.localeCompare(b.created_at)
+						})
+					)
+				})
+		}
 		initTE({ Ripple, Input })
 	}, [selectedUser])
 
@@ -47,21 +64,42 @@ export default function Messages() {
 			})
 			return
 		}
-		fetch('/api/messages', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				content: message,
-				receiver_id: selectedUser.id
+		if (
+			global.state.profile.team &&
+			selectedUser &&
+			selectedUser.name === global.state.profile.team.name
+		) {
+			fetch('/api/messages/team', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					content: message
+				})
 			})
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				setMessages([...messages, data])
-				setMessage('')
+				.then((res) => res.json())
+				.then((data) => {
+					setTeamMessages([...teamMessages, data])
+					setMessage('')
+				})
+		} else {
+			fetch('/api/messages', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					content: message,
+					receiver_id: selectedUser.id
+				})
 			})
+				.then((res) => res.json())
+				.then((data) => {
+					setMessages([...messages, data])
+					setMessage('')
+				})
+		}
 	}
 
 	const handleInvite = () => {
@@ -94,7 +132,7 @@ export default function Messages() {
 						type: 'TOAST',
 						payload: {
 							type: 'error',
-							message: data.message
+							message: data.error
 						}
 					})
 				})
@@ -115,12 +153,7 @@ export default function Messages() {
 		}).then((res) => {
 			if (res.ok) {
 				res.json().then((data) => {
-					global.dispatch({
-						type: 'REFRESH',
-						payload: {
-							profile: data
-						}
-					})
+					global.dispatch({ type: 'REFRESH', payload: data })
 					global.dispatch({
 						type: 'TOAST',
 						payload: {
@@ -128,7 +161,6 @@ export default function Messages() {
 							message: `You have joined the team.`
 						}
 					})
-					setAccepted(true)
 				})
 			} else {
 				res.json().then((data) => {
@@ -205,6 +237,13 @@ export default function Messages() {
 		})
 	}
 
+	const handleTeamSelect = () => {
+		setSelectedUser(global.state.profile.team)
+	}
+
+	// selectedUser && console.log(selectedUser)
+	console.log(conversations_list)
+
 	const filteredUsers =
 		users &&
 		users.filter((user) => {
@@ -214,8 +253,6 @@ export default function Messages() {
 		})
 
 	const displayUsers = searchQuery.length > 0 ? filteredUsers : users
-
-	selectedUser && console.log(global.state.profile)
 
 	if (!global.state.isLoggedIn) {
 		return (
@@ -257,7 +294,7 @@ export default function Messages() {
 						</svg>
 					</label>
 				</div>
-				<span>Browse all users</span>
+				<span className='font-bold'>Browse all users</span>
 				<ul className='ml-1 overflow-auto'>
 					{displayUsers &&
 						displayUsers.map(
@@ -282,7 +319,27 @@ export default function Messages() {
 						)}
 				</ul>
 				<hr className='py-0.5 my-2 border-0 bg-amber-500' />
-				<span>
+				{global.state.profile.team && (
+					<ul className='ml-1'>
+						<span className='font-bold'>Team Chat</span>
+						<li
+							className='flex items-center py-1 rounded hover:bg-slate-300 text-sm cursor-pointer'
+							onClick={handleTeamSelect}
+						>
+							<img
+								className='w-8 h-8 rounded-full mr-2 border-2 border-amber-500 shadow-2xl'
+								src={
+									global.state.profile.team.image ||
+									'/svg/circle_logo_color.svg'
+								}
+								alt='team avatar'
+							/>
+							<span>{global.state.profile.team.name}</span>
+						</li>
+						<hr className='py-0.5 my-2 border-0 bg-amber-500' />
+					</ul>
+				)}
+				<span className='font-bold'>
 					{conversations_list.length > 0 ? `Conversations` : `No conversations`}
 				</span>
 				<ul className='ml-1 overflow-auto'>
@@ -298,7 +355,7 @@ export default function Messages() {
 									src={conversation.with.image || '/avatar.jpg'}
 									alt='avatar'
 								/>
-								<span className=''>{`${conversation.with.first_name} ${conversation.with.last_name}`}</span>
+								<span>{`${conversation.with.first_name} ${conversation.with.last_name}`}</span>
 								{conversation.unread > 0 && (
 									<span className='ml-1 bg-red-600 rounded-full py-0.5 px-1.5 text-xs font-bold'>
 										{conversation.unread}
@@ -311,7 +368,11 @@ export default function Messages() {
 			<div className='flex flex-col flex-grow bg-slate-100 dark:bg-slate-400'>
 				<header className='py-2 pl-1 bg-slate-200 dark:bg-slate-800'>
 					<h1 className='text-sm sm:text-xl font-bold text-center'>
-						{selectedUser
+						{selectedUser &&
+						global.state.profile.team &&
+						selectedUser.name === global.state.profile.team.name
+							? `${global.state.profile.team.name} Team Chat`
+							: selectedUser
 							? `Conversation with ${selectedUser.first_name} ${selectedUser.last_name}`
 							: `Conversations`}
 					</h1>
@@ -319,68 +380,99 @@ export default function Messages() {
 				<div className='flex-grow overflow-y-auto'>
 					<ScrollContainer>
 						{selectedUser &&
-							messages &&
-							messages.map((message) => {
-								if (
-									(message.sender_id === selectedUser.id &&
-										message.receiver_id === global.state.profile.id) ||
-									(message.receiver_id === selectedUser.id &&
-										message.sender_id === global.state.profile.id)
-								) {
-									return (
-										<div
-											key={message.id}
-											className={`flex flex-col my-2 ml-1 rounded text-black ${
-												message.sender_id === global.state.profile.id
-													? 'bg-sky-200'
-													: 'bg-gray-200'
-											}`}
-										>
-											<div key={message.id} className='flex items-center p-1'>
-												<img
-													className='w-8 h-8 rounded-full mr-2 mb-1 border-2 border-amber-500 shadow-2xl'
-													src={
-														message.sender_id === global.state.profile.id
-															? global.state.profile.image || '/avatar.jpg'
-															: selectedUser.image || '/avatar.jpg'
-													}
-													alt='avatar'
-												/>
-												<span className='text-xs font-bold'>
-													{message.sender_id === global.state.profile.id
-														? `You · ${message.created_at}`
-														: `${selectedUser.first_name} ${selectedUser.last_name} · ${message.created_at}`}
-												</span>
-											</div>
-											<p className='text-black rounded-lg my-1 ml-1'>
-												{message.content}
-												{!invited &&
-													global.state.profile.team &&
-													global.state.profile.team.leader_id ===
-														global.state.profile.id &&
-													message.content.includes(
-														`${selectedUser.first_name} ${selectedUser.last_name} has requested to join ${global.state.profile.team.name}.`
-													) && (
+						global.state.profile.team &&
+						selectedUser.name === global.state.profile.team.name &&
+						teamMessages
+							? teamMessages.map((message) => (
+									<div
+										key={message.id}
+										className={`flex flex-col my-2 ml-1 rounded text-black ${
+											message.sender_id === global.state.profile.id
+												? 'bg-sky-200'
+												: 'bg-gray-200'
+										}`}
+									>
+										<div key={message.id} className='flex items-center p-1'>
+											<img
+												className='w-8 h-8 rounded-full mr-2 mb-1 border-2 border-amber-500 shadow-2xl'
+												src={message.sender.image || '/avatar.jpg'}
+												alt='avatar'
+											/>
+											<span className='text-xs font-bold'>
+												{message.sender_id === global.state.profile.id
+													? `You · ${message.created_at}`
+													: `${message.sender.first_name} ${message.sender.last_name} · ${message.created_at}`}
+											</span>
+										</div>
+										<p className='text-black rounded-lg my-1 ml-1'>
+											{message.content}
+										</p>
+									</div>
+							  ))
+							: selectedUser && messages
+							? messages.map((message) => {
+									if (
+										(message.sender_id === selectedUser.id &&
+											message.receiver_id === global.state.profile.id) ||
+										(message.receiver_id === selectedUser.id &&
+											message.sender_id === global.state.profile.id)
+									) {
+										return (
+											<div
+												key={message.id}
+												className={`flex flex-col my-2 ml-1 rounded text-black ${
+													message.sender_id === global.state.profile.id
+														? 'bg-sky-200'
+														: 'bg-gray-200'
+												}`}
+											>
+												<div key={message.id} className='flex items-center p-1'>
+													<img
+														className='w-8 h-8 rounded-full mr-2 mb-1 border-2 border-amber-500 shadow-2xl'
+														src={
+															message.sender_id === global.state.profile.id
+																? global.state.profile.image || '/avatar.jpg'
+																: selectedUser.image || '/avatar.jpg'
+														}
+														alt='avatar'
+													/>
+													<span className='text-xs font-bold'>
+														{message.sender_id === global.state.profile.id
+															? `You · ${message.created_at}`
+															: `${selectedUser.first_name} ${selectedUser.last_name} · ${message.created_at}`}
+													</span>
+												</div>
+												<p className='text-black rounded-lg my-1 ml-1'>
+													{message.content}
+													{!invited &&
+														!selectedUser.team_id &&
+														global.state.profile.team &&
+														global.state.profile.team.leader_id ===
+															global.state.profile.id &&
+														message.content.includes(
+															`${selectedUser.first_name} ${selectedUser.last_name} has requested to join ${global.state.profile.team.name}.`
+														) && (
+															<button
+																className='bg-sky-700 px-2 py-2 rounded-lg text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+																onClick={handleInvite}
+															>
+																invite
+															</button>
+														)}
+													{!global.state.profile.team && message.invitation && (
 														<button
 															className='bg-sky-700 px-2 py-2 rounded-lg text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-															onClick={handleInvite}
+															onClick={handleAccept}
 														>
-															invite
+															accept
 														</button>
 													)}
-												{!global.state.profile.team && message.invitation && (
-													<button
-														className='bg-sky-700 px-2 py-2 rounded-lg text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-														onClick={handleAccept}
-													>
-														accept
-													</button>
-												)}
-											</p>
-										</div>
-									)
-								}
-							})}
+												</p>
+											</div>
+										)
+									}
+							  })
+							: null}
 					</ScrollContainer>
 				</div>
 				{selectedUser && (
