@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext } from 'react'
-import Image from 'next/image'
 import { initTE, Ripple } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 
@@ -36,19 +35,14 @@ export default function TeamCard(team) {
 	}
 
 	return (
-		<article
-			className='text-center inline-block max-w-sm m-2 p-1 rounded-lg 
-		border
-		border-amber-500 bg-neutral-400 shadow-lg dark:bg-neutral-800'
-		>
-			<Image
-				className='my-2 mx-auto'
-				src='/svg/circle_logo_color.svg'
-				width={200}
-				height={200}
-				alt='team logo'
-				priority
-			/>
+		<article className='text-center inline-block max-w-sm m-2 p-1 rounded-lg border border-amber-500 bg-neutral-400 shadow-lg dark:bg-neutral-800'>
+			<div className='w-32 h-32 mx-auto rounded-full bg-slate-300'>
+				<img
+					src={team.image || '/svg/circle_logo_color.svg'}
+					className='w-full h-full rounded-full object-cover'
+					alt='team logo'
+				/>
+			</div>
 			<h3 className='text-xl font-medium'>{team.name}</h3>
 			<h4 className='text-lg font-medium mb-2'>{team.activity_type}</h4>
 			<p>Members: {team.members}</p>

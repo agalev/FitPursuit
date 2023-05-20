@@ -378,13 +378,11 @@ class TeamsController(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
 
+class GetTeam(Resource):
+    def get(self, id):
+        return Team.query.filter(Team.id == id).first().to_dict(), 200
+
 class TeamLeaderController(Resource):
-    def get(self):
-        try:
-            team = Team.query.filter(Team.leader_id == session['user_id']).first()
-            return team.to_dict(), 200
-        except Exception as e:
-            return {'error': str(e)}, 400
     # invite user to team
     def post(self):
         try:
@@ -481,6 +479,7 @@ api.add_resource(UnreadMessages, '/api/messages/unread', endpoint='/api/messages
 api.add_resource(ActivitiesController, '/api/activities/<string:param>', endpoint='/api/activities/<string:param>')
 api.add_resource(Stats, '/api/stats', endpoint='/api/stats')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
+api.add_resource(GetTeam, '/api/teams/<int:id>', endpoint='/api/teams/<int:id>')
 api.add_resource(TeamLeaderController, '/api/teams/leader', endpoint='/api/teams/leader')
 api.add_resource(JoinTeam, '/api/teams/join', endpoint='/api/teams/join')
 api.add_resource(LeaveTeam, '/api/teams/leave', endpoint='/api/teams/leave')

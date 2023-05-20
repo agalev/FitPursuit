@@ -119,6 +119,7 @@ export default function CreateTeam() {
 							<img
 								src={formData.image || '/svg/circle_logo_color.svg'}
 								className='w-full h-full rounded-full object-cover'
+								alt='Team Logo'
 							/>
 						</div>
 						<div className='ml-2'>
