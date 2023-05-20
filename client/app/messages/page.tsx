@@ -23,7 +23,6 @@ export default function Messages() {
 			fetch('/api/messages/team')
 				.then((res) => res.json())
 				.then((data) => {
-					console.log(data)
 					setTeamMessages(
 						data.sort((a, b) => {
 							return a.created_at.localeCompare(b.created_at)
@@ -240,9 +239,6 @@ export default function Messages() {
 	const handleTeamSelect = () => {
 		setSelectedUser(global.state.profile.team)
 	}
-
-	// selectedUser && console.log(selectedUser)
-	console.log(conversations_list)
 
 	const filteredUsers =
 		users &&

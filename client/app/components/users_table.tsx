@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Image from 'next/image'
 import { initTE, Input } from 'tw-elements'
+import { GlobalState } from '../global-provider'
 
 export default function UsersTable() {
+	const global = useContext(GlobalState)
 	const [users, setUsers] = useState(null)
 	const [searchQuery, setSearchQuery] = useState('')
 	const [sortField, setSortField] = useState('')
@@ -39,6 +41,42 @@ export default function UsersTable() {
 			})
 			setUsers(sorted)
 		}
+	}
+
+	const handleInvite = (selectedUser) => {
+		fetch('/api/teams/leader', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				content: `${global.state.profile.first_name} ${global.state.profile.last_name} has invited ${selectedUser.first_name} ${selectedUser.last_name} to join ${global.state.profile.team.name}.`,
+				receiver_id: selectedUser.id,
+				invitation: true
+			})
+		}).then((res) => {
+			if (res.ok) {
+				res.json().then((data) => {
+					global.dispatch({
+						type: 'TOAST',
+						payload: {
+							type: 'success',
+							message: 'Invitation sent.'
+						}
+					})
+				})
+			} else {
+				res.json().then((data) => {
+					global.dispatch({
+						type: 'TOAST',
+						payload: {
+							type: 'error',
+							message: data.error
+						}
+					})
+				})
+			}
+		})
 	}
 
 	const filteredUsers =
@@ -341,7 +379,20 @@ export default function UsersTable() {
 								</td>
 								<td className='whitespace-nowrap px-10 py-4'>{user.wins}</td>
 								<td className='whitespace-nowrap px-6 py-4'>
-									{user.team ? user.team.name : '-'}
+									{user.team ? (
+										user.team.name
+									) : global.state.profile.team &&
+									  global.state.profile.team.leader_id ===
+											global.state.profile.id ? (
+										<button
+											className='bg-sky-700 px-2 py-2 rounded-lg text-xs text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+											onClick={() => handleInvite(user)}
+										>
+											invite to team
+										</button>
+									) : (
+										'-'
+									)}
 								</td>
 								<td className='whitespace-nowrap px-6 py-4'>
 									{user.city ? user.city : '-'}

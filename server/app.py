@@ -429,6 +429,26 @@ class JoinTeam(Resource):
             return user.to_dict(), 201
         except Exception as e:
             return {'error': str(e)}, 400
+
+class LeaveTeam(Resource):
+    def delete(self):
+        try:
+            user = User.query.filter(User.id == session['user_id']).first()
+            team = Team.query.filter(Team.id == user.team_id).first()
+            if team.leader_id == session['user_id']:
+                return {'error': 'Team leader cannot leave team.'}, 400
+            message = Message(
+                sender_id = session['user_id'],
+                team_id = team.id,
+                content = f'{user.first_name} {user.last_name} has left {team.name}.'
+            )
+            db.session.add(message)
+            user.team_id = None
+            team.members -= 1
+            db.session.commit()
+            return user.to_dict(), 201
+        except Exception as e:
+            return {'error': str(e)}, 400
         
 class GetCompetitions(Resource):
     def get(self):
@@ -463,6 +483,7 @@ api.add_resource(Stats, '/api/stats', endpoint='/api/stats')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
 api.add_resource(TeamLeaderController, '/api/teams/leader', endpoint='/api/teams/leader')
 api.add_resource(JoinTeam, '/api/teams/join', endpoint='/api/teams/join')
+api.add_resource(LeaveTeam, '/api/teams/leave', endpoint='/api/teams/leave')
 api.add_resource(GetCompetitions, '/api/competitions', endpoint='/api/competitions')
 api.add_resource(CompetitionController, '/api/competition_handler', endpoint='/api/competition_handler')
 

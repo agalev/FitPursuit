@@ -2,14 +2,9 @@
 import { useState, useEffect, useContext } from 'react'
 import { Ripple, Input, Select, initTE } from 'tw-elements'
 import { GlobalState } from '../global-provider'
-import StravaButton from './strava_button'
-import states_countries from '../misc/states_countries.json'
 
 export default function UserProfile() {
 	const global = useContext(GlobalState)
-
-	const states = states_countries.states
-	const countries = states_countries.countries
 
 	const [editMode, setEditMode] = useState(false)
 
@@ -17,18 +12,7 @@ export default function UserProfile() {
 		initTE({ Ripple, Input, Select })
 	}, [editMode])
 
-	const [formData, setFormData] = useState({
-		first_name: global.state.profile.first_name,
-		last_name: global.state.profile.last_name,
-		bio: global.state.profile.bio,
-		image: global.state.profile.image,
-		city: global.state.profile.city,
-		state: global.state.profile.state,
-		country: global.state.profile.country,
-		sex: global.state.profile.sex,
-		height: global.state.profile.height ? global.state.profile.height : 0,
-		weight: global.state.profile.weight ? global.state.profile.weight : 0
-	})
+	const [formData, setFormData] = useState({})
 
 	const handleInputChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -64,38 +48,9 @@ export default function UserProfile() {
 
 	const handleCancel = () => {
 		setEditMode(false)
-		setFormData({
-			first_name: global.state.profile.first_name,
-			last_name: global.state.profile.last_name,
-			bio: global.state.profile.bio,
-			image: global.state.profile.image,
-			city: global.state.profile.city,
-			state: global.state.profile.state,
-			country: global.state.profile.country,
-			sex: global.state.profile.sex,
-			height: global.state.profile.height,
-			weight: global.state.profile.weight
-		})
+		setFormData({})
 	}
 
-	let gender: string = 'Nonbinary'
-	if (global.state.profile.sex === 'M') gender = 'Male'
-	else if (global.state.profile.sex === 'F') gender = 'Female'
-
-	const SyncActivities = () => {
-		fetch('/api/activities/self', {
-			method: 'POST'
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				data.profile &&
-					global.dispatch({ type: 'REFRESH', payload: data.profile })
-				global.dispatch({
-					type: 'TOAST',
-					payload: { message: data.message, type: 'info' }
-				})
-			})
-	}
 
 	const handleLeave = () => {
 		fetch('/api/teams/leave', {
