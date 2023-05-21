@@ -97,29 +97,6 @@ export default function UserProfile() {
 			})
 	}
 
-	const handleLeave = () => {
-		fetch('/api/teams/leave', {
-			method: 'DELETE'
-		}).then((res) => {
-			if (res.ok) {
-				res.json().then((data) => {
-					global.dispatch({ type: 'REFRESH', payload: data })
-					global.dispatch({
-						type: 'TOAST',
-						payload: { message: 'Left team successfully.', type: 'success' }
-					})
-				})
-			} else {
-				res.json().then((error) => {
-					global.dispatch({
-						type: 'TOAST',
-						payload: { message: error.error, type: 'error' }
-					})
-				})
-			}
-		})
-	}
-
 	return (
 		<section
 			className='rounded-lg p-4 mx-2 text-center text-white'
@@ -268,17 +245,6 @@ export default function UserProfile() {
 					</section>
 				) : (
 					<div className='m-auto'>
-						{global.state.profile.team && (
-							<>
-								Team: {global.state.profile.team.name}
-								<button
-									className='bg-sky-700 ml-1 px-1 py-1 rounded-lg text-xs text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-									onClick={handleLeave}
-								>
-									Leave Team
-								</button>
-							</>
-						)}
 						<h3 className='text-lg font-semibold mt-2'>Location</h3>
 
 						<p>City: {global.state.profile.city}</p>

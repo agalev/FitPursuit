@@ -367,14 +367,16 @@ class TeamsController(Resource):
     def delete(self):
         try:
             req = request.get_json()
-            user = User.query.filter(User.id == session['user_id']).first()
             team = Team.query.filter(Team.id == req['id']).first()
+            users = User.query.filter(User.team_id == team.id).all()
             if team.leader_id != session['user_id']:
                 return {'error': 'Unauthorized.'}, 401
-            user.team_id = None
+            for user in users:
+                user.team_id = None
+                db.session.commit()
             db.session.delete(team)
             db.session.commit()
-            return {'message': 'Team deleted.'}, 200
+            return User.query.filter(User.id == session['user_id']).first().to_dict(), 200
         except Exception as e:
             return {'error': str(e)}, 400
 
@@ -402,6 +404,28 @@ class TeamLeaderController(Resource):
             db.session.add(invitation)
             db.session.commit()
             return invitation.to_dict(), 201
+        except Exception as e:
+            return {'error': str(e)}, 400
+    # remove user from team
+    def delete(self):
+        try:
+            req = request.get_json()
+            team = Team.query.filter(Team.leader_id == session['user_id']).first()
+            user = User.query.filter(User.id == req).first()
+            if team.leader_id != session['user_id']:
+                return {'error': 'Unauthorized'}, 401
+            if user.team_id != team.id:
+                return {'error': 'User does not belong to this team.'}, 400
+            user.team_id = None
+            team.members -= 1
+            group_msg = Message(
+                sender_id = session['user_id'],
+                receiver_id = user.id,
+                team_id = team.id,
+                content = f'{user.first_name} {user.last_name} has been removed from {team.name}.')
+            db.session.add(group_msg)
+            db.session.commit()
+            return team.to_dict(), 200
         except Exception as e:
             return {'error': str(e)}, 400
 

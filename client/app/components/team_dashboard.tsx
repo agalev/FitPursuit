@@ -66,9 +66,69 @@ export default function TeamDashboard() {
 		})
 	}
 
+	const handleKick = (id) => {
+		fetch('/api/teams/leader', {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(id)
+		}).then((res) => {
+			if (res.ok) {
+				res.json().then((data) => {
+					setTeam(data)
+					global.dispatch({
+						type: 'TOAST',
+						payload: {
+							message: 'User has been removed from the team.',
+							type: 'success'
+						}
+					})
+				})
+			} else {
+				res.json().then((error) => {
+					global.dispatch({
+						type: 'TOAST',
+						payload: { message: error.error, type: 'error' }
+					})
+				})
+			}
+		})
+	}
+
+	const handleLeave = () => {
+		fetch('/api/teams/leave', {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}).then((res) => {
+			if (res.ok) {
+				res.json().then((data) => {
+					global.dispatch({ type: 'REFRESH', payload: data })
+					global.dispatch({
+						type: 'TOAST',
+						payload: { message: 'Left team successfully.', type: 'success' }
+					})
+				})
+			} else {
+				res.json().then((error) => {
+					global.dispatch({
+						type: 'TOAST',
+						payload: { message: error.error, type: 'error' }
+					})
+				})
+			}
+		})
+	}
+
 	const handleDisband = () => {
 		fetch('/api/teams', {
-			method: 'DELETE'
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ id: global.state.profile.team.id })
 		}).then((res) => {
 			if (res.ok) {
 				res.json().then((data) => {
@@ -83,6 +143,7 @@ export default function TeamDashboard() {
 				})
 			} else {
 				res.json().then((error) => {
+					console.log(error)
 					global.dispatch({
 						type: 'TOAST',
 						payload: { message: error.error, type: 'error' }
@@ -146,6 +207,21 @@ export default function TeamDashboard() {
 									src={team.image || '/avatar.jpg'}
 									alt='avatar'
 								/>
+								{team.leader_id === global.state.profile.id ? (
+									<button
+										className='bg-red-500 m-1 px-1 py-1 rounded-lg text-xs text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+										onClick={handleDisband}
+									>
+										Disband Team
+									</button>
+								) : (
+									<button
+										className='bg-red-500 m-1 px-1 py-1 rounded-lg text-xs text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+										onClick={handleLeave}
+									>
+										Leave Team
+									</button>
+								)}
 							</>
 						)}
 					</div>
@@ -160,13 +236,25 @@ export default function TeamDashboard() {
 					<div>
 						<h3 className='text-lg font-medium'>Members</h3>
 						<ul>
-							<li className='font-semibold'>Leader: {team.leader.first_name} {team.leader.last_name}</li>
-							{team.users.map((user) => (
-								user.id !== team.leader.id &&
-								<li key={user.id}>
-									{user.first_name} {user.last_name}
-								</li>
-							))}
+							<li className='font-semibold'>
+								Leader: {team.leader.first_name} {team.leader.last_name}
+							</li>
+							{team.users.map(
+								(user) =>
+									user.id !== team.leader.id && (
+										<li key={user.id}>
+											{user.first_name} {user.last_name}
+											{global.state.profile.id === team.leader_id && (
+												<button
+													className='bg-red-500 m-1 px-1 py-1 rounded-lg text-xs text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
+													onClick={() => handleKick(user.id)}
+												>
+													Kick
+												</button>
+											)}
+										</li>
+									)
+							)}
 						</ul>
 					</div>
 				</div>

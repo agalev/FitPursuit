@@ -67,7 +67,7 @@ with app.app_context():
         weight=180,
         wins=2,
         FPcoins=3000,
-        team_id=1
+        team_id=2
     )
     user3.password_hash = 'Password1'
 
@@ -103,7 +103,7 @@ with app.app_context():
         weight=178,
         wins=4,
         FPcoins=1000,
-        team_id=1
+        team_id=4
     )
     user5.password_hash = 'Password1'
 
@@ -121,7 +121,7 @@ with app.app_context():
         weight=180,
         wins=5,
         FPcoins=4000,
-        team_id=2
+        team_id=5
     )
     user6.password_hash = 'Password1'
 
@@ -139,7 +139,7 @@ with app.app_context():
         weight=220,
         wins=2,
         FPcoins=2000,
-        team_id=3
+        team_id=6
     )
     user7.password_hash = 'Password1'
 
@@ -157,7 +157,7 @@ with app.app_context():
         weight=170,
         wins=1,
         FPcoins=4000,
-        team_id=2
+        team_id=7
     )
     user8.password_hash = 'Password1'
 
@@ -174,8 +174,7 @@ with app.app_context():
         height=79,
         weight=179,
         wins=3,
-        FPcoins=3000,
-        team_id=3
+        FPcoins=3000
     )
     user9.password_hash = 'Password1'
 
@@ -192,8 +191,7 @@ with app.app_context():
         height=79,
         weight=166,
         wins=1,
-        FPcoins=1000,
-        team_id=1
+        FPcoins=1000
     )
     user10.password_hash = 'Password1'
 
@@ -207,44 +205,44 @@ with app.app_context():
         activity_type='running'
     )
     team2 = Team(
-        name='Cyclus',
-        leader_id=2,
-        wins=11,
-        activity_type='bicycling'
-    )
-    team3 = Team(
         name='Rollerbladers',
         leader_id=3,
         wins=7,
         activity_type='rollerblading'
     )
 
-    team4 = Team(
+    team3 = Team(
         name='Ski Bums',
         leader_id=4,
         wins=12,
         activity_type='skiing'
     )
 
-    team5 = Team(
+    team4 = Team(
         name='Snow Bunniez',
         leader_id=5,
         wins=5,
         activity_type='snowboarding'
     )
 
-    team6 = Team(
+    team5 = Team(
         name='Mountain Goats',
         leader_id=6,
         wins=9,
         activity_type='climbing'
     )
 
-    team7 = Team(
+    team6 = Team(
         name='Swimmers',
         leader_id=7,
         wins=8,
         activity_type='swimming'
+    )
+    team7 = Team(
+        name='Cyclus',
+        leader_id=8,
+        wins=11,
+        activity_type='bicycling'
     )
 
     # Create activities
@@ -322,7 +320,6 @@ with app.app_context():
         sender_id=1,
         team_id=1,
         receiver_id=2,
-        invitation=True,
         content='Hello, Jane!'
     )
     message2 = Message(
@@ -460,12 +457,10 @@ with app.app_context():
     )
     competition_participant2 = CompetitionHandler(
         user_id=2,
-        team_id=1,
         competition_id=2
     )
     competition_participant3 = CompetitionHandler(
         user_id=3,
-        team_id=3,
         competition_id=3
     )
 
