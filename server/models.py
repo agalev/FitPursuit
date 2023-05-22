@@ -104,7 +104,24 @@ class User(db.Model, SerializerMixin):
 class Activity(db.Model, SerializerMixin):
     __tablename__ = 'activities'
 
-    serialize_rules = ('-user',)
+    serialize_rules = ('-user.FPcoins',
+                       '-user.bio',
+                       '-user.city',
+                       '-user.state',
+                       '-user.country',
+                       '-user.competitions',
+                       '-user.email',
+                       '-user.height',
+                       '-user.weight',
+                       '-user.id',
+                       '-user.image',
+                       '-user.last_online',
+                       '-user.sex',
+                       '-user.strava_connected',
+                       '-user.strava_id',
+                       '-user.team',
+                       '-user.team_id',
+                       '-user.wins',)
 
     id = db.Column(db.Integer, primary_key=True)
     qualified = db.Column(db.Boolean, default=True)

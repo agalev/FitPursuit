@@ -35,6 +35,15 @@ export default function TeamsTable() {
 		}
 	}
 
+	const convertSecondsToHours = (seconds) => {
+		const hours = Math.floor(seconds / 3600)
+		const remainingMinutes = Math.floor((seconds % 3600) / 60)
+		const remainingSeconds = (seconds % 3600) % 60
+		return hours > 0
+			? `${hours}h ${remainingMinutes}m ${remainingSeconds}s`
+			: `${remainingMinutes}m ${remainingSeconds}s`
+	}
+
 	return (
 		<section className='flex flex-col overflow-x-auto'>
 			<h2 className='text-2xl my-2 font-bold text-center'>Teams Leaderboard</h2>
@@ -297,16 +306,24 @@ export default function TeamsTable() {
 									{`${team.leader.first_name} ${team.leader.last_name}`}
 								</td>
 								<td className='whitespace-nowrap px-12 py-4'>
-									{team.average_speed ? team.average_speed : '-'}
+									{team.average_speed
+										? `${Math.round(team.average_speed * 100) / 100} mph`
+										: '-'}
 								</td>
 								<td className='whitespace-nowrap px-12 py-4'>
-									{team.max_speed ? team.max_speed : '-'}
+									{team.max_speed
+										? `${Math.round(team.max_speed * 100) / 100} mph`
+										: '-'}
 								</td>
 								<td className='whitespace-nowrap px-20 py-4'>
-									{team.total_moving_time ? team.total_moving_time : '-'}
+									{team.total_moving_time
+										? convertSecondsToHours(team.total_moving_time)
+										: '-'}
 								</td>
 								<td className='whitespace-nowrap px-16 py-4'>
-									{team.total_distance ? team.total_distance : '-'}
+									{team.total_distance
+										? `${Math.round(team.total_distance * 100) / 100} miles`
+										: '-'}
 								</td>
 							</tr>
 						))}

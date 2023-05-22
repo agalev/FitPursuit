@@ -10,6 +10,15 @@ export default function TeamCard(team) {
 		initTE({ Ripple })
 	}, [])
 
+	const convertSecondsToHours = (seconds) => {
+		const hours = Math.floor(seconds / 3600)
+		const remainingMinutes = Math.floor((seconds % 3600) / 60)
+		const remainingSeconds = (seconds % 3600) % 60
+		return hours > 0
+			? `${hours}h ${remainingMinutes}m ${remainingSeconds}s`
+			: `${remainingMinutes}m ${remainingSeconds}s`
+	}
+
 	const handleMessage = () => {
 		setIsPending(true)
 		fetch('/api/messages', {
@@ -45,16 +54,32 @@ export default function TeamCard(team) {
 			</div>
 			<h3 className='text-xl font-medium'>{team.name}</h3>
 			<h4 className='text-lg font-medium mb-2'>{team.activity_type}</h4>
+			<p>Leader: {`${team.leader.first_name} ${team.leader.last_name}`}</p>
 			<p>Members: {team.members}</p>
 			<p>Wins: {team.wins}</p>
-			<p>Leader: {`${team.leader.first_name} ${team.leader.last_name}`}</p>
 			<h4 className='text-lg font-medium my-1'>Stats</h4>
-			{team.total_distance > 0 && <p>Distance: {team.total_distance}</p>}
-			{team.total_moving_time > 0 && (
-				<p>Moving Time: {team.total_moving_time}</p>
-			)}
-			{team.average_speed > 0 && <p>Avg Speed: {team.average_speed}</p>}
-			{team.max_speed > 0 && <p>Max Speed: {team.max_speed}</p>}
+			<p>
+				Distance:{' '}
+				{team.total_distance
+					? `${Math.round(team.total_distance * 100) / 100} miles`
+					: '-'}
+			</p>
+			<p>
+				Moving Time:{' '}
+				{team.total_moving_time
+					? convertSecondsToHours(team.total_moving_time)
+					: '-'}
+			</p>
+			<p>
+				Avg Speed:{' '}
+				{team.average_speed
+					? `${Math.round(team.average_speed * 100) / 100} mph`
+					: '-'}
+			</p>
+			<p>
+				Max Speed:{' '}
+				{team.max_speed ? `${Math.round(team.max_speed * 100) / 100} mph` : '-'}
+			</p>
 			{!global.state.profile.team && !isPending && (
 				<button
 					type='button'

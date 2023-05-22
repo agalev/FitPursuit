@@ -49,7 +49,11 @@ export default function ActivitiesTable({ param }) {
 
 	return (
 		<section className='flex flex-col overflow-x-auto'>
-			<h2 className='text-2xl my-2 font-bold text-center'>{`${global.state.profile.first_name}'s Activities`}</h2>
+			<h2 className='text-2xl my-2 font-bold text-center'>
+				{param === 'all'
+					? 'All Activities'
+					: `${global.state.profile.first_name}'s Activities`}
+			</h2>
 			<table className='min-w-full text-center text-sm font-light'>
 				<thead className='border-b bg-amber-500 text-white font-medium dark:border-neutral-500'>
 					<tr>
@@ -82,6 +86,34 @@ export default function ActivitiesTable({ param }) {
 								/>
 							)}
 						</th>
+						{param === 'all' && (
+							<th
+								scope='col'
+								className='hover:bg-slate-600 cursor-pointer'
+								onClick={() => sortActivities('user')}
+							>
+								Athlete
+								{sortField === 'user' && sortOrder === 'asc' ? (
+									<Image
+										src='/arrow-up.svg'
+										width='0'
+										height='0'
+										sizes='100vw'
+										className='w-6 h-auto inline-block'
+										alt='arrow up'
+									/>
+								) : (
+									<Image
+										src='/arrow-down.svg'
+										width='0'
+										height='0'
+										sizes='100vw'
+										className='w-6 h-auto inline-block'
+										alt='arrow down'
+									/>
+								)}
+							</th>
+						)}
 						<th
 							scope='col'
 							className='hover:bg-slate-600 cursor-pointer'
@@ -355,7 +387,12 @@ export default function ActivitiesTable({ param }) {
 									{index++}
 								</td>
 								<td className='whitespace-nowrap px-8 py-4'>{activity.name}</td>
-								<td className='whitespace-nowrap px-6 py-4'>
+								{param === 'all' && (
+									<td className='whitespace-nowrap px-8 py-4'>
+										{activity.user.first_name} {activity.user.last_name}
+									</td>
+								)}
+								<td className='whitespace-nowrap px-8 py-4'>
 									{activity.activity_type}
 								</td>
 								<td className='whitespace-nowrap px-6 py-4'>
@@ -373,10 +410,10 @@ export default function ActivitiesTable({ param }) {
 								<td className='whitespace-nowrap px-6 py-4'>
 									{Math.round(activity.total_elevation_gain * 100) / 100} ft
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
+								<td className='whitespace-nowrap px-8 py-4'>
 									{Math.round(activity.average_speed * 100) / 100}mph
 								</td>
-								<td className='whitespace-nowrap px-6 py-4'>
+								<td className='whitespace-nowrap px-8 py-4'>
 									{Math.round(activity.max_speed * 100) / 100}mph
 								</td>
 								<td className='whitespace-nowrap px-6 py-4'>

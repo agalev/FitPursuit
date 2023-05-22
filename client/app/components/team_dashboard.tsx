@@ -23,6 +23,15 @@ export default function TeamDashboard() {
 		initTE({ Input, Select })
 	}, [editMode])
 
+	const convertSecondsToHours = (seconds) => {
+		const hours = Math.floor(seconds / 3600)
+		const remainingMinutes = Math.floor((seconds % 3600) / 60)
+		const remainingSeconds = (seconds % 3600) % 60
+		return hours > 0
+			? `${hours}h ${remainingMinutes}m ${remainingSeconds}s`
+			: `${remainingMinutes}m ${remainingSeconds}s`
+	}
+
 	const handleInputChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value })
 	}
@@ -226,10 +235,30 @@ export default function TeamDashboard() {
 					<div>
 						<h3 className='text-lg font-medium'>Stats</h3>
 						<p>Team Wins: {team.wins}</p>
-						<p>Distance: {team.total_distance} miles</p>
-						<p>Moving Time: {team.total_moving_time}</p>
-						<p>Avg Speed: {team.average_speed} mph</p>
-						<p>Max Speed: {team.max_speed} mph</p>
+						<p>
+							Distance:{' '}
+							{team.total_distance
+								? `${Math.round(team.total_distance * 100) / 100} miles`
+								: '-'}
+						</p>
+						<p>
+							Moving Time:{' '}
+							{team.total_moving_time
+								? convertSecondsToHours(team.total_moving_time)
+								: '-'}
+						</p>
+						<p>
+							Avg Speed:{' '}
+							{team.average_speed
+								? `${Math.round(team.average_speed * 100) / 100} mph`
+								: '-'}
+						</p>
+						<p>
+							Max Speed:{' '}
+							{team.max_speed
+								? `${Math.round(team.max_speed * 100) / 100} mph`
+								: '-'}
+						</p>
 					</div>
 					<div>
 						<h3 className='text-lg font-medium'>Members</h3>

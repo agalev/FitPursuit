@@ -166,23 +166,6 @@ class UserController(Resource):
         except:
             return {'error': 'Unable to delete user.'}, 401
 
-class UserStats(Resource):
-    def get(self):
-        activities = [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == user.id)]
-        if activities:
-            df = pandas.DataFrame(activities)
-            aggregate = df.agg({
-                            'distance': 'sum',
-                            'moving_time': 'sum',
-                            'total_elevation_gain': 'sum',
-                            'average_speed': 'mean',
-                            'max_speed': 'max',
-                            'average_heartrate': 'mean',
-                            'max_heartrate': 'max'
-                            })
-            return aggregate.to_dict(), 200
-            
-
 class MessagesController(Resource):
     def get(self):
         try:
@@ -347,7 +330,30 @@ class Stats(Resource):
 
 class TeamsController(Resource):
     def get(self):
-        return [team.to_dict() for team in Team.query.all()], 200
+        try:
+            teams = Team.query.all()
+            for team in teams:
+                stats = []
+                for user in team.users:
+                    activities = [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == user.id)]
+                    stats += activities
+                if not stats:
+                    continue
+                df = pandas.DataFrame(stats)
+                aggregate = df.agg({
+                                'distance': 'sum',
+                                'moving_time': 'sum',
+                                'average_speed': 'mean',
+                                'max_speed': 'max'
+                                })
+                team.total_distance = aggregate.distance
+                team.total_moving_time = aggregate.moving_time
+                team.average_speed = aggregate.average_speed
+                team.max_speed = aggregate.max_speed
+                db.session.commit()
+            return [team.to_dict() for team in teams], 200
+        except Exception as e:
+            return {'error': str(e)}, 400
     def post(self):
         try:
             req = request.get_json()
@@ -399,7 +405,29 @@ class TeamsController(Resource):
 
 class GetTeam(Resource):
     def get(self, id):
-        return Team.query.filter(Team.id == id).first().to_dict(), 200
+        try:
+            team = Team.query.filter(Team.id == id).first()
+            stats = []
+            for user in team.users:
+                activities = [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == user.id)]
+                stats += activities
+                if not stats:
+                    continue
+                df = pandas.DataFrame(stats)
+                aggregate = df.agg({
+                                'distance': 'sum',
+                                'moving_time': 'sum',
+                                'average_speed': 'mean',
+                                'max_speed': 'max'
+                                })
+                team.total_distance = aggregate.distance
+                team.total_moving_time = aggregate.moving_time
+                team.average_speed = aggregate.average_speed
+                team.max_speed = aggregate.max_speed
+                db.session.commit()
+            return team.to_dict(), 200
+        except Exception as e:
+            return {'error': str(e)}, 400
 
 class TeamLeaderController(Resource):
     # invite user to team
@@ -498,16 +526,7 @@ class CompetitionController(Resource):
         return [competition_handler.to_dict() for competition_handler in CompetitionHandler.query.all()], 200
     
 ## Will continue backend later
-
-# class StravaAuth(Resource):
-#     def post(self):
-#         req = request.get_json()
-#         user = User.query.filter(User.id == session['user_id']).first()
-#         user.strava_access_token = req['access_token']
-#         user.strava_refresh_token = req['refresh_token']
-#         user.strava_token_expiry = datetime.fromtimestamp(int(req['expires_at']))
-#         db.session.commit()
-            
+       
 api.add_resource(Auth, '/api/auth', endpoint='/api/auth')
 api.add_resource(Signup, '/api/signup', endpoint='/api/signup')
 api.add_resource(Login, '/api/login', endpoint='/api/login')
@@ -519,7 +538,6 @@ api.add_resource(TeamMessagesController, '/api/messages/team', endpoint='/api/me
 api.add_resource(UnreadMessages, '/api/messages/unread', endpoint='/api/messages/unread')
 api.add_resource(ActivitiesController, '/api/activities/<string:param>', endpoint='/api/activities/<string:param>')
 api.add_resource(Stats, '/api/stats', endpoint='/api/stats')
-api.add_resource(UserStats, '/api/stats/<int:id>', endpoint='/api/stats/<int:id>')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
 api.add_resource(GetTeam, '/api/teams/<int:id>', endpoint='/api/teams/<int:id>')
 api.add_resource(TeamLeaderController, '/api/teams/leader', endpoint='/api/teams/leader')
