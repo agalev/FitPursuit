@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useContext } from 'react'
-import { Ripple, Input, Select, initTE } from 'tw-elements'
+import { initTE, Input, Select } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import StravaButton from './strava_button'
 import states_countries from '../misc/states_countries.json'
@@ -14,7 +14,7 @@ export default function UserProfile() {
 	const [editMode, setEditMode] = useState(false)
 
 	useEffect(() => {
-		initTE({ Ripple, Input, Select })
+		initTE({ Input, Select })
 	}, [editMode])
 
 	const [formData, setFormData] = useState({
@@ -179,8 +179,6 @@ export default function UserProfile() {
 							{global.state.profile.strava_connected ? (
 								<button
 									type='button'
-									data-te-ripple-init
-									data-te-ripple-color='light'
 									className='bg-gradient-to-r
 				from-pink-500
 				via-red-500
@@ -315,16 +313,12 @@ export default function UserProfile() {
 				<>
 					<button
 						className='inline-block px-2 w-48 bg-red-500 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-						data-te-ripple-init
-						data-te-ripple-color='light'
 						onClick={() => handleCancel()}
 					>
 						Cancel Edit
 					</button>
 					<button
 						className='inline-block px-2 w-48 bg-green-500 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-						data-te-ripple-init
-						data-te-ripple-color='light'
 						onClick={() => handleSubmit()}
 					>
 						Submit
@@ -333,8 +327,6 @@ export default function UserProfile() {
 			) : (
 				<button
 					className='inline-block px-2 w-48 bg-amber-500 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-					data-te-ripple-init
-					data-te-ripple-color='light'
 					onClick={() => setEditMode(true)}
 				>
 					Edit Profile Details

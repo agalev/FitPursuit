@@ -202,6 +202,7 @@ with app.app_context():
         name='Runner Ups',
         leader_id=1,
         wins=13,
+        members= 2,
         activity_type='running'
     )
     team2 = Team(

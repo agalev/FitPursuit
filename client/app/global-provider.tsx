@@ -40,6 +40,14 @@ const DispatchProvider = ({ children }) => {
 					...state,
 					profile: action.payload
 				}
+			case 'REFRESH_TEAM':
+				return {
+					...state,
+					profile: {
+						...state.profile,
+						team: action.payload
+					}
+				}
 			default:
 				return state
 		}

@@ -166,6 +166,23 @@ class UserController(Resource):
         except:
             return {'error': 'Unable to delete user.'}, 401
 
+class UserStats(Resource):
+    def get(self):
+        activities = [activity.to_dict() for activity in Activity.query.filter(Activity.user_id == user.id)]
+        if activities:
+            df = pandas.DataFrame(activities)
+            aggregate = df.agg({
+                            'distance': 'sum',
+                            'moving_time': 'sum',
+                            'total_elevation_gain': 'sum',
+                            'average_speed': 'mean',
+                            'max_speed': 'max',
+                            'average_heartrate': 'mean',
+                            'max_heartrate': 'max'
+                            })
+            return aggregate.to_dict(), 200
+            
+
 class MessagesController(Resource):
     def get(self):
         try:
@@ -242,7 +259,7 @@ class UnreadMessages(Resource):
     def patch(self):
         try:
             req = request.get_json()
-            messages = Message.query.filter(Message.sender_id == req).filter(Message.read == False).all()
+            messages = Message.query.filter(Message.sender_id == req).filter(Message.receiver_id == session['user_id']).filter(Message.read == False).all()
             for message in messages:
                 message.read = True
             db.session.commit()
@@ -393,7 +410,7 @@ class TeamLeaderController(Resource):
             user = User.query.filter(User.id == req['receiver_id']).first()
             if user.team_id:
                 return {'error': 'User already belongs to a team.'}, 400
-            if team.members > 5:
+            if team.members >= 5:
                 return {'error': 'Team is full.'}, 400
             invitation = Message(
                 sender_id = session['user_id'],
@@ -502,6 +519,7 @@ api.add_resource(TeamMessagesController, '/api/messages/team', endpoint='/api/me
 api.add_resource(UnreadMessages, '/api/messages/unread', endpoint='/api/messages/unread')
 api.add_resource(ActivitiesController, '/api/activities/<string:param>', endpoint='/api/activities/<string:param>')
 api.add_resource(Stats, '/api/stats', endpoint='/api/stats')
+api.add_resource(UserStats, '/api/stats/<int:id>', endpoint='/api/stats/<int:id>')
 api.add_resource(TeamsController, '/api/teams', endpoint='/api/teams')
 api.add_resource(GetTeam, '/api/teams/<int:id>', endpoint='/api/teams/<int:id>')
 api.add_resource(TeamLeaderController, '/api/teams/leader', endpoint='/api/teams/leader')

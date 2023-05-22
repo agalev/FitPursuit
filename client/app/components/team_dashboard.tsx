@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useContext } from 'react'
-import { Ripple, Input, Select, initTE } from 'tw-elements'
+import { initTE, Input, Select } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 
 export default function TeamDashboard() {
@@ -11,7 +11,7 @@ export default function TeamDashboard() {
 	const [formData, setFormData] = useState({
 		name: global.state.profile.team.name,
 		activity_type: global.state.profile.team.activity_type,
-		image: global.state.profile.team.image
+		image: global.state.profile.team.image || ''
 	})
 
 	useEffect(() => {
@@ -20,10 +20,8 @@ export default function TeamDashboard() {
 			.then((data) => {
 				setTeam(data)
 			})
-		initTE({ Ripple, Input, Select })
+		initTE({ Input, Select })
 	}, [editMode])
-
-	console.log(team)
 
 	const handleInputChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value })
@@ -35,15 +33,16 @@ export default function TeamDashboard() {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(formData)
+			body: JSON.stringify({ id: team.id, ...formData })
 		}).then((res) => {
 			if (res.ok) {
 				res.json().then((data) => {
-					global.dispatch({ type: 'REFRESH', payload: data })
+					global.dispatch({ type: 'REFRESH_TEAM', payload: data })
 					global.dispatch({
 						type: 'TOAST',
 						payload: { message: 'Team edited successfully', type: 'success' }
 					})
+					setTeam(data)
 					setEditMode(false)
 				})
 			} else {
@@ -143,7 +142,6 @@ export default function TeamDashboard() {
 				})
 			} else {
 				res.json().then((error) => {
-					console.log(error)
 					global.dispatch({
 						type: 'TOAST',
 						payload: { message: error.error, type: 'error' }
@@ -262,16 +260,12 @@ export default function TeamDashboard() {
 					<>
 						<button
 							className='inline-block px-2 w-48 bg-red-500 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-							data-te-ripple-init
-							data-te-ripple-color='light'
 							onClick={handleCancel}
 						>
 							Cancel Edit
 						</button>
 						<button
 							className='inline-block px-2 w-48 bg-green-500 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-							data-te-ripple-init
-							data-te-ripple-color='light'
 							onClick={handleFormSubmit}
 						>
 							Submit
@@ -280,8 +274,6 @@ export default function TeamDashboard() {
 				) : (
 					<button
 						className='inline-block px-2 w-48 bg-amber-500 rounded pb-2 pt-2.5 text-xs font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
-						data-te-ripple-init
-						data-te-ripple-color='light'
 						onClick={() => setEditMode(true)}
 					>
 						Edit Team Details
