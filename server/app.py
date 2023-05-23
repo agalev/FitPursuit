@@ -519,9 +519,34 @@ class LeaveTeam(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
         
-class GetCompetitions(Resource):
+class CompetitionsHandler(Resource):
     def get(self):
         return [competition.to_dict() for competition in Competition.query.all()], 200
+    def post(self):
+        try:
+            req = request.get_json()
+            user = User.query.filter(User.id == session['user_id']).first()
+            if user.FPcoins < req['prize_pool']:
+                return {'error': 'Not enough FPcoins.'}, 400
+            competition = Competition(
+                organizer_id = user.id,
+                title = req['title'],
+                description = req['description'],
+                type = req['type'],
+                activity_type = req['activity_type'],
+                prize_pool = req['prize_pool'],
+                distance = req['distance'] if 'distance' in req else None,
+                average_speed = req['average_speed'] if 'average_speed' in req else None,
+                max_speed = req['max_speed'] if 'max_speed' in req else None,
+                start_date = datetime(req['start_date']),
+                end_date = datetime(req['end_date'])
+            )
+            user.FPcoins -= req['prize_pool']
+            db.session.add(competition)
+            db.session.commit()
+            return {'competition': competition.to_dict(), 'user': user.to_dict()}, 201
+        except Exception as e:
+            return {'error': str(e)}, 400
     
 class CompetitionController(Resource):
     def get(self):
@@ -545,7 +570,7 @@ api.add_resource(GetTeam, '/api/teams/<int:id>', endpoint='/api/teams/<int:id>')
 api.add_resource(TeamLeaderController, '/api/teams/leader', endpoint='/api/teams/leader')
 api.add_resource(JoinTeam, '/api/teams/join', endpoint='/api/teams/join')
 api.add_resource(LeaveTeam, '/api/teams/leave', endpoint='/api/teams/leave')
-api.add_resource(GetCompetitions, '/api/competitions', endpoint='/api/competitions')
+api.add_resource(CompetitionsHandler, '/api/competitions', endpoint='/api/competitions')
 api.add_resource(CompetitionController, '/api/competition_handler', endpoint='/api/competition_handler')
 
 if __name__ == '__main__':

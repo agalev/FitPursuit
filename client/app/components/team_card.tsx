@@ -1,14 +1,9 @@
-import { useState, useEffect, useContext } from 'react'
-import { initTE, Ripple } from 'tw-elements'
+import { useState, useContext } from 'react'
 import { GlobalState } from '../global-provider'
 
 export default function TeamCard(team) {
 	const global = useContext(GlobalState)
 	const [isPending, setIsPending] = useState(false)
-
-	useEffect(() => {
-		initTE({ Ripple })
-	}, [])
 
 	const convertSecondsToHours = (seconds) => {
 		const hours = Math.floor(seconds / 3600)
@@ -84,8 +79,6 @@ export default function TeamCard(team) {
 				<button
 					type='button'
 					className='inline-block rounded border border-warning px-3 pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-warning transition duration-150 ease-in-out hover:border-warning-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-warning-600 focus:border-warning-600 focus:text-warning-600 focus:outline-none focus:ring-0 active:border-warning-700 active:text-warning-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10'
-					data-te-ripple-init
-					data-te-ripple-color='light'
 					onClick={handleMessage}
 				>
 					ask to join

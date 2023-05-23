@@ -25,6 +25,7 @@ export default function Teams() {
 	return (
 		<main>
 			{!global.state.profile.team && <CreateTeam />}
+			<h1 className='flex justify-center text-3xl'>Browse Teams</h1>
 			<section className='grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 justify-items-stretch'>
 				{teams && teams.map((team) => <TeamCard key={team.id} {...team} />)}
 			</section>

@@ -421,8 +421,8 @@ with app.app_context():
         distance=1000,
         average_speed=1.23,
         max_speed=1.34,
-        start_date=datetime(2012, 3, 3, 10, 10, 10),
-        end_date=datetime(2012, 3, 3, 10, 10, 10)
+        start_date=datetime(2023, 5, 22, 10, 10),
+        end_date=datetime(2023, 5, 30, 10, 10)
     )
     competition2 = Competition(
         organizer_id=2,
@@ -433,8 +433,8 @@ with app.app_context():
         distance=1000,
         average_speed=1.23,
         max_speed=1.34,
-        start_date=datetime(2012, 3, 3, 10, 10, 10),
-        end_date=datetime(2012, 3, 3, 10, 10, 10)
+        start_date=datetime(2023, 5, 25, 10, 10),
+        end_date=datetime(2023, 6, 10, 10, 10)
     )
     competition3 = Competition(
         organizer_id=3,
@@ -445,8 +445,8 @@ with app.app_context():
         distance=1000,
         average_speed=1.23,
         max_speed=1.34,
-        start_date=datetime(2012, 3, 3, 10, 10, 10),
-        end_date=datetime(2012, 3, 3, 10, 10, 10)
+        start_date=datetime(2023, 5, 27, 10, 10),
+        end_date=datetime(2023, 6, 15, 10, 10)
     )
 
     # Create competition participants

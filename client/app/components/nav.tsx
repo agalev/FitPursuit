@@ -24,7 +24,7 @@ export default function Nav() {
 		: [
 				{ label: 'Home', href: '/' },
 				{ label: 'Teams', href: '/teams' },
-				// { label: 'Competitions', href: '/competitions' },
+				{ label: 'Competitions', href: '/competitions' },
 				{ label: 'Dashboard', href: '/dashboard' }
 		  ]
 
