@@ -85,16 +85,27 @@ export default function UserProfile() {
 	const SyncActivities = () => {
 		fetch('/api/activities/self', {
 			method: 'POST'
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				data.profile &&
-					global.dispatch({ type: 'REFRESH', payload: data.profile })
-				global.dispatch({
-					type: 'TOAST',
-					payload: { message: data.message, type: 'info' }
+		}).then((res) => {
+			if (res.ok) {
+				res.json().then((data) => {
+					console.log(data)
+					data.profile &&
+						global.dispatch({ type: 'REFRESH', payload: data.profile })
+					global.dispatch({
+						type: 'TOAST',
+						payload: { message: data.message, type: 'info' }
+					})
 				})
-			})
+			} else {
+				res.json().then((error) => {
+					console.log(error)
+					global.dispatch({
+						type: 'TOAST',
+						payload: { message: error.error, type: 'error' }
+					})
+				})
+			}
+		})
 	}
 
 	return (

@@ -35,6 +35,8 @@ class Auth(Resource):
             return session, 200
         else:
             try:
+                if (User.query.filter(User.strava_id == req['id']).first()):
+                    return {'error': 'This Strava account is already associated with a user.'}, 401
                 new_user = User(id = req['id'],
                                 strava_id = req['id'],
                                 email = f"strava@{req['username']}",
@@ -267,7 +269,7 @@ class ActivitiesController(Resource):
                             headers = {'Authorization': f'Bearer {user.strava_access_token}'},
                             params={'per_page': 200, 'page': page_count})
             if res.status_code != 200:
-                return {'error': 'Unable to retrieve activities.'}, 400
+                return res.json(), 400
             activities = res.json()
             while len(activities) == 200:
                 page_count += 1

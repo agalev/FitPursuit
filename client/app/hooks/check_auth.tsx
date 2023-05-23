@@ -21,7 +21,7 @@ export default function checkAuth() {
 					expires_at: session.data.expires
 				})
 			}).then((res) => {
-				if (res.status === 200 || res.status === 201) {
+				if (res.ok) {
 					res.json().then((data) => {
 						global.dispatch({ type: 'LOGIN', payload: data.profile })
 					})
