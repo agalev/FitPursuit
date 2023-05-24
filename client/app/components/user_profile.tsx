@@ -11,6 +11,7 @@ export default function UserProfile() {
 	const states = states_countries.states
 	const countries = states_countries.countries
 
+	const [loading, setLoading] = useState(false)
 	const [editMode, setEditMode] = useState(false)
 
 	useEffect(() => {
@@ -83,12 +84,13 @@ export default function UserProfile() {
 	else if (global.state.profile.sex === 'F') gender = 'Female'
 
 	const SyncActivities = () => {
+		setLoading(true)
 		fetch('/api/activities/self', {
 			method: 'POST'
 		}).then((res) => {
 			if (res.ok) {
 				res.json().then((data) => {
-					console.log(data)
+					setLoading(false)
 					data.profile &&
 						global.dispatch({ type: 'REFRESH', payload: data.profile })
 					global.dispatch({
@@ -98,7 +100,7 @@ export default function UserProfile() {
 				})
 			} else {
 				res.json().then((error) => {
-					console.log(error)
+					setLoading(false)
 					global.dispatch({
 						type: 'TOAST',
 						payload: { message: error.error, type: 'error' }
@@ -203,7 +205,20 @@ export default function UserProfile() {
         text-white'
 									onClick={SyncActivities}
 								>
-									SYNC WITH STRAVA
+									{!loading && 'SYNC WITH STRAVA'}
+									{loading && (
+										<>
+											<div
+												className='inline-block mr-1 h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]'
+												role='status'
+											>
+												<span className='!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]'>
+													Loading...
+												</span>
+											</div>
+											<span>SYNCING...</span>
+										</>
+									)}
 								</button>
 							) : (
 								<StravaButton />
