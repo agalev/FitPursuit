@@ -114,7 +114,7 @@ export default function CreateTeam() {
 				</form>
 				<div>
 					<h2 className='mb-2'>Preview</h2>
-					<div className='flex inline-flex items-center'>
+					<div className='inline-flex items-center'>
 						<div className='w-32 h-32 rounded-full bg-slate-300'>
 							<img
 								src={formData.image || '/svg/circle_logo_color.svg'}

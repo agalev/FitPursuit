@@ -9,6 +9,9 @@ export default function Countdown(targetDate, onEnd) {
 			const now = new Date().getTime()
 
 			const target = new Date(targetDate).getTime()
+			if (isNaN(target)) {
+				return 'Enter a date'
+			}
 
 			const difference = target - now
 

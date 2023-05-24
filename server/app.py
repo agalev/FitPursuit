@@ -526,22 +526,22 @@ class CompetitionsHandler(Resource):
         try:
             req = request.get_json()
             user = User.query.filter(User.id == session['user_id']).first()
-            if user.FPcoins < req['prize_pool']:
+            if user.FPcoins < int(req['prize_pool']):
                 return {'error': 'Not enough FPcoins.'}, 400
+            if Competition.query.filter(Competition.title == req['title']).first():
+                return {'error': 'Competition with this title already exists.'}, 400
             competition = Competition(
                 organizer_id = user.id,
                 title = req['title'],
-                description = req['description'],
+                description = 'description',
                 type = req['type'],
                 activity_type = req['activity_type'],
-                prize_pool = req['prize_pool'],
-                distance = req['distance'] if 'distance' in req else None,
-                average_speed = req['average_speed'] if 'average_speed' in req else None,
-                max_speed = req['max_speed'] if 'max_speed' in req else None,
-                start_date = datetime(req['start_date']),
-                end_date = datetime(req['end_date'])
+                prize_pool = int(req['prize_pool']),
+                distance = req['distance'],
+                start_date = datetime.fromisoformat(req['start_date']),
+                end_date = datetime.strptime(req['end_date'], "%a, %d %b %Y %H:%M:%S %Z")
             )
-            user.FPcoins -= req['prize_pool']
+            user.FPcoins -= int(req['prize_pool'])
             db.session.add(competition)
             db.session.commit()
             return {'competition': competition.to_dict(), 'user': user.to_dict()}, 201

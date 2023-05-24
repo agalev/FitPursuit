@@ -148,3 +148,7 @@ th:active:hover::after {
 	width: 100%;
 	z-index: -1;
 }
+
+.react-datepicker__aria-live {
+	display: none;
+}

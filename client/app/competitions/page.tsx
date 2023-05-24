@@ -14,7 +14,7 @@ export default function Competitions() {
 			.then((data) => {
 				setCompetitions(data)
 			})
-	}, [])
+	}, [global.state.profile])
 
 	if (!global.state.isLoggedIn) {
 		return (
@@ -27,10 +27,12 @@ export default function Competitions() {
 	return (
 		<main>
 			<CreateCompetition />
-			{competitions &&
-				competitions.map((competition) => {
-					return <CompetitionCard key={competition.id} {...competition} />
-				})}
+			<section className='grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 justify-items-stretch'>
+				{competitions &&
+					competitions.map((competition) => {
+						return <CompetitionCard key={competition.id} {...competition} />
+					})}
+			</section>
 		</main>
 	)
 }

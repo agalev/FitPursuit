@@ -1,8 +1,8 @@
-"""create tables
+"""tables
 
-Revision ID: 01e4e285a256
+Revision ID: de48420e9c9e
 Revises: 
-Create Date: 2023-05-05 13:20:16.293728
+Create Date: 2023-05-24 16:46:23.397224
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '01e4e285a256'
+revision = 'de48420e9c9e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -39,6 +39,7 @@ def upgrade():
     )
     op.create_table('users',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('strava_id', sa.Integer(), nullable=True),
     sa.Column('email', sa.String(length=80), nullable=False),
     sa.Column('_password_hash', sa.String(), nullable=False),
     sa.Column('image', sa.String(length=200), nullable=True),
@@ -50,11 +51,12 @@ def upgrade():
     sa.Column('country', sa.String(length=80), nullable=True),
     sa.Column('sex', sa.String(length=1), nullable=True),
     sa.Column('height', sa.Integer(), nullable=True),
-    sa.Column('weight', sa.Integer(), nullable=True),
+    sa.Column('weight', sa.Float(), nullable=True),
     sa.Column('wins', sa.Integer(), nullable=True),
     sa.Column('FPcoins', sa.Integer(), nullable=True),
     sa.Column('team_id', sa.Integer(), nullable=True),
     sa.Column('last_online', sa.DateTime(), nullable=True),
+    sa.Column('strava_connected', sa.Boolean(), nullable=True),
     sa.Column('strava_access_token', sa.String(), nullable=True),
     sa.Column('strava_refresh_token', sa.String(), nullable=True),
     sa.Column('strava_token_expiry', sa.DateTime(), nullable=True),
@@ -62,17 +64,19 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['team_id'], ['teams.id'], name=op.f('fk_users_team_id_teams')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_users')),
-    sa.UniqueConstraint('email', name=op.f('uq_users_email'))
+    sa.UniqueConstraint('email', name=op.f('uq_users_email')),
+    sa.UniqueConstraint('strava_id', name=op.f('uq_users_strava_id'))
     )
     op.create_table('activities',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('qualified', sa.Boolean(), nullable=True),
     sa.Column('strava_id', sa.Integer(), nullable=True),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('activity_type', sa.String(), nullable=True),
-    sa.Column('distance', sa.Integer(), nullable=True),
+    sa.Column('distance', sa.Float(), nullable=True),
     sa.Column('moving_time', sa.Integer(), nullable=True),
     sa.Column('elapsed_time', sa.Integer(), nullable=True),
-    sa.Column('total_elevation_gain', sa.Integer(), nullable=True),
+    sa.Column('total_elevation_gain', sa.Float(), nullable=True),
     sa.Column('start_date_local', sa.DateTime(), nullable=True),
     sa.Column('timezone', sa.String(), nullable=True),
     sa.Column('achievement_count', sa.Integer(), nullable=True),
@@ -82,8 +86,8 @@ def upgrade():
     sa.Column('max_speed', sa.Float(), nullable=True),
     sa.Column('average_heartrate', sa.Float(), nullable=True),
     sa.Column('max_heartrate', sa.Float(), nullable=True),
-    sa.Column('elev_high', sa.Integer(), nullable=True),
-    sa.Column('elev_low', sa.Integer(), nullable=True),
+    sa.Column('elev_high', sa.Float(), nullable=True),
+    sa.Column('elev_low', sa.Float(), nullable=True),
     sa.Column('pr_count', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_activities_user_id_users')),
@@ -93,18 +97,19 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('organizer_id', sa.Integer(), nullable=True),
     sa.Column('title', sa.String(), nullable=False),
-    sa.Column('description', sa.String(), nullable=False),
+    sa.Column('description', sa.String(), nullable=True),
     sa.Column('type', sa.String(), nullable=False),
     sa.Column('activity_type', sa.String(), nullable=False),
     sa.Column('prize_pool', sa.Integer(), nullable=False),
-    sa.Column('distance', sa.Integer(), nullable=False),
-    sa.Column('average_speed', sa.Float(), nullable=False),
-    sa.Column('max_speed', sa.Float(), nullable=False),
+    sa.Column('distance', sa.Boolean(), nullable=False),
+    sa.Column('average_speed', sa.Float(), nullable=True),
+    sa.Column('max_speed', sa.Float(), nullable=True),
     sa.Column('start_date', sa.DateTime(), nullable=False),
     sa.Column('end_date', sa.DateTime(), nullable=False),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.ForeignKeyConstraint(['organizer_id'], ['users.id'], name=op.f('fk_competitions_organizer_id_users')),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_competitions'))
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_competitions')),
+    sa.UniqueConstraint('title', name=op.f('uq_competitions_title'))
     )
     op.create_table('messages',
     sa.Column('id', sa.Integer(), nullable=False),
