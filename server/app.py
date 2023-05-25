@@ -526,10 +526,10 @@ class CompetitionsHandler(Resource):
         try:
             req = request.get_json()
             user = User.query.filter(User.id == session['user_id']).first()
+            if req['start_date'] == '' or req['end_date'] == '':
+                return {'error': 'Invalid dates.'}, 400
             if user.FPcoins < int(req['prize_pool']):
                 return {'error': 'Not enough FPcoins.'}, 400
-            if Competition.query.filter(Competition.title == req['title']).first():
-                return {'error': 'Competition with this title already exists.'}, 400
             competition = Competition(
                 organizer_id = user.id,
                 title = req['title'],
@@ -548,11 +548,66 @@ class CompetitionsHandler(Resource):
         except Exception as e:
             return {'error': str(e)}, 400
     
-class CompetitionController(Resource):
+class GetCompetition(Resource):
     def get(self):
         return [competition_handler.to_dict() for competition_handler in CompetitionHandler.query.all()], 200
-    
-## Will continue backend later
+
+class JoinCompetition(Resource):
+    def post(self, param):
+        if param == 'solo':
+            try:
+                req = request.get_json()
+                user = User.query.filter(User.id == session['user_id']).first()
+                competition = Competition.query.filter(Competition.id == req['competition_id']).first()
+                for user in competition.users:
+                    if user.id == session['user_id']:
+                        return {'error': 'You have already joined this competition.'}, 400
+                if competition.start_date < datetime.now():
+                    return {'error': 'Competition has already started.'}, 400
+                if competition.end_date < datetime.now():
+                    return {'error': 'Competition has already ended.'}, 400
+                if competition.type != 'solo':
+                    return {'error': 'Competition is not solo.'}, 400
+                new_entry = CompetitionHandler(
+                    competition_id = competition.id,
+                    user_id = user.id
+                )
+                db.session.add(new_entry)
+                db.session.commit()
+                return {'message': 'You have successfuly joined the solo competition.'}, 201
+            except Exception as e:
+                return {'error': str(e)}, 400
+        elif param == 'team':
+            try:
+                req = request.get_json()
+                team = Team.query.filter(Team.leader_id == session['user_id']).first()
+                competition = Competition.query.filter(Competition.id == req['competition_id']).first()
+                if team is None:
+                    return {'error': 'You are not a team leader.'}, 400
+                for team in competition.teams:
+                    if team.id == team.id:
+                        return {'error': 'Your team has already joined this competition.'}, 400
+                if competition.start_date < datetime.now():
+                    return {'error': 'Competition has already started.'}, 400
+                if competition.end_date < datetime.now():
+                    return {'error': 'Competition has already ended.'}, 400
+                if competition.type != 'team':
+                    return {'error': 'Competition is not team.'}, 400
+                new_entry = CompetitionHandler(
+                    competition_id = competition.id,
+                    team_id = team.id
+                )
+                group_msg = Message(
+                sender_id = session['user_id'],
+                team_id = team.id,
+                content = f'Our team {team.name} has joined the "{competition.title}" competition. Competition starts on {competition.start_date}. To contribute to the team effort, use your Strava to log&upload "{competition.activity_type}" activities between {competition.start_date} and {competition.end_date}. The goal is to accumulate the highest distance. Every mile matters. Good luck!'
+                )
+                
+                db.session.add_all([new_entry, group_msg])
+                db.session.commit()
+                return {'message': 'You have successfuly joined the team competition.'}, 201
+            except Exception as e:
+                return {'error': str(e)}, 400
        
 api.add_resource(Auth, '/api/auth', endpoint='/api/auth')
 api.add_resource(Signup, '/api/signup', endpoint='/api/signup')
@@ -571,7 +626,8 @@ api.add_resource(TeamLeaderController, '/api/teams/leader', endpoint='/api/teams
 api.add_resource(JoinTeam, '/api/teams/join', endpoint='/api/teams/join')
 api.add_resource(LeaveTeam, '/api/teams/leave', endpoint='/api/teams/leave')
 api.add_resource(CompetitionsHandler, '/api/competitions', endpoint='/api/competitions')
-api.add_resource(CompetitionController, '/api/competition_handler', endpoint='/api/competition_handler')
+api.add_resource(GetCompetition, '/api/competition_handler', endpoint='/api/competition_handler')
+api.add_resource(JoinCompetition, '/api/competitions/<string:param>', endpoint='/api/competitions/<string:param>')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

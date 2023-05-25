@@ -259,7 +259,7 @@ export default function Messages() {
 	}
 	return (
 		<main className='flex' style={{ height: 'calc(100vh - 4.5rem)' }}>
-			<div className='flex flex-col w-48 bg-slate-200 dark:bg-slate-800'>
+			<div className='flex flex-col min-w-[10rem] bg-slate-200 dark:bg-slate-800'>
 				<h2 className='text-sm sm:text-xl py-2 pl-1 font-bold text-center'>
 					Users
 				</h2>

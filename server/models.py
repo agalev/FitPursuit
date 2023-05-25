@@ -5,6 +5,59 @@ import re
 
 from config import bcrypt, db
 
+strava_activities = [
+		"Run",
+		"Trail Run",
+		"Walk",
+		"Hike",
+		"Virtual Run",
+		"Ride",
+		"Mountain Bike Ride",
+		"Gravel Bike Ride",
+		"E-Bike Ride",
+		"E-Mountain Bike Ride",
+		"Velomobile",
+		"Virtual Ride",
+		"Canoe",
+		"Kayak",
+		"Kitesurf Session",
+		"Row",
+		"Stand Up Paddle",
+		"Surf",
+		"Swim",
+		"Windsurf Session",
+		"Ice Skate",
+		"Alpine Ski",
+		"Backcountry Ski",
+		"Nordic Ski",
+		"Snowboard",
+		"Snowshoe",
+		"Golf",
+		"Handcycle",
+		"Inline Skate",
+		"Rock Climb",
+		"Roller Ski",
+		"Wheelchair",
+		"Crossfit",
+		"Elliptical",
+		"Sailing",
+		"Skateboarding",
+		"Soccer",
+		"Stair Stepper",
+		"Weight Training",
+		"Yoga",
+		"Workout",
+		"Tennis",
+		"Pickleball",
+		"Racquetball",
+		"Squash",
+		"Badminton",
+		"Table Tennis",
+		"HIIT",
+		"Pilates",
+		"Virtual Row"
+	]
+
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
@@ -198,12 +251,13 @@ class Team(db.Model, SerializerMixin):
         if not name:
             raise ValueError("Please provide a team name")
         return name
-    
+
     @validates('activity_type')
     def validate_activity_type(self, key, activity_type):
-        if not activity_type:
-            raise ValueError("Please provide an activity type")
+        if not activity_type or activity_type not in strava_activities:
+            raise ValueError("Please provide an activity type.")
         return activity_type
+    
     
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
@@ -262,6 +316,51 @@ class Competition(db.Model, SerializerMixin):
     organizer = db.relationship('User', foreign_keys=[organizer_id])
     users = db.relationship('User', back_populates='competitions', secondary='competition_handlers', overlaps="competitions")
     teams = db.relationship('Team', back_populates='competitions', secondary='competition_handlers', overlaps="competitions,users")
+
+    @validates('title')
+    def validate_name(self, key, title):
+        existing_title = Competition.query.filter(Competition.title == title).first()
+        if existing_title:
+            raise ValueError('Competition with this title already exists.')
+        if not title:
+            raise ValueError("Please provide a title.")
+        return title
+    
+    @validates('type')
+    def validate_type(self, key, type):
+        if not type or type not in ['solo', 'team']:
+            raise ValueError("Please provide a type.")
+        return type
+
+    @validates('activity_type')
+    def validate_activity_type(self, key, activity_type):
+        if not activity_type or activity_type not in strava_activities:
+            raise ValueError("Please provide an activity type.")
+        return activity_type
+    
+    @validates('start_date')
+    def validate_start_date(self, key, start_date):
+        if not start_date or start_date == '':
+            raise ValueError("Please provide a start date.")
+        return start_date
+    
+    @validates('end_date')
+    def validate_end_date(self, key, end_date):
+        if not end_date or end_date == '':
+            raise ValueError("Please provide an end date.")
+        return end_date
+    
+    @validates('prize_pool')
+    def validate_prize_pool(self, key, prize_pool):
+        if not prize_pool:
+            raise ValueError("Please provide a prize pool.")
+        return prize_pool
+    
+    @validates('distance')
+    def validate_distance(self, key, distance):
+        if not distance:
+            raise ValueError("Please provide an objective.")
+        return distance
 
 class CompetitionHandler(db.Model, SerializerMixin):
     __tablename__ = 'competition_handlers'

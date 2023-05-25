@@ -15,7 +15,7 @@ export default function CreateCompetition() {
 		title: '',
 		type: '',
 		activity_type: '',
-		prize_pool: '',
+		prize_pool: 0,
 		distance: null,
 		start_date: '',
 		end_date: ''
@@ -71,7 +71,7 @@ export default function CreateCompetition() {
 					title: '',
 					type: '',
 					activity_type: '',
-					prize_pool: '',
+					prize_pool: 0,
 					distance: null,
 					start_date: '',
 					end_date: ''
@@ -119,9 +119,10 @@ export default function CreateCompetition() {
 			</article>
 			<section className='grid gap-6 grid-cols-1 sm:grid-cols-2 text-center mb-6'>
 				<form
-					className='text-center inline-block ml-2 p-5 rounded-lg border border-amber-500 bg-neutral-400 shadow-lg dark:bg-neutral-800'
+					className='text-center inline-block ml-2 px-5 pb-5 rounded-lg border border-amber-500 bg-neutral-400 shadow-lg dark:bg-neutral-800'
 					onSubmit={handleSubmit}
 				>
+					<h2 className='text-xl font-bold mb-2'>Enter competition details</h2>
 					<div className='flex'>
 						<div className='relative mb-2 flex-auto' data-te-input-wrapper-init>
 							<input
@@ -216,10 +217,9 @@ export default function CreateCompetition() {
 					<div>
 						<label htmlFor='customRange1' className='mb-2'>
 							How much is the prize pool? You have{' '}
-							{formData.prize_pool === ''
+							{formData.prize_pool === 0
 								? global.state.profile.FPcoins
-								: global.state.profile.FPcoins -
-								  parseInt(formData.prize_pool)}{' '}
+								: global.state.profile.FPcoins - formData.prize_pool}{' '}
 							FPcoins left.
 						</label>
 						<input
@@ -231,7 +231,10 @@ export default function CreateCompetition() {
 							step='10'
 							value={formData.prize_pool || 0}
 							onChange={(e) =>
-								setFormData({ ...formData, prize_pool: e.target.value })
+								setFormData({
+									...formData,
+									prize_pool: parseInt(e.target.value)
+								})
 							}
 						/>
 						<h4 className='text-center text-lg font-semibold'>
