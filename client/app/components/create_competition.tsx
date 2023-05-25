@@ -77,7 +77,6 @@ export default function CreateCompetition() {
 					end_date: ''
 				})
 				res.json().then((data) => {
-					console.log(data)
 					global.dispatch({ type: 'REFRESH', payload: data.user })
 				})
 				global.dispatch({
@@ -89,7 +88,6 @@ export default function CreateCompetition() {
 				})
 			} else {
 				res.json().then((error) => {
-					console.log(error)
 					global.dispatch({
 						type: 'TOAST',
 						payload: { message: error.error, type: 'error' }

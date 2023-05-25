@@ -35,15 +35,6 @@ export default function CompetitionsTable() {
 		}
 	}
 
-	const convertSecondsToHours = (seconds) => {
-		const hours = Math.floor(seconds / 3600)
-		const remainingMinutes = Math.floor((seconds % 3600) / 60)
-		const remainingSeconds = (seconds % 3600) % 60
-		return hours > 0
-			? `${hours}h ${remainingMinutes}m ${remainingSeconds}s`
-			: `${remainingMinutes}m ${remainingSeconds}s`
-	}
-
 	return (
 		<section className='flex flex-col overflow-x-auto'>
 			<h2 className='text-2xl my-2 font-bold text-center'>Competitions</h2>

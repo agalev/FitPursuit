@@ -15,13 +15,22 @@ export default function TeamDashboard() {
 	})
 
 	useEffect(() => {
-		fetch(`/api/teams/${global.state.profile.team.id}`)
-			.then((res) => res.json())
-			.then((data) => {
-				setTeam(data)
-			})
+		fetch(`/api/teams/${global.state.profile.team.id}`).then((res) => {
+			if (res.ok) {
+				res.json().then((data) => {
+					setTeam(data)
+				})
+			} else {
+				res.json().then((error) => {
+					global.dispatch({
+						type: 'TOAST',
+						payload: { message: error.error, type: 'error' }
+					})
+				})
+			}
+		})
 		initTE({ Input, Select })
-	}, [editMode])
+	}, [global.state.profile, editMode])
 
 	const convertSecondsToHours = (seconds) => {
 		const hours = Math.floor(seconds / 3600)
@@ -264,7 +273,8 @@ export default function TeamDashboard() {
 						<h3 className='text-lg font-medium'>Members</h3>
 						<ul>
 							<li className='font-semibold'>
-								Leader: {team.leader.first_name} {team.leader.last_name}
+								{team &&
+									`Leader: ${team.leader.first_name} ${team.leader.last_name}`}
 							</li>
 							{team.users.map(
 								(user) =>
