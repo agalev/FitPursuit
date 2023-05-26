@@ -203,47 +203,47 @@ with app.app_context():
         leader_id=1,
         wins=13,
         members= 2,
-        activity_type='running'
+        activity_type='Run'
     )
     team2 = Team(
         name='Rollerbladers',
         leader_id=3,
         wins=7,
-        activity_type='rollerblading'
+        activity_type='Ride'
     )
 
     team3 = Team(
         name='Ski Bums',
         leader_id=4,
         wins=12,
-        activity_type='skiing'
+        activity_type='Hike'
     )
 
     team4 = Team(
         name='Snow Bunniez',
         leader_id=5,
         wins=5,
-        activity_type='snowboarding'
+        activity_type='Run'
     )
 
     team5 = Team(
         name='Mountain Goats',
         leader_id=6,
         wins=9,
-        activity_type='climbing'
+        activity_type='Ride'
     )
 
     team6 = Team(
         name='Swimmers',
         leader_id=7,
         wins=8,
-        activity_type='swimming'
+        activity_type='Hike'
     )
     team7 = Team(
         name='Cyclus',
         leader_id=8,
         wins=11,
-        activity_type='bicycling'
+        activity_type='Run'
     )
 
     # Create activities
@@ -417,7 +417,7 @@ with app.app_context():
         title='Competition 1',
         description='This is a test competition',
         type='team',
-        activity_type='running',
+        activity_type='Run',
         distance=True,
         average_speed=1.23,
         max_speed=1.34,
@@ -429,7 +429,7 @@ with app.app_context():
         title='Competition 2',
         description='This is a test competition',
         type='solo',
-        activity_type='bicycling',
+        activity_type='Ride',
         distance=True,
         average_speed=1.23,
         max_speed=1.34,
@@ -441,7 +441,7 @@ with app.app_context():
         title='Competition 3',
         description='This is a test competition',
         type='solo',
-        activity_type='rollerblading',
+        activity_type='Hike',
         distance=True,
         average_speed=1.23,
         max_speed=1.34,
@@ -452,7 +452,6 @@ with app.app_context():
     # Create competition participants
     print('Creating competition participants...')
     competition_participant1 = CompetitionHandler(
-        user_id=1,
         team_id=1,
         competition_id=1
     )

@@ -370,6 +370,7 @@ class TeamsController(Resource):
             db.session.commit()
             user.team_id = team.id
             db.session.commit()
+            session['profile'] = user.to_dict()
             return user.to_dict(), 201
         except Exception as e:
             return {'error': str(e)}, 400
@@ -392,6 +393,7 @@ class TeamsController(Resource):
     def delete(self):
         try:
             req = request.get_json()
+            self = User.query.filter(User.id == session['user_id']).first()
             team = Team.query.filter(Team.id == req['id']).first()
             users = User.query.filter(User.team_id == team.id).all()
             if team.leader_id != session['user_id']:
@@ -401,7 +403,8 @@ class TeamsController(Resource):
                 db.session.commit()
             db.session.delete(team)
             db.session.commit()
-            return User.query.filter(User.id == session['user_id']).first().to_dict(), 200
+            session['profile'] = self.to_dict()
+            return self.to_dict(), 200
         except Exception as e:
             return {'error': str(e)}, 400
 
@@ -495,6 +498,7 @@ class JoinTeam(Resource):
             user.team_id = team.id
             team.members += 1
             db.session.commit()
+            session['profile'] = user.to_dict()
             return user.to_dict(), 201
         except Exception as e:
             return {'error': str(e)}, 400
@@ -515,6 +519,7 @@ class LeaveTeam(Resource):
             user.team_id = None
             team.members -= 1
             db.session.commit()
+            session['profile'] = user.to_dict()
             return user.to_dict(), 201
         except Exception as e:
             return {'error': str(e)}, 400
@@ -544,6 +549,7 @@ class CompetitionsHandler(Resource):
             user.FPcoins -= int(req['prize_pool'])
             db.session.add(competition)
             db.session.commit()
+            session['profile'] = user.to_dict()
             return {'competition': competition.to_dict(), 'user': user.to_dict()}, 201
         except Exception as e:
             return {'error': str(e)}, 400
@@ -559,8 +565,8 @@ class JoinCompetition(Resource):
                 req = request.get_json()
                 user = User.query.filter(User.id == session['user_id']).first()
                 competition = Competition.query.filter(Competition.id == req['competition_id']).first()
-                for user in competition.users:
-                    if user.id == session['user_id']:
+                for participant in competition.users:
+                    if participant.id == session['user_id']:
                         return {'error': 'You have already joined this competition.'}, 400
                 if competition.start_date < datetime.now():
                     return {'error': 'Competition has already started.'}, 400
@@ -574,18 +580,20 @@ class JoinCompetition(Resource):
                 )
                 db.session.add(new_entry)
                 db.session.commit()
-                return {'message': 'You have successfuly joined the solo competition.'}, 201
+                session['profile'] = user.to_dict()
+                return user.to_dict(), 201
             except Exception as e:
                 return {'error': str(e)}, 400
         elif param == 'team':
             try:
                 req = request.get_json()
+                user = User.query.filter(User.id == session['user_id']).first()
                 team = Team.query.filter(Team.leader_id == session['user_id']).first()
                 competition = Competition.query.filter(Competition.id == req['competition_id']).first()
                 if team is None:
                     return {'error': 'You are not a team leader.'}, 400
-                for team in competition.teams:
-                    if team.id == team.id:
+                for participant in competition.teams:
+                    if participant.id == team.id:
                         return {'error': 'Your team has already joined this competition.'}, 400
                 if competition.start_date < datetime.now():
                     return {'error': 'Competition has already started.'}, 400
@@ -605,7 +613,8 @@ class JoinCompetition(Resource):
                 
                 db.session.add_all([new_entry, group_msg])
                 db.session.commit()
-                return {'message': 'You have successfuly joined the team competition.'}, 201
+                session['profile'] = user.to_dict()
+                return user.to_dict(), 201
             except Exception as e:
                 return {'error': str(e)}, 400
        

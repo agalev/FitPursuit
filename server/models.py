@@ -71,7 +71,6 @@ class User(db.Model, SerializerMixin):
                        '-team.users',
                        '-team.leader',
                        '-team.messages',
-                       '-team.competitions',
                        '-team.created_at',
                        '-team.updated_at',
                        '-competitions.organizer',
