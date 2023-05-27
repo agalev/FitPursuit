@@ -4,7 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { initTE, Collapse, Dropdown } from 'tw-elements'
+import { initTE, Collapse } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import checkAuth from '../hooks/check_auth'
 import MessagesLink from './messages_link'
@@ -39,7 +39,7 @@ export default function Nav() {
 	}
 
 	useEffect(() => {
-		initTE({ Collapse, Dropdown })
+		initTE({ Collapse })
 	}, [])
 
 	return (

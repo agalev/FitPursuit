@@ -24,9 +24,8 @@ export default function Countdown(targetDate, onEnd) {
 				(difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
 			)
 			const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
-			const seconds = Math.floor((difference % (1000 * 60)) / 1000)
 
-			return `${days}d ${hours}h ${minutes}m ${seconds}s`
+			return `${days}d ${hours}h ${minutes}m`
 		}
 
 		setCountdown(calculateRemainingTime())
@@ -34,7 +33,7 @@ export default function Countdown(targetDate, onEnd) {
 		const interval = setInterval(() => {
 			const updatedCountdown = calculateRemainingTime()
 			setCountdown(updatedCountdown)
-		}, 1000)
+		}, 60000)
 
 		return () => {
 			clearInterval(interval)

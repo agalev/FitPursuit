@@ -1,10 +1,13 @@
 import { useState, useEffect, useContext } from 'react'
 import { GlobalState } from '../global-provider'
 import Countdown from '../hooks/countdown'
+import CompetitionModal from './competition_modal'
 
 export default function CompetitionCard(competition) {
 	const global = useContext(GlobalState)
 	const [isEligible, setIsEligible] = useState(false)
+	const [details, setDetails] = useState(null)
+	const [isModalOpen, setIsModalOpen] = useState(false)
 
 	useEffect(() => {
 		const starts = new Date(competition.start_date)
@@ -36,6 +39,17 @@ export default function CompetitionCard(competition) {
 			}
 		}
 	}, [global.state.profile, isEligible])
+
+	const handleDetailedView = () => {
+		fetch(`/api/competitions/${competition.id}`)
+			.then((res) => res.json())
+			.then((data) => {
+				setDetails(data)
+				setIsModalOpen(true)
+			})
+	}
+
+	console.log(isModalOpen)
 
 	const handleJoin = () => {
 		fetch(`/api/competitions/${competition.type}`, {
@@ -84,6 +98,16 @@ export default function CompetitionCard(competition) {
 			<p>Objective:</p>
 			<p>Starts in: {Countdown(competition.start_date, 'Started')}</p>
 			<p>Ends in: {Countdown(competition.end_date, 'Ended')}</p>
+			<button
+				type='button'
+				className='inline-block rounded border border-warning px-3 pb-[6px] pt-2 text-xs font-medium uppercase leading-normal text-warning transition duration-150 ease-in-out hover:border-warning-600 hover:bg-neutral-500 hover:bg-opacity-10 hover:text-warning-600 focus:border-warning-600 focus:text-warning-600 focus:outline-none focus:ring-0 active:border-warning-700 active:text-warning-700 dark:hover:bg-neutral-100 dark:hover:bg-opacity-10'
+				onClick={handleDetailedView}
+			>
+				View Details
+			</button>
+			{isModalOpen && (
+				<CompetitionModal details={details} close={setIsModalOpen(false)} />
+			)}
 			{isEligible && (
 				<button
 					type='button'

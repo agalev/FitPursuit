@@ -555,8 +555,12 @@ class CompetitionsHandler(Resource):
             return {'error': str(e)}, 400
     
 class GetCompetition(Resource):
-    def get(self):
-        return [competition_handler.to_dict() for competition_handler in CompetitionHandler.query.all()], 200
+    def get(self, id):
+        try:
+            return [competition_handler.to_dict() for competition_handler in CompetitionHandler.query.filter(CompetitionHandler.competition_id == id).all()], 200
+            # return {'competition': Competition.query.filter(Competition.id == id).first().to_dict(), 'competition_handlers': [competition_handler.to_dict() for competition_handler in CompetitionHandler.query.filter(CompetitionHandler.competition_id == id).all()]}, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
 
 class JoinCompetition(Resource):
     def post(self, param):
@@ -635,7 +639,7 @@ api.add_resource(TeamLeaderController, '/api/teams/leader', endpoint='/api/teams
 api.add_resource(JoinTeam, '/api/teams/join', endpoint='/api/teams/join')
 api.add_resource(LeaveTeam, '/api/teams/leave', endpoint='/api/teams/leave')
 api.add_resource(CompetitionsHandler, '/api/competitions', endpoint='/api/competitions')
-api.add_resource(GetCompetition, '/api/competition_handler', endpoint='/api/competition_handler')
+api.add_resource(GetCompetition, '/api/competitions/<int:id>', endpoint='/api/competitions/<int:id>')
 api.add_resource(JoinCompetition, '/api/competitions/<string:param>', endpoint='/api/competitions/<string:param>')
 
 if __name__ == '__main__':
