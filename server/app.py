@@ -3,6 +3,8 @@ from flask_restful import Resource
 from datetime import datetime
 import httpx
 import pandas
+from flask_apscheduler import APScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 from config import app, api, db
 from models import User, Activity, Team, Message, Competition, CompetitionHandler
@@ -621,6 +623,41 @@ class JoinCompetition(Resource):
                 return user.to_dict(), 201
             except Exception as e:
                 return {'error': str(e)}, 400
+            
+
+class Config:
+    SCHEDULER_API_ENABLED = True
+
+app.config.from_object(Config())
+scheduler = APScheduler()
+
+# @scheduler.task('interval', id='check_time', seconds=10, misfire_grace_time=900)
+# def check_time():
+#     print(datetime.now())
+
+def competition_check():
+    with scheduler.app.app_context():
+        print('running cron job at 6am on Sunday', datetime.now())
+        competitions = Competition.query.all()
+        for competition in competitions:
+            if competition.start_date < datetime.now() and competition.end_date > datetime.now() and competition.in_progress == False:
+                competition.in_progress = True
+                db.session.commit()
+                print(f"{competition.title} has started! - {competition.in_progress}")
+            elif competition.end_date < datetime.now() and competition.in_progress == True:
+                competition.in_progress = False
+                db.session.commit()
+                print(f"{competition.title} has ended! - {competition.in_progress}")
+
+scheduler.add_job(
+    func=competition_check,
+    id='run_job',
+    trigger=CronTrigger(day_of_week='sun', hour='6', minute='0', second='0')
+)
+
+scheduler.init_app(app)
+scheduler.start()
+
        
 api.add_resource(Auth, '/api/auth', endpoint='/api/auth')
 api.add_resource(Signup, '/api/signup', endpoint='/api/signup')
