@@ -32,7 +32,7 @@ export default function Toaster({
 
 	return (
 		<div
-			className={`fixed bottom-5 right-5 z-50 flex justify-content pointer-events-auto hidden w-96 rounded-lg bg-${toast_types[type]}-100 bg-clip-padding text-sm !text-${toast_types[type]}-700 shadow-lg shadow-black/5 data-[te-toast-show]:block data-[te-toast-hide]:hidden`}
+			className={`fixed bottom-5 right-5 z-10 flex justify-content pointer-events-auto w-96 rounded-lg bg-${toast_types[type]}-100 bg-clip-padding text-sm !text-${toast_types[type]}-700 shadow-lg shadow-black/5 data-[te-toast-show]:block data-[te-toast-hide]:hidden`}
 			id='static-example'
 			role='alert'
 			aria-live='assertive'

@@ -44,7 +44,7 @@ export default function Nav() {
 
 	return (
 		<nav
-			className='flex flex-wrap sticky top-0 z-50 w-full items-center justify-between backdrop-blur-sm py-1'
+			className='flex flex-wrap sticky top-0 z-10 w-full items-center justify-between backdrop-blur-sm py-1'
 			data-te-navbar-ref
 		>
 			<Link href='/'>

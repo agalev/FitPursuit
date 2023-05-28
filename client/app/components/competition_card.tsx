@@ -41,15 +41,13 @@ export default function CompetitionCard(competition) {
 	}, [global.state.profile, isEligible])
 
 	const handleDetailedView = () => {
+		setIsModalOpen(true)
 		fetch(`/api/competitions/${competition.id}`)
 			.then((res) => res.json())
 			.then((data) => {
 				setDetails(data)
-				setIsModalOpen(true)
 			})
 	}
-
-	console.log(isModalOpen)
 
 	const handleJoin = () => {
 		fetch(`/api/competitions/${competition.type}`, {
@@ -95,7 +93,7 @@ export default function CompetitionCard(competition) {
 				{competition.organizer &&
 					`${competition.organizer.first_name} ${competition.organizer.last_name}`}
 			</p>
-			<p>Objective:</p>
+			<p>Objective: Distance</p>
 			<p>Starts in: {Countdown(competition.start_date, 'Started')}</p>
 			<p>Ends in: {Countdown(competition.end_date, 'Ended')}</p>
 			<button
@@ -106,7 +104,11 @@ export default function CompetitionCard(competition) {
 				View Details
 			</button>
 			{isModalOpen && (
-				<CompetitionModal details={details} close={setIsModalOpen(false)} />
+				<CompetitionModal
+					competition={competition}
+					details={details}
+					close={() => setIsModalOpen(false)}
+				/>
 			)}
 			{isEligible && (
 				<button

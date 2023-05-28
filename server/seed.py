@@ -453,7 +453,8 @@ with app.app_context():
     print('Creating competition participants...')
     competition_participant1 = CompetitionHandler(
         team_id=1,
-        competition_id=1
+        competition_id=1,
+        score=100
     )
     competition_participant2 = CompetitionHandler(
         user_id=2,
@@ -462,6 +463,47 @@ with app.app_context():
     competition_participant3 = CompetitionHandler(
         user_id=3,
         competition_id=3
+    )
+
+    competition_participant4 = CompetitionHandler(
+        team_id=2,
+        competition_id=1,
+        score=200
+    )
+
+    competition_participant5 = CompetitionHandler(
+        team_id=3,
+        competition_id=1,
+        score=300
+    )
+
+    competition_participant6 = CompetitionHandler(
+        team_id=4,
+        competition_id=1,
+        score=400
+    )
+    competition_participant7 = CompetitionHandler(
+        user_id=3,
+        competition_id=2,
+        score=400
+    )
+
+    competition_participant8 = CompetitionHandler(
+        user_id=4,
+        competition_id=2,
+        score=300
+    )
+
+    competition_participant9 = CompetitionHandler(
+        user_id=5,
+        competition_id=2,
+        score=200
+    )
+
+    competition_participant10 = CompetitionHandler(
+        user_id=6,
+        competition_id=2,
+        score=100
     )
 
     db.session.add_all([
@@ -508,6 +550,13 @@ with app.app_context():
         competition3,
         competition_participant1,
         competition_participant2,
-        competition_participant3
+        competition_participant3,
+        competition_participant4,
+        competition_participant5,
+        competition_participant6,
+        competition_participant7,
+        competition_participant8,
+        competition_participant9,
+        competition_participant10
     ])
     db.session.commit()

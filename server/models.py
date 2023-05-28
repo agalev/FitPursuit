@@ -310,6 +310,7 @@ class Competition(db.Model, SerializerMixin):
     max_speed = db.Column(db.Float)
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)
+    in_progress = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, server_default=db.func.now())
 
     organizer = db.relationship('User', foreign_keys=[organizer_id])
