@@ -626,6 +626,7 @@ class JoinCompetition(Resource):
             
 
 # Cron job running every Sunday at 6:00am to start/end competitions and disburse awards.
+# Successfully allocating award monies to users and teams. In case of a team competition, the award is split evenly among team members.
 class Config:
     SCHEDULER_API_ENABLED = True
 
