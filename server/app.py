@@ -263,56 +263,62 @@ class ActivitiesController(Resource):
     def post(self, param):
         if param == 'self':
             user = User.query.filter(User.id == session['user_id']).first()
-            if user.strava_token_expiry < datetime.now():
-                return {'error': 'Strava token expired'}, 400
-            page_count = 1
-            new_activity_count = 0
+        competitions = CompetitionHandler.query.filter(CompetitionHandler.user_id == user.id, CompetitionHandler.start_date < datetime.now(), CompetitionHandler.end_date > datetime.now()).all()
+        if user.team_id:
+            competitions += CompetitionHandler.query.filter(CompetitionHandler.team_id == user.team_id, CompetitionHandler.start_date < datetime.now(), CompetitionHandler.end_date > datetime.now()).all()
+        if user.strava_token_expiry < datetime.now():
+            return {'error': 'Strava token expired'}, 400
+        page_count = 1
+        new_activity_count = 0
+        res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
+                        headers = {'Authorization': f'Bearer {user.strava_access_token}'},
+                        params={'per_page': 200, 'page': page_count})
+        if res.status_code != 200:
+            return res.json(), 400
+        activities = res.json()
+        while len(activities) == 200:
+            page_count += 1
             res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
                             headers = {'Authorization': f'Bearer {user.strava_access_token}'},
                             params={'per_page': 200, 'page': page_count})
             if res.status_code != 200:
-                return res.json(), 400
-            activities = res.json()
-            while len(activities) == 200:
-                page_count += 1
-                res = httpx.get('https://www.strava.com/api/v3/athlete/activities',
-                                headers = {'Authorization': f'Bearer {user.strava_access_token}'},
-                                params={'per_page': 200, 'page': page_count})
-                if res.status_code != 200:
-                    return {'error': 'Unable to retrieve activities.'}, 400
-                activities += res.json()
-            for activity in activities:
-                if Activity.query.filter(Activity.strava_id == int(activity['id'])).first():
-                    continue
-                new_activity = Activity(strava_id = activity['id'],
-                                        name = activity['name'],
-                                        activity_type = activity['type'],
-                                        distance = activity['distance'] * 0.000621371192, # convert meters to miles
-                                        moving_time = activity['moving_time'],
-                                        elapsed_time = activity['elapsed_time'],
-                                        total_elevation_gain = activity['total_elevation_gain'] * 3.2808399, # convert meters to feet
-                                        start_date_local = datetime.strptime(activity['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'),
-                                        timezone = activity['timezone'],
-                                        achievement_count = activity['achievement_count'],
-                                        kudos_count = activity['kudos_count'],
-                                        comment_count = activity['comment_count'],
-                                        average_speed = activity['average_speed'] * 2.23694, # convert meters per second to miles per hour
-                                        max_speed = activity['max_speed'] * 2.23694, # convert meters per second to miles per hour
-                                        average_heartrate = activity['average_heartrate'] if 'average_heartrate' in activity else 0,
-                                        max_heartrate = activity['max_heartrate'] if 'max_heartrate' in activity else 0,
-                                        elev_high = activity['elev_high'] * 3.2808399, # convert meters to feet,
-                                        elev_low = activity['elev_low'] * 3.2808399, # convert meters to feet,
-                                        pr_count = activity['pr_count'],
-                                        user_id = session['user_id'])
-                new_activity_count += 1
-                db.session.add(new_activity)
-                db.session.commit()
-            user.FPcoins += new_activity_count * 10
-            db.session.commit()
-            session['profile'] = user.to_dict()
-            if new_activity_count == 0:
-                return {'message': 'Your Strava is synced'}, 200
-            return {'message': f"You just added {new_activity_count} new {'activity' if new_activity_count == 1 else 'activities'}! You earned {new_activity_count * 10} FP coins!", 'profile': user.to_dict()}, 200
+                return {'error': 'Unable to retrieve activities.'}, 400
+            activities += res.json()
+        for activity in activities:
+            if Activity.query.filter(Activity.strava_id == int(activity['id'])).first():
+                continue
+            for competition in competitions:
+                competition_activity_type = competition.activity_type.replace(' ', '')
+                if activity['type'] == competition_activity_type and competition.start_date < datetime.strptime(activity['start_date_local'], '%Y-%m-%dT%H:%M:%SZ') < competition.end_date:
+                    competition.score += int(activity['distance'] * 0.000621371192)
+            new_activity = Activity(strava_id = activity['id'],
+                                    name = activity['name'],
+                                    activity_type = activity['type'],
+                                    distance = activity['distance'] * 0.000621371192, # convert meters to miles
+                                    moving_time = activity['moving_time'],
+                                    elapsed_time = activity['elapsed_time'],
+                                    total_elevation_gain = activity['total_elevation_gain'] * 3.2808399, # convert meters to feet
+                                    start_date_local = datetime.strptime(activity['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'),
+                                    timezone = activity['timezone'],
+                                    achievement_count = activity['achievement_count'],
+                                    kudos_count = activity['kudos_count'],
+                                    comment_count = activity['comment_count'],
+                                    average_speed = activity['average_speed'] * 2.23694, # convert meters per second to miles per hour
+                                    max_speed = activity['max_speed'] * 2.23694, # convert meters per second to miles per hour
+                                    average_heartrate = activity['average_heartrate'] if 'average_heartrate' in activity else 0,
+                                    max_heartrate = activity['max_heartrate'] if 'max_heartrate' in activity else 0,
+                                    elev_high = activity['elev_high'] * 3.2808399, # convert meters to feet,
+                                    elev_low = activity['elev_low'] * 3.2808399, # convert meters to feet,
+                                    pr_count = activity['pr_count'],
+                                    user_id = session['user_id'])
+            new_activity_count += 1
+            db.session.add(new_activity)
+        user.FPcoins += new_activity_count * 10
+        db.session.commit()
+        session['profile'] = user.to_dict()
+        if new_activity_count == 0:
+            return {'message': 'Your Strava is synced'}, 200
+        return {'message': f"You just added {new_activity_count} new {'activity' if new_activity_count == 1 else 'activities'}! You earned {new_activity_count * 10} FP coins!", 'profile': user.to_dict()}, 200
 
 class Stats(Resource):
     def get(self):
@@ -547,6 +553,7 @@ class CompetitionsHandler(Resource):
                 distance = req['distance'],
                 start_date = datetime.fromisoformat(req['start_date']),
                 end_date = datetime.strptime(req['end_date'], "%a, %d %b %Y %H:%M:%S %Z")
+                
             )
             user.FPcoins -= int(req['prize_pool'])
             db.session.add(competition)
@@ -693,6 +700,29 @@ scheduler.add_job(
 scheduler.init_app(app)
 scheduler.start()
 
+class Test(Resource):
+    def get(self):
+        req = request.get_json()
+        user = User.query.filter(User.id == session['user_id']).first()
+        competitions = CompetitionHandler.query.filter(CompetitionHandler.user_id == user.id, CompetitionHandler.start_date < datetime.now(), CompetitionHandler.end_date > datetime.now()).all()
+        if user.team_id:
+            competitions += CompetitionHandler.query.filter(CompetitionHandler.team_id == user.team_id, CompetitionHandler.start_date < datetime.now(), CompetitionHandler.end_date > datetime.now()).all()
+        for competition in competitions:
+            competition_activity_type = competition.activity_type.replace(' ', '')
+            if req['activity_type'] == competition_activity_type and competition.start_date < datetime.strptime(req['start_date_local'], '%Y-%m-%dT%H:%M:%SZ') < competition.end_date:
+                competition.score += int(req['distance'])
+                # print(req['activity_type'])
+                # print({'start': competition.start_date, 'end': competition.end_date, 'activity_date': datetime.strptime(req['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'), 'activity_type': req['activity_type'], 'distance': req['distance']})
+        db.session.commit()
+        return [competition.to_dict() for competition in competitions], 200
+        # competitions += Competition.query.filter(Competition.start_date < datetime.now()).filter(Competition.end_date > datetime.now()).filter(Competition.type == 'team').all()
+        # output = []
+            # output.append(competition.to_dict())
+        # return output, 200
+        # return [competitions.to_dict() for competitions in CompetitionHandler.query.filter(CompetitionHandler.user_id == user.id).filter(CompetitionHandler.team_id == user.team_id).all()], 200
+        # return competitions.to_dict(), 200
+
+
 api.add_resource(Auth, '/api/auth', endpoint='/api/auth')
 api.add_resource(Signup, '/api/signup', endpoint='/api/signup')
 api.add_resource(Login, '/api/login', endpoint='/api/login')
@@ -712,6 +742,7 @@ api.add_resource(LeaveTeam, '/api/teams/leave', endpoint='/api/teams/leave')
 api.add_resource(CompetitionsHandler, '/api/competitions', endpoint='/api/competitions')
 api.add_resource(GetCompetition, '/api/competitions/<int:id>', endpoint='/api/competitions/<int:id>')
 api.add_resource(JoinCompetition, '/api/competitions/<string:param>', endpoint='/api/competitions/<string:param>')
+api.add_resource(Test, '/api/test', endpoint='/api/test')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

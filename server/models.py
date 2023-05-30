@@ -12,10 +12,6 @@ strava_activities = [
 		"Hike",
 		"Virtual Run",
 		"Ride",
-		"Mountain Bike Ride",
-		"Gravel Bike Ride",
-		"E-Bike Ride",
-		"E-Mountain Bike Ride",
 		"Velomobile",
 		"Virtual Ride",
 		"Canoe",
@@ -53,7 +49,6 @@ strava_activities = [
 		"Squash",
 		"Badminton",
 		"Table Tennis",
-		"HIIT",
 		"Pilates",
 		"Virtual Row"
 	]

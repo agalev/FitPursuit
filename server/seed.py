@@ -425,8 +425,8 @@ with app.app_context():
         max_speed=1.34,
         in_progress=True,
         prize_pool=5000,
-        start_date=datetime(2023, 5, 21, 6, 0),
-        end_date=datetime(2023, 5, 28, 6, 0)
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
     )
     competition2 = Competition(
         organizer_id=2,
@@ -455,62 +455,127 @@ with app.app_context():
         end_date=datetime(2023, 6, 11, 6, 0)
     )
 
+    competition4 = Competition(
+        organizer_id=3,
+        title='Inline Skate or InlineSkate',
+        description='This is a test competition',
+        type='team',
+        activity_type='Inline Skate',
+        distance=True,
+        average_speed=1.23,
+        max_speed=1.34,
+        prize_pool=5000,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
+    )
+
+    competition5 = Competition(
+        organizer_id=3,
+        title='Inline Skate or InlineSkate SOLO',
+        description='This is a test competition',
+        type='solo',
+        activity_type='Inline Skate',
+        distance=True,
+        average_speed=1.23,
+        max_speed=1.34,
+        prize_pool=5000,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
+    )
+
     # Create competition participants
     print('Creating competition participants...')
     competition_participant1 = CompetitionHandler(
         team_id=1,
         competition_id=1,
-        score=600
+        score=600,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0),
+        activity_type='Run'
     )
     competition_participant2 = CompetitionHandler(
         user_id=2,
-        competition_id=2
+        competition_id=2,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
     )
     competition_participant3 = CompetitionHandler(
         user_id=3,
-        competition_id=3
+        competition_id=3,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
     )
 
     competition_participant4 = CompetitionHandler(
         team_id=2,
         competition_id=1,
-        score=200
+        score=200,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
     )
 
     competition_participant5 = CompetitionHandler(
         team_id=3,
         competition_id=1,
-        score=300
+        score=300,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
     )
 
     competition_participant6 = CompetitionHandler(
         team_id=4,
         competition_id=1,
-        score=400
+        score=400,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
     )
     competition_participant7 = CompetitionHandler(
         user_id=3,
         competition_id=2,
-        score=400
+        score=400,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
     )
 
     competition_participant8 = CompetitionHandler(
         user_id=4,
         competition_id=2,
-        score=300
+        score=300,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
     )
 
     competition_participant9 = CompetitionHandler(
         user_id=5,
         competition_id=2,
-        score=200
+        score=200,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0)
     )
 
     competition_participant10 = CompetitionHandler(
-        user_id=6,
+        user_id=1,
         competition_id=2,
-        score=100
+        score=100,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0),
+        activity_type='Ride'
     )
+    competition_participant11 = CompetitionHandler(
+        team_id=1,
+        competition_id=4,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0),
+        activity_type='Inline Skate'
+    )
+    competition_participant12 = CompetitionHandler(
+        user_id=1,
+        competition_id=5,
+        start_date=datetime(2023, 5, 28, 6, 0),
+        end_date=datetime(2023, 6, 4, 6, 0),
+        activity_type='Inline Skate'
+    )
+
 
     db.session.add_all([
         user1,
@@ -554,6 +619,8 @@ with app.app_context():
         competition1,
         competition2,
         competition3,
+        competition4,
+        competition5,
         competition_participant1,
         competition_participant2,
         competition_participant3,
@@ -563,6 +630,8 @@ with app.app_context():
         competition_participant7,
         competition_participant8,
         competition_participant9,
-        competition_participant10
+        competition_participant10,
+        competition_participant11,
+        competition_participant12
     ])
     db.session.commit()

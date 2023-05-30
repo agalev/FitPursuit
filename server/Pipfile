@@ -15,6 +15,7 @@ python-dotenv = "*"
 httpx = "*"
 pandas = "*"
 flask-apscheduler = "*"
+flask-mail = "*"
 
 [dev-packages]
 
