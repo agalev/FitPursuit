@@ -1,8 +1,8 @@
-"""tables
+"""added activity_type, start_date, end_date to competition handler
 
-Revision ID: de48420e9c9e
+Revision ID: 48362572b43e
 Revises: 
-Create Date: 2023-05-24 16:46:23.397224
+Create Date: 2023-05-29 18:31:11.973734
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'de48420e9c9e'
+revision = '48362572b43e'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -106,6 +106,7 @@ def upgrade():
     sa.Column('max_speed', sa.Float(), nullable=True),
     sa.Column('start_date', sa.DateTime(), nullable=False),
     sa.Column('end_date', sa.DateTime(), nullable=False),
+    sa.Column('in_progress', sa.Boolean(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
     sa.ForeignKeyConstraint(['organizer_id'], ['users.id'], name=op.f('fk_competitions_organizer_id_users')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_competitions')),
@@ -131,6 +132,9 @@ def upgrade():
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('team_id', sa.Integer(), nullable=True),
     sa.Column('competition_id', sa.Integer(), nullable=True),
+    sa.Column('activity_type', sa.String(), nullable=True),
+    sa.Column('start_date', sa.DateTime(), nullable=True),
+    sa.Column('end_date', sa.DateTime(), nullable=True),
     sa.Column('score', sa.Integer(), nullable=True),
     sa.Column('placement', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),

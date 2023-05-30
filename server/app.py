@@ -582,7 +582,10 @@ class JoinCompetition(Resource):
                     return {'error': 'Competition is not solo.'}, 400
                 new_entry = CompetitionHandler(
                     competition_id = competition.id,
-                    user_id = user.id
+                    user_id = user.id,
+                    activity_type = competition.activity_type,
+                    start_date = competition.start_date,
+                    end_date = competition.end_date
                 )
                 db.session.add(new_entry)
                 db.session.commit()
@@ -609,7 +612,10 @@ class JoinCompetition(Resource):
                     return {'error': 'Competition is not team.'}, 400
                 new_entry = CompetitionHandler(
                     competition_id = competition.id,
-                    team_id = team.id
+                    team_id = team.id,
+                    activity_type = competition.activity_type,
+                    start_date = competition.start_date,
+                    end_date = competition.end_date
                 )
                 group_msg = Message(
                 sender_id = session['user_id'],
