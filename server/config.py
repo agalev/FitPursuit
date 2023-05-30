@@ -7,13 +7,22 @@ from flask_migrate import Migrate
 from flask_restful import Api
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
+from flask_mail import Mail
 
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = 'alexander.galev@gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'alexander.galev@gmail.com'
+app.config['MAIL_PASSWORD'] = 'ytffyyhidpouwusm'
+mail = Mail(app)
+app.secret_key = os.environ.get('SECRET_KEY')
 app.json.compact = False
 
 metadata = MetaData(naming_convention={

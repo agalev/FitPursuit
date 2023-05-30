@@ -5,8 +5,9 @@ import httpx
 import pandas
 from flask_apscheduler import APScheduler
 from apscheduler.triggers.cron import CronTrigger
+from flask_mail import Message as MailMessage
 
-from config import app, api, db
+from config import app, mail, api, db
 from models import User, Activity, Team, Message, Competition, CompetitionHandler
 
 @app.before_request
@@ -700,28 +701,25 @@ scheduler.add_job(
 scheduler.init_app(app)
 scheduler.start()
 
-class Test(Resource):
-    def get(self):
-        req = request.get_json()
-        user = User.query.filter(User.id == session['user_id']).first()
-        competitions = CompetitionHandler.query.filter(CompetitionHandler.user_id == user.id, CompetitionHandler.start_date < datetime.now(), CompetitionHandler.end_date > datetime.now()).all()
-        if user.team_id:
-            competitions += CompetitionHandler.query.filter(CompetitionHandler.team_id == user.team_id, CompetitionHandler.start_date < datetime.now(), CompetitionHandler.end_date > datetime.now()).all()
-        for competition in competitions:
-            competition_activity_type = competition.activity_type.replace(' ', '')
-            if req['activity_type'] == competition_activity_type and competition.start_date < datetime.strptime(req['start_date_local'], '%Y-%m-%dT%H:%M:%SZ') < competition.end_date:
-                competition.score += int(req['distance'])
-                # print(req['activity_type'])
-                # print({'start': competition.start_date, 'end': competition.end_date, 'activity_date': datetime.strptime(req['start_date_local'], '%Y-%m-%dT%H:%M:%SZ'), 'activity_type': req['activity_type'], 'distance': req['distance']})
-        db.session.commit()
-        return [competition.to_dict() for competition in competitions], 200
-        # competitions += Competition.query.filter(Competition.start_date < datetime.now()).filter(Competition.end_date > datetime.now()).filter(Competition.type == 'team').all()
-        # output = []
-            # output.append(competition.to_dict())
-        # return output, 200
-        # return [competitions.to_dict() for competitions in CompetitionHandler.query.filter(CompetitionHandler.user_id == user.id).filter(CompetitionHandler.team_id == user.team_id).all()], 200
-        # return competitions.to_dict(), 200
+class Feedback(Resource):
+    def post(self):
+        try:
+            user = User.query.filter(User.id == session['user_id']).first()
+            req = request.get_json()
+            msg = MailMessage(f"FitPursuit: {req['subject']}",
+                            # sender="from@example.com",
+                            recipients=["alexander.galev@gmail.com"])
+            msg.body = f"""
+            Name: {user.first_name} {user.last_name}, FitPursuit_id: {user.id}
+            
+            Email: {req['email']}
 
+            {req['message']}
+            """
+            mail.send(msg)
+            return {'message': 'Form received.'}, 200
+        except Exception as e:
+            return {'error': str(e)}, 400
 
 api.add_resource(Auth, '/api/auth', endpoint='/api/auth')
 api.add_resource(Signup, '/api/signup', endpoint='/api/signup')
@@ -742,7 +740,7 @@ api.add_resource(LeaveTeam, '/api/teams/leave', endpoint='/api/teams/leave')
 api.add_resource(CompetitionsHandler, '/api/competitions', endpoint='/api/competitions')
 api.add_resource(GetCompetition, '/api/competitions/<int:id>', endpoint='/api/competitions/<int:id>')
 api.add_resource(JoinCompetition, '/api/competitions/<string:param>', endpoint='/api/competitions/<string:param>')
-api.add_resource(Test, '/api/test', endpoint='/api/test')
+api.add_resource(Feedback, '/api/feedback', endpoint='/api/feedback')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
