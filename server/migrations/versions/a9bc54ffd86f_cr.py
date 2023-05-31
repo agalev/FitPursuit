@@ -1,8 +1,8 @@
-"""added activity_type, start_date, end_date to competition handler
+"""cr
 
-Revision ID: 48362572b43e
+Revision ID: a9bc54ffd86f
 Revises: 
-Create Date: 2023-05-29 18:31:11.973734
+Create Date: 2023-05-31 12:24:05.355491
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '48362572b43e'
+revision = 'a9bc54ffd86f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,6 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('image', sa.String(length=200), nullable=True),
-    sa.Column('leader_id', sa.Integer(), nullable=True),
     sa.Column('activity_type', sa.String(length=20), nullable=True),
     sa.Column('members', sa.Integer(), nullable=True),
     sa.Column('score', sa.Integer(), nullable=True),
@@ -31,9 +30,8 @@ def upgrade():
     sa.Column('total_moving_time', sa.Integer(), nullable=True),
     sa.Column('average_speed', sa.Integer(), nullable=True),
     sa.Column('max_speed', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['leader_id'], ['users.id'], name=op.f('fk_teams_leader_id_users')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_teams')),
     sa.UniqueConstraint('name', name=op.f('uq_teams_name'))
     )
@@ -54,15 +52,13 @@ def upgrade():
     sa.Column('weight', sa.Float(), nullable=True),
     sa.Column('wins', sa.Integer(), nullable=True),
     sa.Column('FPcoins', sa.Integer(), nullable=True),
-    sa.Column('team_id', sa.Integer(), nullable=True),
     sa.Column('last_online', sa.DateTime(), nullable=True),
     sa.Column('strava_connected', sa.Boolean(), nullable=True),
     sa.Column('strava_access_token', sa.String(), nullable=True),
     sa.Column('strava_refresh_token', sa.String(), nullable=True),
     sa.Column('strava_token_expiry', sa.DateTime(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['team_id'], ['teams.id'], name=op.f('fk_users_team_id_teams')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_users')),
     sa.UniqueConstraint('email', name=op.f('uq_users_email')),
     sa.UniqueConstraint('strava_id', name=op.f('uq_users_strava_id'))
@@ -107,7 +103,7 @@ def upgrade():
     sa.Column('start_date', sa.DateTime(), nullable=False),
     sa.Column('end_date', sa.DateTime(), nullable=False),
     sa.Column('in_progress', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.ForeignKeyConstraint(['organizer_id'], ['users.id'], name=op.f('fk_competitions_organizer_id_users')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_competitions')),
     sa.UniqueConstraint('title', name=op.f('uq_competitions_title'))
@@ -120,7 +116,7 @@ def upgrade():
     sa.Column('content', sa.String(length=2000), nullable=False),
     sa.Column('read', sa.Boolean(), nullable=True),
     sa.Column('invitation', sa.Boolean(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['receiver_id'], ['users.id'], name=op.f('fk_messages_receiver_id_users')),
     sa.ForeignKeyConstraint(['sender_id'], ['users.id'], name=op.f('fk_messages_sender_id_users')),
@@ -137,7 +133,7 @@ def upgrade():
     sa.Column('end_date', sa.DateTime(), nullable=True),
     sa.Column('score', sa.Integer(), nullable=True),
     sa.Column('placement', sa.Integer(), nullable=True),
-    sa.Column('created_at', sa.DateTime(), server_default=sa.text('(CURRENT_TIMESTAMP)'), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.ForeignKeyConstraint(['competition_id'], ['competitions.id'], name=op.f('fk_competition_handlers_competition_id_competitions')),
     sa.ForeignKeyConstraint(['team_id'], ['teams.id'], name=op.f('fk_competition_handlers_team_id_teams')),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_competition_handlers_user_id_users')),

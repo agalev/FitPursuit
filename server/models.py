@@ -172,7 +172,7 @@ class Activity(db.Model, SerializerMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     qualified = db.Column(db.Boolean, default=True)
-    strava_id = db.Column(db.Integer)
+    strava_id = db.Column(db.BigInteger)
     name = db.Column(db.String)
     activity_type = db.Column(db.String)
     distance = db.Column(db.Float)
@@ -213,7 +213,7 @@ class Team(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, unique=True)
     image = db.Column(db.String(200))
-    leader_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    leader_id = db.Column(db.Integer, db.ForeignKey('users.id', use_alter=True))
     activity_type = db.Column(db.String(20))
     members = db.Column(db.Integer, default=1)
     score = db.Column(db.Integer, default=0)

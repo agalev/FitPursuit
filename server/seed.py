@@ -5,15 +5,15 @@ from datetime import datetime
 with app.app_context():
     print('Deleting all tables...')
 
-    # db.drop_all()
-    # db.create_all()
+    db.drop_all()
+    db.create_all()
 
-    User.query.delete()
-    Team.query.delete()
-    Activity.query.delete()
-    Message.query.delete()
-    Competition.query.delete()
-    CompetitionHandler.query.delete()
+    # User.query.delete()
+    # Team.query.delete()
+    # Activity.query.delete()
+    # Message.query.delete()
+    # Competition.query.delete()
+    # CompetitionHandler.query.delete()
 
     # Create users
     print('Creating users...')
@@ -31,7 +31,8 @@ with app.app_context():
         weight=220,
         wins=3,
         FPcoins=2000,
-        team_id=1
+        # team_id=1
+        team_id=None
     )
     user1.password_hash = 'Password1'
     
@@ -49,7 +50,9 @@ with app.app_context():
         weight=120,
         wins=2,
         FPcoins=3000,
-        team_id=1
+        # team_id=1
+        team_id=None
+
     )
     user2.password_hash = 'Password1'
 
@@ -67,7 +70,8 @@ with app.app_context():
         weight=180,
         wins=2,
         FPcoins=3000,
-        team_id=2
+        # team_id=3
+        team_id=None
     )
     user3.password_hash = 'Password1'
 
@@ -85,7 +89,8 @@ with app.app_context():
         weight=177,
         wins=1,
         FPcoins=1000,
-        team_id=3
+        # team_id=4
+        team_id=None
     )
     user4.password_hash = 'Password1'
 
@@ -103,7 +108,8 @@ with app.app_context():
         weight=178,
         wins=4,
         FPcoins=1000,
-        team_id=4
+        # team_id=5
+        team_id=None
     )
     user5.password_hash = 'Password1'
 
@@ -121,7 +127,8 @@ with app.app_context():
         weight=180,
         wins=5,
         FPcoins=4000,
-        team_id=5
+        # team_id=6
+        team_id=None
     )
     user6.password_hash = 'Password1'
 
@@ -139,7 +146,8 @@ with app.app_context():
         weight=220,
         wins=2,
         FPcoins=2000,
-        team_id=6
+        # team_id=7
+        team_id=None
     )
     user7.password_hash = 'Password1'
 
@@ -157,7 +165,8 @@ with app.app_context():
         weight=170,
         wins=1,
         FPcoins=4000,
-        team_id=7
+        # team_id=7
+        team_id=None
     )
     user8.password_hash = 'Password1'
 
@@ -175,7 +184,8 @@ with app.app_context():
         weight=179,
         wins=3,
         FPcoins=3000,
-        team_id=1
+        # team_id=7
+        team_id=None
     )
     user9.password_hash = 'Password1'
 
@@ -193,9 +203,23 @@ with app.app_context():
         weight=166,
         wins=1,
         FPcoins=1000,
-        team_id=1
+        # team_id=7
+        team_id=None
     )
     user10.password_hash = 'Password1'
+
+    db.session.add_all([
+        user1,
+        user2,
+        user3,
+        user4,
+        user5,
+        user6,
+        user7,
+        user8,
+        user9,
+        user10])
+    db.session.commit()
 
 
     # Create teams
@@ -207,6 +231,7 @@ with app.app_context():
         members= 3,
         activity_type='Run'
     )
+
     team2 = Team(
         name='Rollerbladers',
         leader_id=3,
@@ -241,12 +266,46 @@ with app.app_context():
         wins=8,
         activity_type='Hike'
     )
+
     team7 = Team(
         name='Cyclus',
         leader_id=8,
         wins=11,
         activity_type='Run'
     )
+
+    db.session.add_all([
+        team1,
+        team2,
+        team3,
+        team4,
+        team5,
+        team6,
+        team7])
+    db.session.commit()
+
+    user1.team_id = team1.id
+    user2.team_id = team1.id
+    user3.team_id = team2.id
+    user4.team_id = team3.id
+    user5.team_id = team4.id
+    user6.team_id = team5.id
+    user7.team_id = team6.id
+    user8.team_id = team7.id
+    user9.team_id = team7.id
+    user10.team_id = team7.id
+    db.session.add_all([
+        user1,
+        user2,
+        user3,
+        user4,
+        user5,
+        user6,
+        user7,
+        user8,
+        user9,
+        user10,])
+    db.session.commit()
 
     # Create activities
     print('Creating activities...')
@@ -316,6 +375,11 @@ with app.app_context():
         pr_count=1,
         user_id=3
     )
+    db.session.add_all([
+        activity1,
+        activity2,
+        activity3])
+    db.session.commit()
 
     # Create messages
     print('Creating messages...')
@@ -412,6 +476,27 @@ with app.app_context():
         content='Hello John'
     )
 
+    db.session.add_all([
+        message1,
+        message2,
+        message3,
+        message4,
+        message5,
+        message6,
+        message7,
+        message8,
+        message9,
+        message10,
+        message11,
+        message12,
+        message13,
+        message14,
+        message15,
+        message16,
+        message17,
+        message18])
+    db.session.commit()
+
     # Create competitions
     print('Creating competitions...')
     competition1 = Competition(
@@ -482,6 +567,14 @@ with app.app_context():
         start_date=datetime(2023, 5, 28, 6, 0),
         end_date=datetime(2023, 6, 4, 6, 0)
     )
+
+    db.session.add_all([
+        competition1,
+        competition2,
+        competition3,
+        competition4,
+        competition5])
+    db.session.commit()
 
     # Create competition participants
     print('Creating competition participants...')
@@ -576,51 +669,7 @@ with app.app_context():
         activity_type='Inline Skate'
     )
 
-
     db.session.add_all([
-        user1,
-        user2,
-        user3,
-        user4,
-        user5,
-        user6,
-        user7,
-        user8,
-        user9,
-        user10,
-        team1,
-        team2,
-        team3,
-        team4,
-        team5,
-        team6,
-        team7,
-        activity1,
-        activity2,
-        activity3,
-        message1,
-        message2,
-        message3,
-        message4,
-        message5,
-        message6,
-        message7,
-        message8,
-        message9,
-        message10,
-        message11,
-        message12,
-        message13,
-        message14,
-        message15,
-        message16,
-        message17,
-        message18,
-        competition1,
-        competition2,
-        competition3,
-        competition4,
-        competition5,
         competition_participant1,
         competition_participant2,
         competition_participant3,

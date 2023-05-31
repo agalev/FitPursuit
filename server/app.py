@@ -295,7 +295,7 @@ class ActivitiesController(Resource):
             new_activity = Activity(strava_id = activity['id'],
                                     name = activity['name'],
                                     activity_type = activity['type'],
-                                    distance = activity['distance'] * 0.000621371192, # convert meters to miles
+                                    distance = round(activity['distance'] * 0.000621371192, 2), # convert meters to miles
                                     moving_time = activity['moving_time'],
                                     elapsed_time = activity['elapsed_time'],
                                     total_elevation_gain = activity['total_elevation_gain'] * 3.2808399, # convert meters to feet
@@ -638,6 +638,25 @@ class JoinCompetition(Resource):
             except Exception as e:
                 return {'error': str(e)}, 400
             
+class Feedback(Resource):
+    def post(self):
+        try:
+            user = User.query.filter(User.id == session['user_id']).first()
+            req = request.get_json()
+            msg = MailMessage(f"FitPursuit: {req['subject']}",
+                            recipients=["fit.pursuit.app@gmail.com"])
+            msg.body = f"""
+            Name: {user.first_name} {user.last_name}, FitPursuit_id: {user.id}
+            
+            Email: {req['email']}
+
+            {req['message']}
+            """
+            mail.send(msg)
+            return {'message': 'Form received.'}, 200
+        except Exception as e:
+            print(str(e))
+            return {'error': str(e)}, 400
 
 # Cron job running every Sunday at 6:00am to start/end competitions and disburse awards.
 # Successfully allocating award monies to users and teams. In case of a team competition, the award is split evenly among team members.
@@ -700,26 +719,6 @@ scheduler.add_job(
 )
 scheduler.init_app(app)
 scheduler.start()
-
-class Feedback(Resource):
-    def post(self):
-        try:
-            user = User.query.filter(User.id == session['user_id']).first()
-            req = request.get_json()
-            msg = MailMessage(f"FitPursuit: {req['subject']}",
-                            # sender="from@example.com",
-                            recipients=["alexander.galev@gmail.com"])
-            msg.body = f"""
-            Name: {user.first_name} {user.last_name}, FitPursuit_id: {user.id}
-            
-            Email: {req['email']}
-
-            {req['message']}
-            """
-            mail.send(msg)
-            return {'message': 'Form received.'}, 200
-        except Exception as e:
-            return {'error': str(e)}, 400
 
 api.add_resource(Auth, '/api/auth', endpoint='/api/auth')
 api.add_resource(Signup, '/api/signup', endpoint='/api/signup')
