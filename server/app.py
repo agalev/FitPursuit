@@ -1,4 +1,4 @@
-from flask import session, request
+from flask import session, request, jsonify, make_response
 from flask_restful import Resource
 from datetime import datetime
 import httpx
@@ -19,7 +19,7 @@ class Auth(Resource):
     def get(self):
         if 'user_id' not in session:
             return {'error': 'Not logged in.'}, 204
-        return session, 200
+        return make_response(jsonify(session), 200)
     def post(self):
         if 'user_id' in session:
             return {'message': 'Already logged in.'}, 200
@@ -35,7 +35,7 @@ class Auth(Resource):
             db.session.commit()
             session['user_id'] = req['id']
             session['profile'] = user.to_dict()
-            return session, 200
+            return make_response(jsonify(session), 200)
         else:
             try:
                 if (User.query.filter(User.strava_id == req['id']).first()):
@@ -63,7 +63,7 @@ class Auth(Resource):
                 db.session.commit()
                 session['user_id'] = new_user.id
                 session['profile'] = new_user.to_dict()
-                return session, 201
+                return make_response(jsonify(session), 201)
             except Exception as e:
                 return {'error': str(e)}, 401
     def patch(self):
@@ -82,7 +82,7 @@ class Auth(Resource):
             user.last_online = datetime.now()
             db.session.commit()
             session['profile'] = user.to_dict()
-            return session, 200
+            return make_response(jsonify(session), 200)
         else:
             return {'error': 'User not found.'}, 404
 
@@ -111,7 +111,7 @@ class Signup(Resource):
             db.session.commit()
             session['user_id'] = user.id
             session['profile'] = user.to_dict()
-            return session, 201
+            return make_response(jsonify(session), 200)
         except Exception as e:
             return {'error': str(e)}, 401
 
@@ -129,7 +129,7 @@ class Login(Resource):
         db.session.commit()
         session['user_id'] = user.id
         session['profile'] = user.to_dict()
-        return session, 200
+        return make_response(jsonify(session), 200)
 
 class Logout(Resource):
     def post(self):
