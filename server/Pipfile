@@ -17,6 +17,7 @@ pandas = "*"
 flask-apscheduler = "*"
 flask-mail = "*"
 psycopg2 = "*"
+gunicorn = "*"
 
 [dev-packages]
 
