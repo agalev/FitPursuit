@@ -625,15 +625,12 @@ class JoinCompetition(Resource):
                 return {'error': str(e)}, 400
             
 
+# Cron job running every Sunday at 6:00am to start/end competitions and disburse awards.
 class Config:
     SCHEDULER_API_ENABLED = True
 
 app.config.from_object(Config())
 scheduler = APScheduler()
-
-# @scheduler.task('interval', id='check_time', seconds=10, misfire_grace_time=900)
-# def check_time():
-#     print(datetime.now())
 
 def competition_check():
     with scheduler.app.app_context():
@@ -645,6 +642,38 @@ def competition_check():
                 db.session.commit()
                 print(f"{competition.title} has started! - {competition.in_progress}")
             elif competition.end_date < datetime.now() and competition.in_progress == True:
+                for i, entry in enumerate(CompetitionHandler.query.filter(CompetitionHandler.competition_id == competition.id).order_by(CompetitionHandler.score.desc()).all()):
+                    if i == 0:
+                        entry.placement = i + 1
+                        award = competition.prize_pool * 0.5
+                        if competition.type == 'solo':
+                            entry.user.FPcoins += int(award)
+                            entry.user.wins += 1
+                        elif competition.type == 'team':
+                            team = Team.query.filter(Team.id == entry.team_id).first()
+                            team.wins += 1
+                            for user in team.users:
+                                user.FPcoins += int(award / len(team.users))
+                        
+                    if i == 1:
+                        entry.placement = i + 1
+                        award = competition.prize_pool * 0.3
+                        if competition.type == 'solo':
+                            entry.user.FPcoins += int(award)
+                        elif competition.type == 'team':
+                            team = Team.query.filter(Team.id == entry.team_id).first()
+                            for user in team.users:
+                                user.FPcoins += int(award / len(team.users))
+                    if i == 2:
+                        entry.placement = i + 1
+                        award = competition.prize_pool * 0.2
+                        if competition.type == 'solo':
+                            entry.user.FPcoins += int(award)
+                        elif competition.type == 'team':
+                            team = Team.query.filter(Team.id == entry.team_id).first()
+                            for user in team.users:
+                                user.FPcoins += int(award / len(team.users))
+                    entry.placement = i + 1
                 competition.in_progress = False
                 db.session.commit()
                 print(f"{competition.title} has ended! - {competition.in_progress}")
@@ -654,11 +683,9 @@ scheduler.add_job(
     id='run_job',
     trigger=CronTrigger(day_of_week='sun', hour='6', minute='0', second='0')
 )
-
 scheduler.init_app(app)
 scheduler.start()
 
-       
 api.add_resource(Auth, '/api/auth', endpoint='/api/auth')
 api.add_resource(Signup, '/api/signup', endpoint='/api/signup')
 api.add_resource(Login, '/api/login', endpoint='/api/login')

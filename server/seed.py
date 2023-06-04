@@ -174,7 +174,8 @@ with app.app_context():
         height=79,
         weight=179,
         wins=3,
-        FPcoins=3000
+        FPcoins=3000,
+        team_id=1
     )
     user9.password_hash = 'Password1'
 
@@ -191,7 +192,8 @@ with app.app_context():
         height=79,
         weight=166,
         wins=1,
-        FPcoins=1000
+        FPcoins=1000,
+        team_id=1
     )
     user10.password_hash = 'Password1'
 
@@ -202,7 +204,7 @@ with app.app_context():
         name='Runner Ups',
         leader_id=1,
         wins=13,
-        members= 2,
+        members= 3,
         activity_type='Run'
     )
     team2 = Team(
@@ -422,6 +424,7 @@ with app.app_context():
         average_speed=1.23,
         max_speed=1.34,
         in_progress=True,
+        prize_pool=5000,
         start_date=datetime(2023, 5, 21, 6, 0),
         end_date=datetime(2023, 5, 28, 6, 0)
     )
@@ -434,6 +437,7 @@ with app.app_context():
         distance=True,
         average_speed=1.23,
         max_speed=1.34,
+        prize_pool=5000,
         start_date=datetime(2023, 5, 28, 6, 0),
         end_date=datetime(2023, 6, 4, 6, 0)
     )
@@ -446,6 +450,7 @@ with app.app_context():
         distance=True,
         average_speed=1.23,
         max_speed=1.34,
+        prize_pool=5000,
         start_date=datetime(2023, 6, 4, 6, 0),
         end_date=datetime(2023, 6, 11, 6, 0)
     )
@@ -455,7 +460,7 @@ with app.app_context():
     competition_participant1 = CompetitionHandler(
         team_id=1,
         competition_id=1,
-        score=100
+        score=600
     )
     competition_participant2 = CompetitionHandler(
         user_id=2,

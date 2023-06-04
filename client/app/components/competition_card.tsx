@@ -107,6 +107,8 @@ export default function CompetitionCard(competition) {
 				<CompetitionModal
 					competition={competition}
 					details={details}
+					isEligible={isEligible}
+					join={handleJoin}
 					close={() => setIsModalOpen(false)}
 				/>
 			)}
