@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect, useContext } from 'react'
-import { initTE, Input, Select } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 
 export default function TeamDashboard() {
@@ -29,8 +28,12 @@ export default function TeamDashboard() {
 				})
 			}
 		})
-		initTE({ Input, Select })
-	}, [global.state.profile, editMode])
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Input: te.Input, Select: te.Select })
+		}
+		init()
+	}, [global, editMode])
 
 	const convertSecondsToHours = (seconds) => {
 		const hours = Math.floor(seconds / 3600)

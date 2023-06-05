@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect, useContext } from 'react'
-import { initTE, Ripple, Input } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import ScrollContainer from '../components/scroll_container'
 
@@ -40,8 +39,12 @@ export default function Messages() {
 					)
 				})
 		}
-		initTE({ Ripple, Input })
-	}, [selectedUser])
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Collapse: te.Collapse })
+		}
+		init()
+	}, [selectedUser, global.state.profile.team])
 
 	useEffect(() => {
 		fetch('/api/messages/unread')

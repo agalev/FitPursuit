@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect, useContext } from 'react'
-import { initTE, Input, Select } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import StravaButton from './strava_button'
 import states_countries from '../misc/states_countries.json'
@@ -15,7 +14,11 @@ export default function UserProfile() {
 	const [editMode, setEditMode] = useState(false)
 
 	useEffect(() => {
-		initTE({ Input, Select })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Input: te.Input, Select: te.Select })
+		}
+		init()
 	}, [editMode])
 
 	const [formData, setFormData] = useState({

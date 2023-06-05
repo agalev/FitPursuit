@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Image from 'next/image'
-import { initTE, Input, Ripple } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 
 export default function UsersTable() {
@@ -12,7 +11,11 @@ export default function UsersTable() {
 	const [sortOrder, setSortOrder] = useState('asc')
 
 	useEffect(() => {
-		initTE({ Input, Ripple })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Ripple: te.Ripple, Input: te.Input })
+		}
+		init()
 	}, [])
 
 	let index = 1
@@ -385,7 +388,8 @@ export default function UsersTable() {
 										user.team.name
 									) : global.state.profile.team &&
 									  global.state.profile.team.leader_id ===
-											global.state.profile.id && !invited.includes(user.id) ? (
+											global.state.profile.id &&
+									  !invited.includes(user.id) ? (
 										<button
 											className='bg-sky-700 px-2 py-2 rounded-lg text-xs text-white shadow-[0_4px_9px_-4px_rgba(0,0,0,0.2)] transition duration-150 ease-in-out hover:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)] focus:outline-none focus:ring-0 active:shadow-[0_8px_9px_-4px_rgba(0,0,0,0.1),0_4px_18px_0_rgba(0,0,0,0.2)]'
 											data-te-ripple-init

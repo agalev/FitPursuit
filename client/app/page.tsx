@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect, useContext } from 'react'
-import { initTE, Ripple } from 'tw-elements'
 import { GlobalState } from './global-provider'
 import CTA from './components/call_to_action'
 import UsersTable from './components/users_table'
@@ -11,10 +10,6 @@ import ActivitiesTable from './components/activities_table'
 export default function Home() {
 	const global = useContext(GlobalState)
 	const [activeTab, setActiveTab] = useState('users')
-
-	useEffect(() => {
-		initTE({ Ripple })
-	}, [])
 
 	if (!global.state.isLoggedIn) return <CTA />
 

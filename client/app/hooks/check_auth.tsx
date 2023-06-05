@@ -3,7 +3,7 @@ import { useContext, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { GlobalState } from '../global-provider'
 
-export default function checkAuth() {
+export default function CheckAuth() {
 	const global = useContext(GlobalState)
 	const session: any = useSession()
 
@@ -72,5 +72,5 @@ export default function checkAuth() {
 				}
 			})
 		}
-	}, [session])
+	}, [session, global])
 }

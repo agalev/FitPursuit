@@ -3,7 +3,6 @@ import { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { initTE, Ripple, Input } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import StravaButton from '../components/strava_button'
 
@@ -16,7 +15,11 @@ export default function Login() {
 	})
 
 	useEffect(() => {
-		initTE({ Input, Ripple })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Ripple: te.Ripple, Input: te.Input })
+		}
+		init()
 	}, [])
 
 	const handleInputChange = (event) => {
@@ -126,7 +129,7 @@ export default function Login() {
 						</form>
 						<div className='mb-12 pb-1 pt-1 text-center'></div>
 						<section className='flex items-center justify-between'>
-							<p className='mb-0 mr-2'>Don't have an account?</p>
+							<p className='mb-0 mr-2'>Don&apos;t have an account?</p>
 							<Link href='/signup'>
 								<button
 									type='button'

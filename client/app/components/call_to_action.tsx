@@ -1,11 +1,13 @@
 'use client'
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { initTE, Ripple } from 'tw-elements'
-
 export default function CTA() {
 	useEffect(() => {
-		initTE({ Ripple })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Ripple: te.Ripple })
+		}
+		init()
 	}, [])
 
 	return (

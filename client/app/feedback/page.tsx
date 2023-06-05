@@ -1,12 +1,16 @@
 'use client'
 import { useState, useEffect, useContext } from 'react'
-import { initTE, Input, Ripple } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 
 export default function Feedback() {
 	const global = useContext(GlobalState)
+
 	useEffect(() => {
-		initTE({ Ripple, Input })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Input: te.Input, Ripple: te.Ripple })
+		}
+		init()
 	}, [])
 
 	const [formData, setFormData] = useState({

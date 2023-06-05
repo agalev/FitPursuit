@@ -3,7 +3,6 @@ import { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Ripple, Input, Select, initTE } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import StravaButton from '../components/strava_button'
 import states_countries from '../misc/states_countries.json'
@@ -12,7 +11,11 @@ export default function SignUp() {
 	const global = useContext(GlobalState)
 
 	useEffect(() => {
-		initTE({ Ripple, Input, Select })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Ripple: te.Ripple, Input: te.Input, Select: te.Select })
+		}
+		init()
 	}, [])
 
 	const states = states_countries.states

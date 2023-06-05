@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
 import { useRouter } from 'next/navigation'
-import { Ripple, Input, Select, initTE } from 'tw-elements'
 import { GlobalState } from '../global-provider'
 import activities_list from '../misc/activities.json'
 
@@ -15,7 +14,11 @@ export default function CreateTeam() {
 	})
 
 	useEffect(() => {
-		initTE({ Ripple, Input, Select })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Ripple: te.Ripple, Input: te.Input, Select: te.Select })
+		}
+		init()
 	}, [])
 
 	const handleInputChange = (e) => {

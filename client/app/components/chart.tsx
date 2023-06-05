@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext } from 'react'
-import { initTE, Select } from 'tw-elements'
 import {
 	ResponsiveContainer,
 	BarChart,
@@ -22,7 +21,11 @@ export default function ChartElement() {
 	})
 
 	useEffect(() => {
-		initTE({ Select })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Select: te.Select })
+		}
+		init()
 	}, [])
 
 	useEffect(() => {

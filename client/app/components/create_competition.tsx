@@ -1,5 +1,4 @@
 import { useState, useEffect, useContext } from 'react'
-import { Ripple, Input, Select, initTE } from 'tw-elements'
 import DatePicker from 'react-datepicker'
 import { addDays, isSunday } from 'date-fns'
 import { GlobalState } from '../global-provider'
@@ -22,7 +21,11 @@ export default function CreateCompetition() {
 	})
 
 	useEffect(() => {
-		initTE({ Ripple, Input, Select })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Ripple: te.Ripple, Select: te.Select, Input: te.Input })
+		}
+		init()
 	}, [])
 
 	useEffect(() => {

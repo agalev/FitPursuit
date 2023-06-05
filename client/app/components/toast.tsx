@@ -1,6 +1,5 @@
 'use client'
 import { useEffect } from 'react'
-import { Toast, initTE } from 'tw-elements'
 
 export default function Toaster({
 	message,
@@ -10,7 +9,11 @@ export default function Toaster({
 	type: string
 }) {
 	useEffect(() => {
-		initTE({ Toast })
+		async function init() {
+			const te = await import('tw-elements')
+			await te.initTE({ Toast: te.Toast })
+		}
+		init()
 	}, [])
 
 	const toast_types = {
