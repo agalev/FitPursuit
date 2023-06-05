@@ -1,5 +1,6 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/react'
 import Nav from './components/nav'
 import Footer from './components/footer'
 import Providers from './providers'
@@ -25,6 +26,7 @@ export default function RootLayout({
 }) {
 	return (
 		<html lang='en'>
+			<Analytics />
 			<body
 				className={`${inter.className} bg-slate-100 dark:text-amber-500 dark:bg-slate-900 transition-colors duration-300`}
 			>
