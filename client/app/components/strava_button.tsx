@@ -12,7 +12,7 @@ export default function StravaButton() {
 			}}
 			onClick={() => {
 				signIn('strava', {
-					callbackUrl: `${window.location.origin}/dashboard`
+					callbackUrl: `/dashboard`
 				})
 			}}
 		>
