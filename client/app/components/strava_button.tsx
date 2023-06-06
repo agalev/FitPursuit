@@ -12,7 +12,7 @@ export default function StravaButton() {
 			}}
 			onClick={() => {
 				signIn('strava', {
-					callbackUrl: `/dashboard`
+					callbackUrl: `https://fit-pursuit.vercel.app/dashboard`
 				})
 			}}
 		>
