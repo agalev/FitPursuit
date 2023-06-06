@@ -1,11 +1,13 @@
 ![nav_logo_orange](https://github.com/agalev/FitPursuit/assets/17399666/26c1bb41-b20a-47ed-84fe-1ed6b6c303c4)
 ### Join teams and compete with others for prizes!
-Check out the live app ~> https://fit-pursuit.vercel.app
+### Check out the live app ~> https://fit-pursuit.vercel.app
 
 # <img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="25"> Tech Stack & Dependencies
 **`Next.js` `Tailwind` `Python3` `Flask` `SQLAlchemy` `Alembic` `Postgres` `Pandas` `Docker`**
 
-FitPursuit is a fitness app powered by Strava allowing users to join teams and compete with others for prizes while tracking their fitness activities and progress towards their goals. This is my capstone project and the culmination of my time at the Flatiron School. It took 6 weeks to go through the whole software development lifecycle. I faced and overcame numerous challenges - oAuth, using cutting edge libraries & frameworks still in beta, implementing cron jobs, dockerizing and deploying containers. As an avid Strava user myself, my idea was to comprise a database of personal, live data that can be synced easily. My focus was on creating a visually appealing user experience, gamifying competitions with the implementation of a virtual currency, providing a sense of community in the form of a Teams functionality and presenting the opportunity to communicate through a messaging system. To accomplish that, I leveraged the power of Object Oriented Programming to control & transform data, utilized an Object Relational Mapping methodology and made use of `SQL` to communicate with a `Postgres` database.
+FitPursuit is a fitness app powered by Strava allowing users to join teams and compete with others for prizes while tracking their fitness activities and progress towards their goals. This is my capstone project and the culmination of my time at the Flatiron School. It took 6 weeks to go through the whole software development lifecycle. I faced and overcame numerous challenges - oAuth, implementing cutting edge libraries & frameworks still in beta, implementing a cron job, dockerizing and deploying a container to AWS.
+
+As an avid Strava user myself, my idea was to comprise a database of personal, live data that can be synced easily. My focus was on creating a visually appealing user experience, gamifying competitions with the implementation of a virtual currency, providing a sense of community in the form of a Teams functionality and presenting the opportunity to communicate through a messaging system. To accomplish that, I leveraged the power of Object Oriented Programming to control & transform data, utilized an Object Relational Mapping methodology and made use of `SQL` to communicate with a `Postgres` database.
 
 Here is a diagram of the relationships established between the tables for this project:
 
