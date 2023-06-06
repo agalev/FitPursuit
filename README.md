@@ -29,7 +29,7 @@ The application utilizes the publicly available [`Strava API`](https://developer
 
 # <img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="25"> User Stories
 
-If you'd like to follow along, visit the following url to access the live application ~> https://fit-pursuit.vercel.app
+### If you'd like to follow along, visit the following url to access the live application ~> https://fit-pursuit.vercel.app
 
 ❖ Upon visiting the front page, users are greeted with a brief explanation of what `FitPursuit` is, a mission statement and the purpose of the application.
 
@@ -92,9 +92,9 @@ If you'd like to follow along, visit the following url to access the live applic
 
 ❖ At any point users can send a feedback/suggestions/issues to the developers using the `Feedback Form` located in the footer of the application.
 
-## How To Run The App 
+# <img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="25"> How To Run The App 
 
-You're welcome to explore the app through `Github` or fork/clone it to test yourself. Below are the steps for running the app on your local machine:
+### You're welcome to explore the app through `Github` or fork/clone it to test yourself. Below are the steps for running the app on your local machine:
 
 ❖ Before you start, make sure you obtain your own [`Strava API Key`](https://developers.strava.com)
 
