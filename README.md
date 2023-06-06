@@ -42,7 +42,6 @@ If you'd like to follow along, visit the following url to access the live applic
 ❖ If a user chooses to connect using their Strava credentials, they are routed to the Strava website to authenticate and give permissions to FitPursuit to access their data. Upon agreement, the user is routed back to the FitPursuit application and an action is dispatched to the backend, which logs the user in, if an account matching their `strava_id` is present in the database, or otherwise creates a new account using their Strava information. 
 
 ❖ Upon authentication, an action is dispatched which:
-
 - Logs a backend session with the user. This session persists through manual page refresh.
 - If the user used the Strava button, it also logs a session with Strava
 - Updates the global state to an authenticated state
@@ -52,7 +51,6 @@ If you'd like to follow along, visit the following url to access the live applic
 ❖ A bubble is present next to the `Messages` nav link where a number indicates new, unread messages.
 
 ❖ After the user is authenticated, they are routed to `/dashboard` which is the richest page. Users can:
-
 - View and edit Profile details.
 - Connect to Strava if they haven't yet.
 - Sync activities from Strava.
@@ -69,30 +67,28 @@ If you'd like to follow along, visit the following url to access the live applic
 ❖ A Search bar is also provided to filter entries. The search bar sifts through all the fields, which makes it a very powerful tool. For example, users can search for other users from "San Francisco". At the moment, the search bar is only available for the `Show Users` option.
 
 ❖ Upon navigating to the `Teams` page, a user can:
-
 - View a list of cards of all the teams. Information includes: Avatar, Name, Primary Activity, Leader, Members, Wins and Stats.
 - If the user doesn't belong to a team, they can create a team, or ask a team's leader to join using a button below each team's card.
 
 ❖ Upon navigating to the `Competitions` page, a user can:
-
 - View a list of cards of all the competitions. Information includes: Name, Type(solo/team), Activity, Prize Pool, Organizer, Objective(Currently only Distance), Starting and Ending date.
 - If the user is eligible, they can decide to join competition, or view details with buttons provided at the bottom of each card.
 - Upon navigating to the detailed view using the 'View Details' button, a modal pops up with additional information about the competition.
 - View a list of competition rules and a form at the top of the page. Users can use the provided form to register a new competition.
 
 ❖ Upon navigating to the `Messages` page, a user can:
-
 - Browse all users. There's a search bar provided for convenience.
 - View Team Chat if the user belongs to a team.
 - View a list of active conversations at the bottom of the 'Users' column. When a conversation with unread messages is selected, an action is dispatched to the backend marking unread messages as read.
 - Click a user/team chat from the left column, which will select the user/team chat, bring an ongoing conversation, if any, and allow the user to send messages.
 
 ❖ Upon selecting the `Logout` option from the navbar, an action is dispatched which:
-
 - Clears the backend session with the user
 - Clears the session with Strava
 - Updates the global state to an unauthenticated state
 - Navigates the user to the homepage
+
+❖ At any point users can send a feedback/suggestions/issues to the developers using the `Feedback Form` located in the footer of the application.
 
 ## How To Run The App 
 
@@ -100,16 +96,42 @@ You're welcome to explore the app through `Github` or fork/clone it to test your
 
 ❖ Before you start, make sure you obtain your own [`Strava API Key`](https://developers.strava.com)
 
+❖ Navigate to https://www.strava.com/settings/api and make a record of your Client ID and Client Secret. You will need these to access the Strava API later.
+
 ❖ Clone/fork the repo. This is a monorepo, containing the `client` and `server` applications.
 
 ### For `client`:
 
-❖ After you've done so, make sure you are running [`Python 3.11`](https://www.python.org/downloads/release/python-3110/)
+❖ Navigate to the `client` folder where the `package.json` file is located.
 
-❖ Navigate to the Root folder where the `Pipfile` file is located.
+❖ Run `npm install` which installs the necessary dependencies.
+ 
+❖ Create a `.env.local` file which contains environment variables. The necessary env variables for the frontend applications are:
+- NEXT_PUBLIC_STRAVA_CLIENT_ID='*YOUR STRAVA API CLIENT ID*'
+- NEXT_PUBLIC_STRAVA_CLIENT_SECRET='*YOUR STRAVA API CLIENT SECRET*'
+- NEXTAUTH_URL=http://localhost:3000/auth Note: Change port if you decide to run the application on a different port.
+- NEXTAUTH_SECRET='*Generate your own random string*'
+
+❖ Finally, run `npm run dev` to start the application and navigate to http://localhost:3000
+ 
+### For `server`:
+
+❖ Make sure you are running [`Python 3.11`](https://www.python.org/downloads/release/python-3110/)
+
+❖ Navigate to the `server` folder where the `Pipfile` file is located.
+
+❖ Create a `.env` file which contains environment variables. The necessary env variables for the backend applications are:
+- SECRET_KEY=*Generate your own random string with `python -c 'import os; print(os.urandom(16))'`*
+- DATABASE_URI=*Link to your postgres db. You can use SQLite alternatively*
+- MAIL_USERNAME=*E-mail address used for the feedback form*
+- MAIL_PASSWORD=*Password associated with email adress*
 
 ❖ Run `pipenv install` then enter the shell with `pipenv shell`
 
-❖ Type `python main.py` to start the application.
+❖ Run `flask db init` `flask db revision --autogenerate -m 'create tables'` `flask db upgrade` to create the tables in the database.
+
+❖ Run `python seed.py` to execute the seeding script which populates the database with some dummy data.
+
+❖ Finally, run `python app.py` to start the application.
 
 ***Please reach out if you have suggestions, run into hurdles or have questions regarding the setup.***
