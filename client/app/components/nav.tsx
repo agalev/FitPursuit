@@ -32,7 +32,7 @@ export default function Nav() {
 			method: 'POST'
 		})
 			.then(() => global.dispatch({ type: 'LOGOUT' }))
-			.finally(() => {
+			.then(() => {
 				signOut({ callbackUrl: '/' })
 			})
 	}
