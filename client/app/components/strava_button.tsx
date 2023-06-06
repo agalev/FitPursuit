@@ -11,9 +11,7 @@ export default function StravaButton() {
 				backgroundColor: '#FC4C02'
 			}}
 			onClick={() => {
-				signIn('strava', {
-					callbackUrl: `https://fit-pursuit.vercel.app/dashboard`
-				})
+				signIn('strava')
 			}}
 		>
 			<svg
