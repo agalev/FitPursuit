@@ -7,7 +7,7 @@ const handler = NextAuth({
 			clientId: process.env.STRAVA_CLIENT_ID,
 			clientSecret: process.env.STRAVA_CLIENT_SECRET,
 			authorization:
-				'https://www.strava.com/oauth/authorize?approval_prompt=force&scope=activity:read_all,profile:read_all'
+				'https://www.strava.com/oauth/authorize?redirect_uri=https://fit-pursuit.vercel.app&approval_prompt=force&scope=activity:read_all,profile:read_all'
 		})
 	],
 	callbacks: {
