@@ -41,7 +41,7 @@ export default function Messages() {
 		}
 		async function init() {
 			const te = await import('tw-elements')
-			await te.initTE({ Collapse: te.Collapse })
+			await te.initTE({ Ripple: te.Ripple, Input: te.Input })
 		}
 		init()
 	}, [selectedUser, global.state.profile.team])
