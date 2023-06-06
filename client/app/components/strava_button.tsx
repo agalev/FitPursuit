@@ -11,7 +11,9 @@ export default function StravaButton() {
 				backgroundColor: '#FC4C02'
 			}}
 			onClick={() => {
-				signIn('strava')
+				signIn('strava', {
+					callbackUrl: `${window.location.origin}/dashboard`
+				})
 			}}
 		>
 			<svg
