@@ -11,13 +11,13 @@ const handler = NextAuth({
 		})
 	],
 	callbacks: {
-		// async redirect({ url, baseUrl }) {
-		// 	// Allows relative callback URLs
-		// 	if (url.startsWith('/')) return `${baseUrl}${url}`
-		// 	// Allows callback URLs on the same origin
-		// 	else if (new URL(url).origin === baseUrl) return url
-		// 	return baseUrl
-		// },
+		async redirect({ url, baseUrl }) {
+			// Allows relative callback URLs
+			if (url.startsWith('/')) return `${baseUrl}${url}`
+			// Allows callback URLs on the same origin
+			else if (new URL(url).origin === baseUrl) return url
+			return baseUrl
+		},
 		async jwt({ token, account }) {
 			// Persist the OAuth access_token to the token right after signin
 			if (account) {
