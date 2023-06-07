@@ -191,7 +191,7 @@ The application utilizes the publicly available [`Strava API`](https://developer
 - SECRET_KEY=*Generate your own random string with `python -c 'import os; print(os.urandom(16))'`*
 - DATABASE_URI=*Link to your postgres db. You can use SQLite alternatively*
 - MAIL_USERNAME=*E-mail address used for the feedback form*
-- MAIL_PASSWORD=*Password associated with email adress*
+- MAIL_PASSWORD=*Password associated with email address*
 
 ❖ Run `pipenv install` then enter the shell with `pipenv shell`
 
