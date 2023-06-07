@@ -126,6 +126,10 @@ The application utilizes the publicly available [`Strava API`](https://developer
 *Competitions Page*
 <img width="1432" alt="Screenshot 2023-06-07 at 10 47 36 AM" src="https://github.com/agalev/FitPursuit/assets/17399666/fa97061a-eda3-4fa1-a9fb-b48dddc1f487">
 
+*View Details Modal*
+
+<img width="458" alt="Screenshot 2023-06-07 at 12 09 42 PM" src="https://github.com/agalev/FitPursuit/assets/17399666/c8c65385-5f86-4d22-9784-76d9df2357a9">
+
 ❖ Upon navigating to the `Messages` page, a user can:
 - Browse all users. There's a search bar provided for convenience
 - View Team Chat if the user belongs to a team
@@ -145,7 +149,7 @@ The application utilizes the publicly available [`Strava API`](https://developer
 
 *Feedback Form*
 
-<img width="730" alt="Screenshot 2023-06-07 at 11 51 44 AM" src="https://github.com/agalev/FitPursuit/assets/17399666/2aedc43c-9fbc-4b84-824d-654bf07a997d">
+<img width="729" alt="Screenshot 2023-06-07 at 11 51 56 AM" src="https://github.com/agalev/FitPursuit/assets/17399666/1caa38ed-e442-4e95-bc45-0060746cc1eb">
 
 # <img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="25"> How To Run The App 
 
@@ -155,7 +159,7 @@ The application utilizes the publicly available [`Strava API`](https://developer
 
 ❖ Navigate to https://www.strava.com/settings/api and make a record of your Client ID and Client Secret. You will need these to access the Strava API later
 
-❖ Clone/fork the repo. This is a monorepo, containing the `client` and `server` applications
+❖ Clone/fork the repo. This is a monorepo, containing both the `client` and `server` applications
 
 ### For `client`:
 
