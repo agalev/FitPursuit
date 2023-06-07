@@ -136,4 +136,6 @@ The application utilizes the publicly available [`Strava API`](https://developer
 
 ❖ Finally, run `python app.py` to start the application.
 
+***Logo design by Marinela Angelova***
+
 ***Please reach out if you have suggestions, run into hurdles or have questions regarding the setup.***
