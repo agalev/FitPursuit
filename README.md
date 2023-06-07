@@ -204,3 +204,4 @@ The application utilizes the publicly available [`Strava API`](https://developer
 ***Logo design by Marinela Angelova***
 
 ***Please reach out if you have suggestions, run into hurdles or have questions regarding the setup.***
+[![](https://visitcount.itsvg.in/api?id=agalev&label=Repo%20Views&color=2&icon=5&pretty=false)](https://visitcount.itsvg.in)
