@@ -1,5 +1,4 @@
 ![nav_logo_orange](https://github.com/agalev/FitPursuit/assets/17399666/26c1bb41-b20a-47ed-84fe-1ed6b6c303c4)
-### Join teams and compete with others for prizes!
 ### Live App ~> https://fit-pursuit.vercel.app
 ### Video Walkthrough ~> https://www.loom.com/share/a3bfa349f5d8425abe1762a9bf9188a8
 
