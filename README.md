@@ -1,7 +1,7 @@
 ![nav_logo_orange](https://github.com/agalev/FitPursuit/assets/17399666/26c1bb41-b20a-47ed-84fe-1ed6b6c303c4)
 ### Join teams and compete with others for prizes!
 ### Check out the live app ~> https://fit-pursuit.vercel.app
-### Check out my demo ~> https://www.loom.com/share/a3bfa349f5d8425abe1762a9bf9188a8
+### Check out the video walkthrough ~> https://www.loom.com/share/a3bfa349f5d8425abe1762a9bf9188a8
 
 # <img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="25"> Tech Stack & Dependencies
 ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
