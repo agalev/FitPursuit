@@ -5,7 +5,7 @@
 # <img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="25"> Tech Stack & Dependencies
 **`Next.js` `Tailwind` `Python3` `Flask` `SQLAlchemy` `Alembic` `Postgres` `Pandas` `Docker`**
 
-FitPursuit is a fitness app powered by Strava allowing users to join teams and compete with others for prizes while tracking their fitness activities and progress towards their goals. This is my capstone project and the culmination of my time at Flatiron School. I devoted 6 weeks to go through each step of the software development lifecycle. I faced and overcame numerous challenges - oAuth, implementing encryption, sessions, global state, cutting edge libraries & frameworks still in beta, cron jobs, dockerizing and deploying a container to AWS to name a few.
+FitPursuit is a fitness app powered by Strava allowing users to join teams and compete with others for prizes while tracking their fitness activities and progress towards their goals. This is my capstone project and the culmination of my time at Flatiron School. I devoted 6 weeks to implement each step of the software development lifecycle. I faced and overcame numerous challenges while incorporating features like oAuth, encryption, sessions, global state, dark/light automatic theme switching, cutting edge libraries & frameworks still in beta, cron jobs, dockerizing and deploying a container to AWS to name a few.
 
 As an avid Strava user myself, my idea was to comprise a database of personal, live data that can be easily synced and accessed. My focus was on creating a visually appealing user experience, gamifying competitions with the implementation of a virtual currency, providing a sense of community in the form of a Teams functionality and presenting the opportunity to communicate through a messaging system. To accomplish that, I leveraged responsive design, accessibility fundamentals, the power of Object Oriented Programming to control & transform data, utilized an Object Relational Mapping methodology and made use of `SQL` to communicate with a `Postgres` database.
 
@@ -13,17 +13,17 @@ Here is a diagram of the relationships established between the tables for this p
 
 ![FitPursuit Database table relations](https://github.com/agalev/FitPursuit/assets/17399666/8eb933ad-3411-4e42-845c-77dc96661871)
 
-The application utilizes the publicly available [`Strava API`](https://developers.strava.com) for fetching `profile` and `activities` data into the application. The data is then stored remotely in a `Postgres` database instance hosted on AWS RDS. `SQL` queries and commands are handled through the powerful ORM module `SQLAlchemy`. Version control on DB was implemented through `Alembic`. With the help of `Pandas` module, I then used the data to aggregate some additional stats that are not part of the original Strava app.
+The application utilizes the publicly available [`Strava API`](https://developers.strava.com) for fetching `profile` and `activities` data into the application. The data is then stored remotely in a `Postgres` database instance hosted on AWS RDS. `SQL` queries and commands are handled through the powerful ORM module `SQLAlchemy`. Version control on DB was implemented through `Alembic`. With the help of `Pandas` module, I then used the data to aggregate some additional stats that are not part of the original Strava application.
 
 ### Future goals include:
-
-❖ Implement activities data from different sources: Apple's HealthKit API and Android's equivalent
-
-❖ Develop a mobile application with `React Native`
 
 ❖ Incorporate websockets for the `Messenger` page
 
 ❖ Implement a global chat
+
+❖ Implement activities data from different sources: Apple's HealthKit API and Android's equivalent
+
+❖ Develop a mobile application with `React Native`
 
 ❖ Rework backend with a different framework (Python+Django or Java+Spring Boot)
 
@@ -33,15 +33,38 @@ The application utilizes the publicly available [`Strava API`](https://developer
 
 ❖ Upon visiting the front page, users are greeted with a brief explanation of what `FitPursuit` is, a mission statement and the purpose of the application
 
-❖ Unauthenticated users can navigate to either `Login` or `Signup` pages by clicking nav links on the navbar at the top. Alternatively, a Call To Action button is also present at the front page that routes to `/login`
+*Front Page(unauthenticated)*
+![Front Page](https://github.com/agalev/FitPursuit/assets/17399666/29f044ed-a516-4415-9595-9aebd65e3b8b)
+
+❖ Unauthenticated users can navigate to either `Login` or `Signup` pages by clicking nav links on the nav bar at the top. Alternatively, a Call To Action button is also present at the front page that routes to `/login`
 
 ❖ On the `Login` page users are presented with the option to connect to the application using their Strava account, or enter an email/password to login
 
+*Login Page*
+![Login Page](https://github.com/agalev/FitPursuit/assets/17399666/9381b2ce-d2cb-495d-889d-7d2c081f2b19)
+
 ❖ On the `Signup` page users are once again prompted to connect to the application using their Strava account, or alternatively fill a form with their information. When submitted, the data is sent to the backend, an account is created with the provided data in the database and the user is logged in
+
+*Signup Page*
+![Signup Page](https://github.com/agalev/FitPursuit/assets/17399666/be3e6b39-c4fa-4290-9b60-b69d23965206)
 
 ❖ Validation of inputs is presented in a toast format at the bottom right corner, signaling errors in user's input
 
-❖ If a user chooses to connect using their Strava credentials, they are routed to the Strava website to authenticate and give permissions to FitPursuit to access their data. Upon agreement, the user is routed back to the FitPursuit application and an action is dispatched to the backend, which logs the user in if an account matching their `strava_id` is present in the database. Otherwise, the application creates a new account using their Strava information
+*Toast Error Notification*
+
+![Toast](https://github.com/agalev/FitPursuit/assets/17399666/66e43460-8362-4886-b50b-710cb3be519f)
+
+❖ If a user chooses to connect using their Strava credentials, they are routed to the Strava website to authenticate and give permissions to FitPursuit to access their data.
+
+*Strava oAuth*
+
+![Strava](https://github.com/agalev/FitPursuit/assets/17399666/19a7405f-a09f-48b3-8242-e50ec33d780a)
+
+❖ Upon agreement, the user is routed back to the FitPursuit application and an action is dispatched to the backend, which logs the user in if an account matching their `strava_id` is present in the database. Otherwise, the application creates a new account using their Strava information
+
+*Toast Success Notification*
+
+![Toast](https://github.com/agalev/FitPursuit/assets/17399666/5a38cf66-7ace-4d56-9a23-70af810bc3a2)
 
 ❖ Upon authentication, an action is dispatched which:
 - Creates a backend session with the user. This session persists through manual page refresh
@@ -51,6 +74,10 @@ The application utilizes the publicly available [`Strava API`](https://developer
 - Navigates the user to the `Dashboard`
 
 ❖ A bubble is present next to the `Messages` nav link where a number indicates new, unread messages
+
+*Unread Message Count Bubble*
+
+![Message Bubble](https://github.com/agalev/FitPursuit/assets/17399666/ff0e6136-3178-461f-b31d-a71eddd223c4)
 
 ❖ After the user is authenticated, they are routed to `/dashboard` which is the richest page. Users can:
 - View and edit Profile details
@@ -62,7 +89,20 @@ The application utilizes the publicly available [`Strava API`](https://developer
 - View a dynamic chart that aggregates stats from all their activities and groups them by `activity_type`. Options include: `distance`, `moving_time`, `total_elevation_gain`, `average_speed`, `max_speed`, `average_heartrate`, `max_heartrate`
 - Show an interactive table with a list of all the activities belonging to the user. Activities can be sorted in ascending/descending order by clicking the desired table header
 
+*Dashboard Page*
+![Dashboard Page](https://github.com/agalev/FitPursuit/assets/17399666/f33fdfff-126b-41b5-9dc5-2f7494399e2e)
+
+*Dynamic Chart*
+![Dynamic Chart](https://github.com/agalev/FitPursuit/assets/17399666/1174fabd-3fd1-4309-9e49-6bce79d94d11)
+
+*Activities Table*
+<img width="1440" alt="Activities Table" src="https://github.com/agalev/FitPursuit/assets/17399666/ba8808ac-a2c2-41f5-85e5-8f8b7a4ace40">
+
+
 ❖ The `Home` page is now transformed and users are prompted to 'Browse the Ranks'. There's a form in a radio format with 4 choices to choose from: `Show Users`, `Show Teams`, `Show Competitions`, `Show Activities`
+
+*Home Page(authenticated)
+<img width="1437" alt="Home Page" src="https://github.com/agalev/FitPursuit/assets/17399666/3b150ac2-b2ed-48d7-8c1c-c999e0629c76">
 
 ❖ Upon navigating through the different tabs, the table below updates with the corresponding data based on the choice the user picked. This table has an identical format of the table used in the `Dashboard` page, which allows for sorting by field
 
@@ -73,13 +113,18 @@ The application utilizes the publicly available [`Strava API`](https://developer
 - *If the user doesn't belong to a team, they can create a new team*
 - *If the user doesn't belong to a team, they can ask a team's leader to join an existing one using a button below each team's card*
 
-❖ Upon navigating to the `Competitions` page, a user can:
+*Teams Page*
+<img width="1437" alt="Screenshot 2023-06-07 at 10 46 38 AM" src="https://github.com/agalev/FitPursuit/assets/17399666/088c224c-5580-4ed5-9478-8f7d70123c5a">
 
+❖ Upon navigating to the `Competitions` page, a user can:
 - View a list of competition rules and a form at the top of the page. Users can use the provided form to register a new competition
 - View a list of cards of all the competitions. Information includes: `Name`, `Type(solo/team)`, `Activity Type`, `Prize Pool`, `Organizer`, `Objective(Currently only Distance)`, `Starting date` and `Ending date`
 - *If the user is eligible, they can decide to join competition by engaging with a button provided at the bottom of each card*
 - View specific competition details by clicking a `View Details` button provided at the bottom of each card
 - Upon navigating to the detailed view using the `View Details` button, a modal pops up with additional information about the competition
+
+*Competitions Page*
+<img width="1432" alt="Screenshot 2023-06-07 at 10 47 36 AM" src="https://github.com/agalev/FitPursuit/assets/17399666/fa97061a-eda3-4fa1-a9fb-b48dddc1f487">
 
 ❖ Upon navigating to the `Messages` page, a user can:
 - Browse all users. There's a search bar provided for convenience
@@ -87,13 +132,20 @@ The application utilizes the publicly available [`Strava API`](https://developer
 - View a list of active conversations at the bottom of the 'Users' column. When a conversation with unread messages is selected, an action is dispatched to the backend marking unread messages as read
 - Click a user/team chat from the left column, which will select the user/team chat, bring an ongoing conversation, if any, and allow the user to send messages
 
+*Messages Page*
+<img width="1436" alt="Screenshot 2023-06-07 at 10 53 11 AM" src="https://github.com/agalev/FitPursuit/assets/17399666/15f9bf24-4050-4277-af7e-08d409f30e2f">
+
 ❖ Upon selecting the `Logout` option from the nav bar, an action is dispatched which:
 - Clears the backend session with the user
 - Clears the session with Strava, if any
 - Updates the global state to an unauthenticated state
 - Navigates the user to `Home`
 
-❖ At any point, the user can navigate to the `Feedback Form` located in the footer of the application and can send a feedback/suggestions/issues to the developers 
+❖ At any point, the user can navigate to the `Feedback Form` located in the footer of the application and can send a feedback/suggestions/issues to the developers
+
+*Feedback Form*
+
+<img width="730" alt="Screenshot 2023-06-07 at 11 51 44 AM" src="https://github.com/agalev/FitPursuit/assets/17399666/2aedc43c-9fbc-4b84-824d-654bf07a997d">
 
 # <img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="25"> How To Run The App 
 
