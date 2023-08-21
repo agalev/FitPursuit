@@ -2,6 +2,8 @@
 ### Live App ~> https://fit-pursuit.vercel.app
 ### Video Walkthrough ~> https://www.loom.com/share/a3bfa349f5d8425abe1762a9bf9188a8
 
+![ezgif com-video-to-gif](https://github.com/agalev/FitPursuit/assets/17399666/b0e13ba4-fafd-4f94-83ef-a60d6320034f)
+
 # <img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="25"> Tech Stack & Dependencies
 ![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
