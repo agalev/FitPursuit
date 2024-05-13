@@ -13,7 +13,7 @@ COPY requirements.txt /app
 COPY . /app
 
 # Install dependencies
-RUN apk update && apk add --no-cache build-base musl-dev
+RUN apk update && apk add --no-cache build-base musl-dev curl
 RUN pip cache purge
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip3 install -r requirements.txt
