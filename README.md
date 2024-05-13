@@ -1,5 +1,5 @@
 ![nav_logo_orange](https://github.com/agalev/FitPursuit/assets/17399666/26c1bb41-b20a-47ed-84fe-1ed6b6c303c4)
-### Live App ~> https://fit-pursuit.vercel.app
+### Live App ~> https://nss0wkc.ironforgesoftware.com
 ### Video Walkthrough ~> https://www.loom.com/share/a3bfa349f5d8425abe1762a9bf9188a8
 
 ![ezgif com-video-to-gif](https://github.com/agalev/FitPursuit/assets/17399666/b0e13ba4-fafd-4f94-83ef-a60d6320034f)
@@ -37,7 +37,7 @@ The application utilizes the publicly available [`Strava API`](https://developer
 
 # <img src="https://media2.giphy.com/media/QssGEmpkyEOhBCb7e1/giphy.gif?cid=ecf05e47a0n3gi1bfqntqmob8g9aid1oyj2wr3ds3mg700bl&rid=giphy.gif" width ="25"> User Stories
 
-### You are welcome to follow along with the user stories. Visit the following url to access the live application ~> https://fit-pursuit.vercel.app
+### You are welcome to follow along with the user stories. Visit the following url to access the live application ~> https://nss0wkc.ironforgesoftware.com
 
 ❖ Upon visiting the front page, users are greeted with a brief explanation of what `FitPursuit` is, a mission statement and the purpose of the application
 

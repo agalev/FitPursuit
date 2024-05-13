@@ -7,7 +7,7 @@ const nextConfig = {
 		return [
 			{
 				source: '/api/:path*',
-				destination: 'https://flask-service.2c8kjrairb3la.us-west-2.cs.amazonlightsail.com/api/:path*' // Proxy to Backend
+				destination: 'https://v0ww4ks.ironforgesoftware.com/api/:path*' // Proxy to Backend
 			}
 		]
 	}
