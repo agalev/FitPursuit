@@ -12,7 +12,7 @@ from models import User, Activity, Team, Message, Competition, CompetitionHandle
 
 @app.before_request
 def firewall():
-    if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup', '/api/auth']:
+    if 'user_id' not in session and request.endpoint not in ['/api/login', '/api/signup', '/api/auth', '/api/healthcheck']:
         return {'error': 'Not logged in.'}, 401
 
 class Auth(Resource):
@@ -657,6 +657,11 @@ class Feedback(Resource):
         except Exception as e:
             print(str(e))
             return {'error': str(e)}, 400
+        
+# Healthcheck
+class HealthCheck(Resource):
+    def get(self):
+        return {'message': 'Healthy'}, 200
 
 # Cron job running every Sunday at 6:00am to start/end competitions and disburse awards.
 # Successfully allocating award monies to users and teams. In case of a team competition, the award is split evenly among team members.
@@ -740,6 +745,7 @@ api.add_resource(CompetitionsHandler, '/api/competitions', endpoint='/api/compet
 api.add_resource(GetCompetition, '/api/competitions/<int:id>', endpoint='/api/competitions/<int:id>')
 api.add_resource(JoinCompetition, '/api/competitions/<string:param>', endpoint='/api/competitions/<string:param>')
 api.add_resource(Feedback, '/api/feedback', endpoint='/api/feedback')
+api.add_resource(HealthCheck, '/api/healthcheck', endpoint='/api/healthcheck')
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
