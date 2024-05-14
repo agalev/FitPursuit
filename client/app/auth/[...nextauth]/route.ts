@@ -21,8 +21,6 @@ const handler = NextAuth({
 				token.refreshToken = account.refresh_token
 				token.profile = account.athlete
 			}
-			console.log('jwt', token)
-			console.log('account', account)
 			return token
 		},
 		async session({ session, token }: any) {
@@ -31,7 +29,6 @@ const handler = NextAuth({
 			}
 			session.accessToken = token.accessToken
 			session.refreshToken = token.refreshToken
-			console.log('session', session)
 			return session
 		}
 	}
