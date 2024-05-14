@@ -1,8 +1,8 @@
-"""cr
+"""create tables
 
-Revision ID: a9bc54ffd86f
+Revision ID: c411e7d7b6a1
 Revises: 
-Create Date: 2023-05-31 12:24:05.355491
+Create Date: 2024-05-14 11:59:30.931482
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'a9bc54ffd86f'
+revision = 'c411e7d7b6a1'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,6 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('image', sa.String(length=200), nullable=True),
+    sa.Column('leader_id', sa.Integer(), nullable=True),
     sa.Column('activity_type', sa.String(length=20), nullable=True),
     sa.Column('members', sa.Integer(), nullable=True),
     sa.Column('score', sa.Integer(), nullable=True),
@@ -32,6 +33,7 @@ def upgrade():
     sa.Column('max_speed', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['leader_id'], ['users.id'], name=op.f('fk_teams_leader_id_users'), use_alter=True),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_teams')),
     sa.UniqueConstraint('name', name=op.f('uq_teams_name'))
     )
@@ -52,6 +54,7 @@ def upgrade():
     sa.Column('weight', sa.Float(), nullable=True),
     sa.Column('wins', sa.Integer(), nullable=True),
     sa.Column('FPcoins', sa.Integer(), nullable=True),
+    sa.Column('team_id', sa.Integer(), nullable=True),
     sa.Column('last_online', sa.DateTime(), nullable=True),
     sa.Column('strava_connected', sa.Boolean(), nullable=True),
     sa.Column('strava_access_token', sa.String(), nullable=True),
@@ -59,6 +62,7 @@ def upgrade():
     sa.Column('strava_token_expiry', sa.DateTime(), nullable=True),
     sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['team_id'], ['teams.id'], name=op.f('fk_users_team_id_teams')),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_users')),
     sa.UniqueConstraint('email', name=op.f('uq_users_email')),
     sa.UniqueConstraint('strava_id', name=op.f('uq_users_strava_id'))
@@ -66,7 +70,7 @@ def upgrade():
     op.create_table('activities',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('qualified', sa.Boolean(), nullable=True),
-    sa.Column('strava_id', sa.Integer(), nullable=True),
+    sa.Column('strava_id', sa.BigInteger(), nullable=True),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('activity_type', sa.String(), nullable=True),
     sa.Column('distance', sa.Float(), nullable=True),
